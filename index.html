@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clínica Altavida | Gestión de citas médicas</title>
+  <meta name="description" content="Consulta las especialidades de Clínica Altavida y solicita tu cita médica en línea.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="assets/css/variables.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/componentes.css">
+  <link rel="stylesheet" href="assets/css/publico.css">
+</head>
+<body>
+
+  <header class="encabezado">
+    <div class="contenedor">
+      <a href="index.html" class="marca">Clínica Altavida</a>
+
+      <nav class="nav-principal" aria-label="Navegación principal">
+        <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="menu-principal">
+          Menú
+        </button>
+        <ul class="nav-principal__enlaces" id="menu-principal">
+          <li><a href="index.html">Inicio</a></li>
+          <li><a href="especialidades.html">Especialidades</a></li>
+          <li><a href="login.html">Ingresar</a></li>
+          <li><a href="registro.html">Registrarme</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- ============ Hero ============ -->
+    <section class="contenedor hero">
+      <div>
+        <h1 class="hero__titulo">Tu cita médica, organizada de principio a fin</h1>
+        <p>
+          Clínica Altavida centraliza la agenda de sus especialidades para que
+          puedas revisar la disponibilidad real de los médicos y solicitar tu
+          cita sin llamadas ni mensajes cruzados.
+        </p>
+        <div class="hero__acciones">
+          <a href="registro.html" class="boton boton--primario">Solicitar una cita</a>
+          <a href="especialidades.html" class="boton boton--contorno">Ver especialidades</a>
+        </div>
+      </div>
+
+      <!-- Ilustración abstracta de línea: no representa personas ni datos reales -->
+      <svg class="hero__ilustracion" viewBox="0 0 400 320" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Ilustración abstracta que combina una hoja y una cruz médica">
+        <circle cx="200" cy="160" r="140" fill="none" stroke="#6B8F71" stroke-width="1.5"/>
+        <path d="M200 60 C 260 100, 260 220, 200 260 C 140 220, 140 100, 200 60 Z" fill="none" stroke="#1B3B36" stroke-width="2"/>
+        <line x1="200" y1="130" x2="200" y2="190" stroke="#B5652D" stroke-width="6" stroke-linecap="round"/>
+        <line x1="170" y1="160" x2="230" y2="160" stroke="#B5652D" stroke-width="6" stroke-linecap="round"/>
+      </svg>
+    </section>
+
+    <!-- ============ Sobre la clínica ============ -->
+    <section class="contenedor seccion">
+      <h2>Sobre Clínica Altavida</h2>
+      <p>
+        <!-- Marcador de contenido: reemplazar con la descripción institucional real de la clínica -->
+        [Descripción institucional pendiente: historia, misión y cobertura de Clínica Altavida.]
+      </p>
+    </section>
+
+    <!-- ============ Flujo de una cita (secuencia real definida en el proyecto) ============ -->
+    <section class="contenedor seccion">
+      <h2>Así funciona la solicitud de tu cita</h2>
+      <ol class="pasos">
+        <li class="paso">
+          <span class="paso__numero">1</span>
+          <h3>Elige especialidad y médico</h3>
+          <p>Consulta la disponibilidad real de cada especialidad antes de continuar.</p>
+        </li>
+        <li class="paso">
+          <span class="paso__numero">2</span>
+          <h3>Selecciona fecha y horario</h3>
+          <p>El sistema solo muestra horarios que aún no han sido tomados.</p>
+        </li>
+        <li class="paso">
+          <span class="paso__numero">3</span>
+          <h3>Confirma tus datos</h3>
+          <p>Tu cita queda registrada con estado pendiente hasta ser confirmada.</p>
+        </li>
+      </ol>
+    </section>
+
+    <!-- ============ Acceso a la aplicación clínica interna ============ -->
+    <section class="contenedor seccion">
+      <h2>¿Eres parte del personal de la clínica?</h2>
+      <p>Ingresa a la aplicación clínica interna para gestionar la agenda médica.</p>
+      <a href="login.html" class="boton boton--contorno">Ingresar a la aplicación clínica</a>
+    </section>
+
+  </main>
+
+  <footer class="pie-pagina">
+    <div class="contenedor">
+      <span>&copy; 2026 Clínica Altavida. Proyecto académico con fines demostrativos.</span>
+      <nav aria-label="Enlaces del pie de página">
+        <a href="especialidades.html">Especialidades</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script src="assets/js/navegacion.js"></script>
+</body>
+</html>

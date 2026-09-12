@@ -1,0 +1,72 @@
+/* ==========================================================================
+   VARIABLES.CSS
+   Sistema de tokens de diseño de Clínica Altavida.
+   Aquí se centralizan colores, tipografías, espaciados y bordes para que
+   el resto de hojas de estilo solo referencien estas variables y el
+   mantenimiento del diseño se haga en un único lugar.
+   ========================================================================== */
+
+:root {
+  /* -------------------- Paleta de color -------------------- */
+  /* Verde pino: color de marca principal, usado en encabezados y navegación */
+  --color-pino: #1B3B36;
+  --color-pino-oscuro: #122723;
+
+  /* Verde salvia: color secundario, usado en acentos y estados positivos */
+  --color-salvia: #6B8F71;
+  --color-salvia-suave: #DCE6DC;
+
+  /* Hueso cálido: fondo general de las páginas */
+  --color-hueso: #EDE7DC;
+
+  /* Sienna: color de acento para llamadas a la acción (botones primarios) */
+  --color-sienna: #B5652D;
+  --color-sienna-oscuro: #92501F;
+
+  /* Carbón: color principal de texto */
+  --color-carbon: #202422;
+  --color-carbon-suave: #4B534F;
+
+  /* Blanco cálido: superficies (tarjetas, formularios, tablas) */
+  --color-superficie: #FFFDF9;
+
+  /* Bordes y líneas divisorias */
+  --color-borde: #D8D0C0;
+
+  /* Estados de una cita (definidos en el flujo del documento del proyecto) */
+  --color-estado-pendiente: #C99A2E;
+  --color-estado-confirmada: #6B8F71;
+  --color-estado-cancelada: #A34C3F;
+  --color-estado-atendida: #4B6D7A;
+
+  /* -------------------- Tipografía -------------------- */
+  /* Serif editorial para titulares: transmite confianza e identidad */
+  --fuente-titulos: "Newsreader", Georgia, "Times New Roman", serif;
+  /* Sans legible para texto de interfaz, formularios y tablas */
+  --fuente-base: "IBM Plex Sans", "Segoe UI", Arial, sans-serif;
+
+  --tamano-h1: clamp(2rem, 4vw + 1rem, 3.25rem);
+  --tamano-h2: clamp(1.5rem, 2vw + 1rem, 2.25rem);
+  --tamano-h3: 1.25rem;
+  --tamano-texto: 1rem;
+  --tamano-pequeno: 0.875rem;
+
+  --interlineado-titulo: 1.15;
+  --interlineado-texto: 1.6;
+
+  /* -------------------- Espaciados -------------------- */
+  --espacio-xs: 0.5rem;
+  --espacio-sm: 1rem;
+  --espacio-md: 1.5rem;
+  --espacio-lg: 2.5rem;
+  --espacio-xl: 4rem;
+  --espacio-xxl: 6rem;
+
+  /* -------------------- Bordes y sombras -------------------- */
+  --radio-borde: 4px;
+  --ancho-maximo-contenido: 72rem;
+  --ancho-maximo-texto: 40rem;
+
+  /* -------------------- Transiciones -------------------- */
+  --transicion-rapida: 150ms ease;
+}

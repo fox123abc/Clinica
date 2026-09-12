@@ -1,0 +1,93 @@
+/* ==========================================================================
+   BASE.CSS
+   Reinicio de estilos del navegador y reglas tipográficas base.
+   No contiene estilos de componentes ni de layout: solo el punto de
+   partida compartido por todas las páginas.
+   ========================================================================== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: var(--fuente-base);
+  font-size: var(--tamano-texto);
+  line-height: var(--interlineado-texto);
+  color: var(--color-carbon);
+  background-color: var(--color-hueso);
+}
+
+img,
+svg {
+  max-width: 100%;
+  display: block;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--fuente-titulos);
+  line-height: var(--interlineado-titulo);
+  font-weight: 500;
+  margin: 0 0 var(--espacio-sm) 0;
+  color: var(--color-pino);
+}
+
+h1 {
+  font-size: var(--tamano-h1);
+}
+
+h2 {
+  font-size: var(--tamano-h2);
+}
+
+h3 {
+  font-size: var(--tamano-h3);
+}
+
+p {
+  margin: 0 0 var(--espacio-sm) 0;
+  max-width: var(--ancho-maximo-texto);
+}
+
+a {
+  color: var(--color-pino);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+
+a:hover {
+  color: var(--color-sienna);
+}
+
+ul,
+ol {
+  padding-left: 1.25rem;
+}
+
+/* Estado de foco visible para navegación por teclado (accesibilidad) */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid var(--color-sienna);
+  outline-offset: 2px;
+}
+
+/* Respeta la preferencia del usuario de reducir animaciones */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

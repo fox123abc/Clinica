@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mis citas | Clínica Altavida</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../assets/css/variables.css">
+  <link rel="stylesheet" href="../assets/css/base.css">
+  <link rel="stylesheet" href="../assets/css/layout.css">
+  <link rel="stylesheet" href="../assets/css/componentes.css">
+  <link rel="stylesheet" href="../assets/css/privado.css">
+</head>
+<body>
+
+  <div class="franja-sesion">
+    <div class="contenedor">
+      <span>Sesión iniciada como: [Nombre del paciente]</span>
+      <a href="../login.html">Cerrar sesión</a>
+    </div>
+  </div>
+
+  <header class="encabezado">
+    <div class="contenedor">
+      <a href="../index.html" class="marca">Clínica Altavida</a>
+      <nav class="nav-principal" aria-label="Navegación del área de paciente">
+        <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="menu-principal">
+          Menú
+        </button>
+        <ul class="nav-principal__enlaces" id="menu-principal">
+          <li><a href="solicitud-cita.html">Solicitar cita</a></li>
+          <li><a href="mis-citas.html">Mis citas</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="contenedor seccion">
+    <div class="cabecera-panel">
+      <h1>Mis citas</h1>
+      <a href="solicitud-cita.html" class="boton boton--primario">Solicitar nueva cita</a>
+    </div>
+
+    <!-- Filtro visual únicamente: sin lógica de filtrado real todavía -->
+    <div class="barra-filtros">
+      <label for="filtro-estado">
+        Filtrar por estado
+        <select id="filtro-estado" name="filtro-estado">
+          <option value="todas">Todas</option>
+          <option value="pendiente">Pendiente</option>
+          <option value="confirmada">Confirmada</option>
+          <option value="cancelada">Cancelada</option>
+          <option value="atendida">Atendida</option>
+        </select>
+      </label>
+    </div>
+
+    <table class="tabla-datos">
+      <caption>Historial de solicitudes</caption>
+      <thead>
+        <tr>
+          <th scope="col">Especialidad</th>
+          <th scope="col">Médico</th>
+          <th scope="col">Fecha</th>
+          <th scope="col">Horario</th>
+          <th scope="col">Estado</th>
+          <th scope="col">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>[Especialidad de ejemplo]</td>
+          <td>[Médico de ejemplo]</td>
+          <td>[Fecha de ejemplo]</td>
+          <td>[Horario de ejemplo]</td>
+          <td><span class="etiqueta-estado etiqueta-estado--pendiente">Pendiente</span></td>
+          <td>
+            <a href="#">Reprogramar</a> ·
+            <a href="#">Cancelar</a>
+          </td>
+        </tr>
+        <tr>
+          <td>[Especialidad de ejemplo]</td>
+          <td>[Médico de ejemplo]</td>
+          <td>[Fecha de ejemplo]</td>
+          <td>[Horario de ejemplo]</td>
+          <td><span class="etiqueta-estado etiqueta-estado--confirmada">Confirmada</span></td>
+          <td>
+            <a href="#">Reprogramar</a> ·
+            <a href="#">Cancelar</a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p class="campo__ayuda" style="margin-top: var(--espacio-md);">
+      Nota de maquetado: las filas y el filtro son de ejemplo. La consulta
+      real de citas por paciente se conectará cuando se implemente la
+      lógica y el acceso a datos.
+    </p>
+  </main>
+
+  <footer class="pie-pagina">
+    <div class="contenedor">
+      <span>&copy; 2026 Clínica Altavida. Proyecto académico con fines demostrativos.</span>
+    </div>
+  </footer>
+
+  <script src="../assets/js/navegacion.js"></script>
+</body>
+</html>

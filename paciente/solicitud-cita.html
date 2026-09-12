@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Solicitar cita | Clínica Altavida</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../assets/css/variables.css">
+  <link rel="stylesheet" href="../assets/css/base.css">
+  <link rel="stylesheet" href="../assets/css/layout.css">
+  <link rel="stylesheet" href="../assets/css/componentes.css">
+  <link rel="stylesheet" href="../assets/css/privado.css">
+</head>
+<body>
+
+  <!-- Franja que indica que el paciente ya inició sesión (dato de ejemplo, sin lógica real aún) -->
+  <div class="franja-sesion">
+    <div class="contenedor">
+      <span>Sesión iniciada como: [Nombre del paciente]</span>
+      <a href="../login.html">Cerrar sesión</a>
+    </div>
+  </div>
+
+  <header class="encabezado">
+    <div class="contenedor">
+      <a href="../index.html" class="marca">Clínica Altavida</a>
+      <nav class="nav-principal" aria-label="Navegación del área de paciente">
+        <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="menu-principal">
+          Menú
+        </button>
+        <ul class="nav-principal__enlaces" id="menu-principal">
+          <li><a href="solicitud-cita.html">Solicitar cita</a></li>
+          <li><a href="mis-citas.html">Mis citas</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="contenedor seccion">
+    <div class="cabecera-panel">
+      <h1>Solicitar una cita</h1>
+    </div>
+
+    <p>
+      Por favor asegurate de rellenar los campos solicitados con tus respectivos datos correctamente.
+    </p>
+
+    <form class="formulario" action="#" method="post" novalidate>
+
+      <div class="campo campo--obligatorio">
+        <label for="especialidad">Especialidad</label>
+        <select id="especialidad" name="especialidad" required>
+          <option value="" selected disabled>Selecciona una especialidad</option>
+          <option value="especialidad-1">[Especialidad 1]</option>
+          <option value="especialidad-2">[Especialidad 2]</option>
+        </select>
+      </div>
+
+      <div class="campo campo--obligatorio">
+        <label for="medico">Médico</label>
+        <select id="medico" name="medico" required>
+          <option value="" selected disabled>Selecciona un médico</option>
+          <option value="medico-1">[Médico disponible 1]</option>
+          <option value="medico-2">[Médico disponible 2]</option>
+        </select>
+        <p class="campo__ayuda">Las opciones se limitarán según la especialidad seleccionada.</p>
+      </div>
+
+      <div class="campo campo--obligatorio">
+        <label for="fecha">Fecha</label>
+        <input type="date" id="fecha" name="fecha" required>
+      </div>
+
+      <div class="campo campo--obligatorio">
+        <label for="horario">Horario disponible</label>
+        <select id="horario" name="horario" required>
+          <option value="" selected disabled>Selecciona un horario</option>
+          <option value="horario-1">[Horario disponible 1]</option>
+          <option value="horario-2">[Horario disponible 2]</option>
+        </select>
+        <p class="campo__ayuda">Solo se mostrarán los horarios aún no ocupados para el médico elegido.</p>
+      </div>
+
+      <div class="campo">
+        <label for="motivo">Motivo general de la consulta</label>
+        <textarea id="motivo" name="motivo" rows="3"></textarea>
+      </div>
+
+      <button type="submit" class="boton boton--primario boton--ancho-completo">Confirmar solicitud</button>
+    </form>
+
+    <p class="campo__ayuda" style="margin-top: var(--espacio-md);">
+      Nota de maquetado: como aún no hay lógica ni backend, este enlace solo
+      permite ver cómo luciría la pantalla posterior a enviar el formulario:
+      <a href="confirmacion.html">ver ejemplo de confirmación</a>.
+    </p>
+  </main>
+
+  <footer class="pie-pagina">
+    <div class="contenedor">
+      <span>&copy; 2026 Clínica Altavida. Proyecto académico con fines demostrativos.</span>
+    </div>
+  </footer>
+
+  <script src="../assets/js/navegacion.js"></script>
+</body>
+</html>

@@ -1,0 +1,165 @@
+/* ==========================================================================
+   COMPONENTES.CSS
+   Piezas reutilizables de interfaz: botones, formularios, tablas y
+   etiquetas de estado de una cita. Se usan tanto en el sitio público
+   como en el área de paciente.
+   ========================================================================== */
+
+/* -------------------- Botones -------------------- */
+.boton {
+  display: inline-block;
+  font-family: var(--fuente-base);
+  font-size: var(--tamano-texto);
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radio-borde);
+  border: 1px solid transparent;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color var(--transicion-rapida), color var(--transicion-rapida);
+}
+
+.boton--primario {
+  background-color: var(--color-sienna);
+  color: var(--color-superficie);
+}
+
+.boton--primario:hover {
+  background-color: var(--color-sienna-oscuro);
+  color: var(--color-superficie);
+}
+
+.boton--secundario {
+  background-color: transparent;
+  border-color: var(--color-superficie);
+  color: var(--color-superficie);
+}
+
+.boton--secundario:hover {
+  background-color: var(--color-superficie);
+  color: var(--color-pino);
+}
+
+.boton--contorno {
+  background-color: transparent;
+  border-color: var(--color-pino);
+  color: var(--color-pino);
+}
+
+.boton--contorno:hover {
+  background-color: var(--color-pino);
+  color: var(--color-superficie);
+}
+
+.boton--ancho-completo {
+  width: 100%;
+  text-align: center;
+}
+
+/* -------------------- Formularios -------------------- */
+.formulario {
+  background-color: var(--color-superficie);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-borde);
+  padding: var(--espacio-lg);
+  max-width: 32rem;
+}
+
+.campo {
+  margin-bottom: var(--espacio-md);
+}
+
+.campo label {
+  display: block;
+  font-size: var(--tamano-pequeno);
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+  color: var(--color-carbon);
+}
+
+.campo input,
+.campo select,
+.campo textarea {
+  width: 100%;
+  font-family: var(--fuente-base);
+  font-size: var(--tamano-texto);
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-borde);
+  background-color: var(--color-superficie);
+  color: var(--color-carbon);
+}
+
+.campo__ayuda {
+  font-size: var(--tamano-pequeno);
+  color: var(--color-carbon-suave);
+  margin-top: 0.25rem;
+}
+
+.campo--obligatorio label::after {
+  content: " *";
+  color: var(--color-sienna);
+}
+
+/* -------------------- Tablas -------------------- */
+.tabla-datos {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: var(--color-superficie);
+  font-size: var(--tamano-pequeno);
+}
+
+.tabla-datos caption {
+  text-align: left;
+  font-family: var(--fuente-titulos);
+  font-size: var(--tamano-h3);
+  color: var(--color-pino);
+  margin-bottom: var(--espacio-sm);
+}
+
+.tabla-datos th,
+.tabla-datos td {
+  text-align: left;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--color-borde);
+}
+
+.tabla-datos th {
+  color: var(--color-carbon-suave);
+  font-weight: 600;
+}
+
+/* -------------------- Etiquetas de estado de una cita -------------------- */
+.etiqueta-estado {
+  display: inline-block;
+  font-size: var(--tamano-pequeno);
+  font-weight: 600;
+  padding: 0.2rem 0.65rem;
+  border-radius: 999px;
+  color: var(--color-superficie);
+}
+
+.etiqueta-estado--pendiente {
+  background-color: var(--color-estado-pendiente);
+}
+
+.etiqueta-estado--confirmada {
+  background-color: var(--color-estado-confirmada);
+}
+
+.etiqueta-estado--cancelada {
+  background-color: var(--color-estado-cancelada);
+}
+
+.etiqueta-estado--atendida {
+  background-color: var(--color-estado-atendida);
+}
+
+/* -------------------- Mensajes de aviso -------------------- */
+.aviso {
+  border-left: 4px solid var(--color-salvia);
+  background-color: var(--color-salvia-suave);
+  padding: var(--espacio-sm) var(--espacio-md);
+  font-size: var(--tamano-pequeno);
+  border-radius: 0 var(--radio-borde) var(--radio-borde) 0;
+}

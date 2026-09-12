@@ -1,0 +1,69 @@
+/* ==========================================================================
+   PRIVADO.CSS
+   Estilos exclusivos del área interna a la que accede el paciente tras
+   iniciar sesión: solicitud-cita.html, confirmacion.html y mis-citas.html.
+   ========================================================================== */
+
+/* Franja que identifica que el usuario está dentro de la aplicación
+   clínica (y no en el sitio público), y con qué rol ingresó. */
+.franja-sesion {
+  background-color: var(--color-salvia-suave);
+  border-bottom: 1px solid var(--color-borde);
+  font-size: var(--tamano-pequeno);
+}
+
+.franja-sesion .contenedor {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-block: var(--espacio-xs);
+}
+
+.cabecera-panel {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--espacio-sm);
+  margin-bottom: var(--espacio-lg);
+}
+
+/* -------------------- Resumen de confirmación de una cita -------------------- */
+.resumen-cita {
+  background-color: var(--color-superficie);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-borde);
+  padding: var(--espacio-lg);
+  max-width: 32rem;
+}
+
+.resumen-cita dl {
+  margin: 0;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.5rem var(--espacio-md);
+}
+
+.resumen-cita dt {
+  font-weight: 600;
+  color: var(--color-carbon-suave);
+}
+
+.resumen-cita dd {
+  margin: 0;
+}
+
+/* -------------------- Barra de filtros de "Mis citas" -------------------- */
+.barra-filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--espacio-sm);
+  margin-bottom: var(--espacio-md);
+}
+
+.barra-filtros select {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-borde);
+  background-color: var(--color-superficie);
+}
