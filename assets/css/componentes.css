@@ -7,26 +7,41 @@
 
 /* -------------------- Botones -------------------- */
 .boton {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
   font-family: var(--fuente-base);
   font-size: var(--tamano-texto);
   font-weight: 600;
-  padding: 0.75rem 1.5rem;
+  line-height: 1.2;
+  padding: 0.8rem 1.5rem;
   border-radius: var(--radio-borde);
   border: 1px solid transparent;
   cursor: pointer;
   text-decoration: none;
-  transition: background-color var(--transicion-rapida), color var(--transicion-rapida);
+  transition: background-color var(--transicion-rapida), color var(--transicion-rapida),
+    box-shadow var(--transicion-rapida), transform var(--transicion-rapida);
+}
+
+.boton:hover {
+  transform: translateY(-1px);
+}
+
+.boton:active {
+  transform: translateY(0);
 }
 
 .boton--primario {
   background-color: var(--color-sienna);
   color: var(--color-superficie);
+  box-shadow: 0 2px 6px rgba(181, 101, 45, 0.3);
 }
 
 .boton--primario:hover {
   background-color: var(--color-sienna-oscuro);
   color: var(--color-superficie);
+  box-shadow: 0 6px 16px rgba(181, 101, 45, 0.35);
 }
 
 .boton--secundario {
@@ -41,7 +56,7 @@
 }
 
 .boton--contorno {
-  background-color: transparent;
+  background-color: var(--color-superficie);
   border-color: var(--color-pino);
   color: var(--color-pino);
 }
@@ -56,13 +71,50 @@
   text-align: center;
 }
 
+.boton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Botón con apariencia de enlace (acciones dentro de tablas y textos) */
+.boton-enlace {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: var(--color-pino);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.boton-enlace:hover {
+  color: var(--color-sienna);
+}
+
+.boton-enlace--peligro {
+  color: var(--color-estado-cancelada);
+}
+
 /* -------------------- Formularios -------------------- */
 .formulario {
   background-color: var(--color-superficie);
   border: 1px solid var(--color-borde);
-  border-radius: var(--radio-borde);
+  border-radius: var(--radio-grande);
   padding: var(--espacio-lg);
   max-width: 32rem;
+  box-shadow: var(--sombra-media);
+}
+
+.formulario .aviso {
+  margin-bottom: var(--espacio-md);
+}
+
+.formulario__pie {
+  margin: var(--espacio-md) 0 0;
+  text-align: center;
 }
 
 .campo {
@@ -73,7 +125,7 @@
   display: block;
   font-size: var(--tamano-pequeno);
   font-weight: 600;
-  margin-bottom: 0.35rem;
+  margin-bottom: 0.4rem;
   color: var(--color-carbon);
 }
 
@@ -83,25 +135,165 @@
   width: 100%;
   font-family: var(--fuente-base);
   font-size: var(--tamano-texto);
-  padding: 0.6rem 0.75rem;
+  padding: 0.7rem 0.85rem;
   border: 1px solid var(--color-borde);
   border-radius: var(--radio-borde);
   background-color: var(--color-superficie);
   color: var(--color-carbon);
+  transition: border-color var(--transicion-rapida), box-shadow var(--transicion-rapida);
+}
+
+.campo textarea {
+  resize: vertical;
+  min-height: 6rem;
+}
+
+/* Flecha propia en los select para que se vean igual en todos los navegadores */
+.campo select,
+.barra-filtros select {
+  appearance: none;
+  padding-right: 2.5rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%231B3B36' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.9rem center;
+}
+
+.campo input:hover,
+.campo select:hover,
+.campo textarea:hover {
+  border-color: var(--color-salvia);
+}
+
+.campo input:focus,
+.campo select:focus,
+.campo textarea:focus {
+  outline: none;
+  border-color: var(--color-pino);
+  box-shadow: var(--anillo-foco);
+}
+
+.campo input:disabled,
+.campo select:disabled,
+.campo textarea:disabled {
+  background-color: var(--color-hueso);
+  color: var(--color-carbon-suave);
+  border-color: var(--color-borde);
+  cursor: not-allowed;
 }
 
 .campo__ayuda {
   font-size: var(--tamano-pequeno);
   color: var(--color-carbon-suave);
-  margin-top: 0.25rem;
+  margin-top: 0.35rem;
 }
 
-.campo--obligatorio label::after {
+.campo--obligatorio > label::after {
   content: " *";
   color: var(--color-sienna);
 }
 
+/* -------------------- Validación de formularios (Vue.js) -------------------- */
+/* Oculta las plantillas de Vue hasta que la aplicación termina de montarse */
+[v-cloak] {
+  display: none;
+}
+
+.campo--error input,
+.campo--error select,
+.campo--error textarea {
+  border-color: var(--color-estado-cancelada);
+  background-color: #FFF8F6;
+}
+
+.campo--error input:focus,
+.campo--error select:focus,
+.campo--error textarea:focus {
+  box-shadow: 0 0 0 3px rgba(163, 76, 63, 0.2);
+}
+
+.campo__error {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.35rem;
+  font-size: var(--tamano-pequeno);
+  color: var(--color-estado-cancelada);
+  margin-top: 0.35rem;
+}
+
+.campo__error::before {
+  content: "!";
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  width: 1rem;
+  height: 1rem;
+  margin-top: 0.15rem;
+  border-radius: 50%;
+  background-color: var(--color-estado-cancelada);
+  color: var(--color-superficie);
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+/* -------------------- Selector de horarios (botones tipo chip) -------------------- */
+.horarios {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(5.25rem, 1fr));
+  gap: 0.5rem;
+}
+
+.horario-chip input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.horario-chip span {
+  display: block;
+  text-align: center;
+  padding: 0.55rem 0.5rem;
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-borde);
+  background-color: var(--color-superficie);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition: border-color var(--transicion-rapida), background-color var(--transicion-rapida);
+}
+
+.horario-chip span:hover {
+  border-color: var(--color-salvia);
+  background-color: var(--color-salvia-suave);
+}
+
+.horario-chip input:checked + span {
+  background-color: var(--color-pino);
+  border-color: var(--color-pino);
+  color: var(--color-superficie);
+}
+
+.horario-chip input:focus-visible + span {
+  box-shadow: var(--anillo-foco);
+}
+
+.horarios__vacio {
+  padding: 0.75rem 0.9rem;
+  border: 1px dashed var(--color-borde);
+  border-radius: var(--radio-borde);
+  color: var(--color-carbon-suave);
+  font-size: var(--tamano-pequeno);
+  margin: 0;
+}
+
 /* -------------------- Tablas -------------------- */
+.tabla-contenedor {
+  background-color: var(--color-superficie);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-grande);
+  box-shadow: var(--sombra-suave);
+  overflow: hidden;
+}
+
 .tabla-datos {
   width: 100%;
   border-collapse: collapse;
@@ -114,52 +306,145 @@
   font-family: var(--fuente-titulos);
   font-size: var(--tamano-h3);
   color: var(--color-pino);
-  margin-bottom: var(--espacio-sm);
+  padding: var(--espacio-sm) var(--espacio-md);
+  border-bottom: 1px solid var(--color-borde);
 }
 
 .tabla-datos th,
 .tabla-datos td {
   text-align: left;
-  padding: 0.75rem 1rem;
+  padding: 0.85rem 1rem;
   border-bottom: 1px solid var(--color-borde);
+  vertical-align: middle;
 }
 
 .tabla-datos th {
+  background-color: var(--color-hueso);
   color: var(--color-carbon-suave);
   font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.tabla-datos tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.tabla-datos tbody tr:hover td {
+  background-color: #FAF6EF;
+}
+
+.tabla-datos__vacia {
+  text-align: center !important;
+  color: var(--color-carbon-suave);
+  padding-block: var(--espacio-lg) !important;
+}
+
+.tabla-datos__acciones {
+  white-space: nowrap;
+}
+
+/* En pantallas angostas cada fila se muestra como una tarjeta */
+@media (max-width: 45rem) {
+  .tabla-datos thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+
+  .tabla-datos tbody tr {
+    display: block;
+    padding: var(--espacio-sm) var(--espacio-md);
+    border-bottom: 1px solid var(--color-borde);
+  }
+
+  .tabla-datos tbody tr:last-child {
+    border-bottom: none;
+  }
+
+  .tabla-datos td {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--espacio-sm);
+    padding: 0.35rem 0;
+    border-bottom: none;
+    text-align: right;
+  }
+
+  .tabla-datos td[data-etiqueta]::before {
+    content: attr(data-etiqueta);
+    font-weight: 600;
+    color: var(--color-carbon-suave);
+    text-align: left;
+  }
+
+  .tabla-datos tbody tr:hover td {
+    background-color: transparent;
+  }
 }
 
 /* -------------------- Etiquetas de estado de una cita -------------------- */
+/* Fondo suave + texto oscuro del mismo tono: legible y con un punto de color */
 .etiqueta-estado {
-  display: inline-block;
-  font-size: var(--tamano-pequeno);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8125rem;
   font-weight: 600;
-  padding: 0.2rem 0.65rem;
+  padding: 0.2rem 0.7rem;
   border-radius: 999px;
-  color: var(--color-superficie);
+  white-space: nowrap;
+}
+
+.etiqueta-estado::before {
+  content: "";
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background-color: currentColor;
 }
 
 .etiqueta-estado--pendiente {
-  background-color: var(--color-estado-pendiente);
+  background-color: var(--color-estado-pendiente-suave);
+  color: var(--color-estado-pendiente-texto);
 }
 
 .etiqueta-estado--confirmada {
-  background-color: var(--color-estado-confirmada);
+  background-color: var(--color-estado-confirmada-suave);
+  color: var(--color-estado-confirmada-texto);
 }
 
 .etiqueta-estado--cancelada {
-  background-color: var(--color-estado-cancelada);
+  background-color: var(--color-estado-cancelada-suave);
+  color: var(--color-estado-cancelada-texto);
 }
 
 .etiqueta-estado--atendida {
-  background-color: var(--color-estado-atendida);
+  background-color: var(--color-estado-atendida-suave);
+  color: var(--color-estado-atendida-texto);
 }
 
 /* -------------------- Mensajes de aviso -------------------- */
 .aviso {
   border-left: 4px solid var(--color-salvia);
   background-color: var(--color-salvia-suave);
-  padding: var(--espacio-sm) var(--espacio-md);
+  padding: 0.75rem var(--espacio-md);
   font-size: var(--tamano-pequeno);
   border-radius: 0 var(--radio-borde) var(--radio-borde) 0;
+  max-width: none;
+}
+
+.aviso--error {
+  border-left-color: var(--color-estado-cancelada);
+  background-color: var(--color-estado-cancelada-suave);
+  color: var(--color-estado-cancelada-texto);
+}
+
+.aviso--exito {
+  border-left-color: var(--color-estado-confirmada);
+  background-color: var(--color-estado-confirmada-suave);
+  color: var(--color-estado-confirmada-texto);
 }

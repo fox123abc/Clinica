@@ -16,54 +16,245 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-block: var(--espacio-xs);
+  gap: var(--espacio-sm);
+  padding-block: 0.4rem;
+}
+
+.franja-sesion__usuario {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+/* Círculo con la inicial del paciente */
+.franja-sesion__avatar {
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 50%;
+  background-color: var(--color-pino);
+  color: var(--color-superficie);
+  font-weight: 600;
+  font-size: 0.75rem;
+}
+
+.franja-sesion__nombre {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.franja-sesion__accion {
+  flex: none;
 }
 
 .cabecera-panel {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  align-items: baseline;
+  align-items: flex-end;
   gap: var(--espacio-sm);
   margin-bottom: var(--espacio-lg);
 }
 
-/* -------------------- Resumen de confirmación de una cita -------------------- */
-.resumen-cita {
-  background-color: var(--color-superficie);
-  border: 1px solid var(--color-borde);
-  border-radius: var(--radio-borde);
-  padding: var(--espacio-lg);
-  max-width: 32rem;
+.cabecera-panel h1 {
+  margin-bottom: 0.25rem;
 }
 
-.resumen-cita dl {
+.cabecera-panel p {
+  margin: 0;
+  color: var(--color-carbon-suave);
+}
+
+/* -------------------- Solicitud: formulario + resumen lateral -------------------- */
+.panel-solicitud {
+  display: grid;
+  gap: var(--espacio-lg);
+  align-items: start;
+}
+
+.panel-solicitud .formulario {
+  max-width: none;
+}
+
+@media (min-width: 60rem) {
+  .panel-solicitud {
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  }
+
+  .panel-solicitud__resumen {
+    position: sticky;
+    top: 5.5rem;
+  }
+}
+
+.tarjeta-resumen {
+  background-color: var(--color-pino);
+  color: var(--color-superficie);
+  border-radius: var(--radio-grande);
+  padding: var(--espacio-lg);
+  box-shadow: var(--sombra-media);
+}
+
+.tarjeta-resumen h2 {
+  color: var(--color-superficie);
+  font-size: var(--tamano-h3);
+  margin-bottom: var(--espacio-md);
+}
+
+.tarjeta-resumen dl {
   margin: 0;
   display: grid;
+  gap: 0.9rem;
+}
+
+.tarjeta-resumen dt {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-salvia-suave);
+}
+
+.tarjeta-resumen dd {
+  margin: 0.15rem 0 0;
+  font-weight: 500;
+}
+
+.tarjeta-resumen__vacio {
+  color: rgba(255, 253, 249, 0.6);
+  font-weight: 400;
+  font-style: italic;
+}
+
+.tarjeta-resumen__nota {
+  margin: var(--espacio-md) 0 0;
+  padding-top: var(--espacio-sm);
+  border-top: 1px solid rgba(255, 253, 249, 0.18);
+  font-size: var(--tamano-pequeno);
+  color: var(--color-salvia-suave);
+}
+
+/* -------------------- Resumen de confirmación de una cita -------------------- */
+.confirmacion {
+  max-width: 36rem;
+}
+
+.confirmacion__icono {
+  display: grid;
+  place-items: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 50%;
+  background-color: var(--color-estado-confirmada-suave);
+  color: var(--color-estado-confirmada-texto);
+  margin-bottom: var(--espacio-md);
+}
+
+.confirmacion__icono--error {
+  background-color: var(--color-estado-cancelada-suave);
+  color: var(--color-estado-cancelada-texto);
+}
+
+/* La propia lista <dl class="resumen-cita"> es la cuadrícula etiqueta / valor */
+.resumen-cita {
+  margin: var(--espacio-md) 0;
+  background-color: var(--color-superficie);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-grande);
+  padding: var(--espacio-xs) var(--espacio-lg);
+  box-shadow: var(--sombra-suave);
+  display: grid;
   grid-template-columns: auto 1fr;
-  gap: 0.5rem var(--espacio-md);
+}
+
+.resumen-cita dt,
+.resumen-cita dd {
+  padding-block: 0.75rem;
+  border-bottom: 1px solid var(--color-borde);
+}
+
+.resumen-cita dt:last-of-type,
+.resumen-cita dd:last-of-type {
+  border-bottom: none;
 }
 
 .resumen-cita dt {
   font-weight: 600;
   color: var(--color-carbon-suave);
+  padding-right: var(--espacio-md);
 }
 
 .resumen-cita dd {
   margin: 0;
 }
 
-/* -------------------- Barra de filtros de "Mis citas" -------------------- */
-.barra-filtros {
+.acciones {
   display: flex;
   flex-wrap: wrap;
   gap: var(--espacio-sm);
-  margin-bottom: var(--espacio-md);
 }
 
-.barra-filtros select {
-  padding: 0.5rem 0.75rem;
+/* -------------------- Filtros de "Mis citas" (botones tipo pestaña) -------------------- */
+.filtros-estado {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  list-style: none;
+  margin: 0 0 var(--espacio-md);
+  padding: 0;
+}
+
+.filtros-estado button {
+  font-family: var(--fuente-base);
+  font-size: var(--tamano-pequeno);
+  font-weight: 500;
+  padding: 0.45rem 0.9rem;
   border: 1px solid var(--color-borde);
-  border-radius: var(--radio-borde);
+  border-radius: 999px;
   background-color: var(--color-superficie);
+  color: var(--color-carbon);
+  cursor: pointer;
+  transition: background-color var(--transicion-rapida), border-color var(--transicion-rapida);
+}
+
+.filtros-estado button:hover {
+  border-color: var(--color-salvia);
+}
+
+.filtros-estado button[aria-pressed="true"] {
+  background-color: var(--color-pino);
+  border-color: var(--color-pino);
+  color: var(--color-superficie);
+}
+
+.filtros-estado__cantidad {
+  display: inline-block;
+  min-width: 1.4rem;
+  margin-left: 0.3rem;
+  padding: 0 0.35rem;
+  border-radius: 999px;
+  background-color: rgba(27, 59, 54, 0.08);
+  font-size: 0.75rem;
+  text-align: center;
+}
+
+.filtros-estado button[aria-pressed="true"] .filtros-estado__cantidad {
+  background-color: rgba(255, 253, 249, 0.2);
+}
+
+@media (max-width: 45rem) {
+  .cabecera-panel .boton {
+    width: 100%;
+  }
+
+  .resumen-cita {
+    padding-inline: var(--espacio-md);
+  }
+
+  .tarjeta-resumen {
+    padding: var(--espacio-md);
+  }
 }

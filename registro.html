@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="assets/css/base.css">
   <link rel="stylesheet" href="assets/css/layout.css">
   <link rel="stylesheet" href="assets/css/componentes.css">
+  <link rel="stylesheet" href="assets/css/publico.css">
 </head>
 <body>
 
@@ -32,11 +33,16 @@
     </div>
   </header>
 
-  <main class="contenedor seccion">
-    <h1>Crear tu cuenta de paciente</h1>
-    <p>
-      Con tu cuenta podrás solicitar citas, consultarlas y darles seguimiento.
-    </p>
+  <main class="contenedor seccion acceso">
+    <div class="acceso__intro">
+      <h1>Crear tu cuenta de paciente</h1>
+      <p>Con tu cuenta podrás solicitar citas, consultarlas y darles seguimiento.</p>
+      <ul class="acceso__beneficios">
+        <li>Registro gratuito en menos de un minuto.</li>
+        <li>Tus datos se usan solo para gestionar tus citas.</li>
+        <li>Recibe el estado de cada solicitud: pendiente, confirmada o atendida.</li>
+      </ul>
+    </div>
 
     <!--
       Nota: los campos siguientes corresponden a los "datos personales mínimos"
@@ -44,33 +50,51 @@
       adicionales (ej. tipo y número de documento), deben confirmarse antes
       de agregarlos.
     -->
-    <form class="formulario" action="#" method="post" novalidate>
-      <div class="campo campo--obligatorio">
-        <label for="nombre">Nombre completo</label>
-        <input type="text" id="nombre" name="nombre" autocomplete="name" required>
-      </div>
+    <!-- Formulario gestionado por Vue.js (assets/js/vue/registro.js) -->
+    <div id="app-registro" v-cloak>
+    <form class="formulario" action="#" method="post" novalidate @submit.prevent="enviar">
+      <p v-if="errorGeneral" class="aviso aviso--error" role="alert">{{ errorGeneral }}</p>
 
-      <div class="campo campo--obligatorio">
-        <label for="correo">Correo electrónico</label>
-        <input type="email" id="correo" name="correo" autocomplete="email" required>
-      </div>
+      <campo-formulario id="nombre" etiqueta="Nombre completo" obligatorio :error="errores.nombre">
+        <input type="text" id="nombre" name="nombre" autocomplete="name" required
+               v-model="formulario.nombre" @blur="validarCampo('nombre')"
+               :aria-invalid="!!errores.nombre">
+      </campo-formulario>
 
-      <div class="campo campo--obligatorio">
-        <label for="telefono">Teléfono de contacto</label>
-        <input type="tel" id="telefono" name="telefono" autocomplete="tel" required>
-      </div>
+      <campo-formulario id="correo" etiqueta="Correo electrónico" obligatorio :error="errores.correo">
+        <input type="email" id="correo" name="correo" autocomplete="email" required
+               v-model.trim="formulario.correo" @blur="validarCampo('correo')"
+               :aria-invalid="!!errores.correo">
+      </campo-formulario>
 
-      <div class="campo campo--obligatorio">
-        <label for="contrasena">Contraseña</label>
-        <input type="password" id="contrasena" name="contrasena" autocomplete="new-password" required>
-      </div>
+      <campo-formulario id="telefono" etiqueta="Teléfono de contacto" obligatorio :error="errores.telefono">
+        <input type="tel" id="telefono" name="telefono" autocomplete="tel" required
+               v-model.trim="formulario.telefono" @blur="validarCampo('telefono')"
+               :aria-invalid="!!errores.telefono">
+      </campo-formulario>
 
-      <button type="submit" class="boton boton--primario boton--ancho-completo">Crear cuenta</button>
+      <campo-formulario id="contrasena" etiqueta="Contraseña" obligatorio :error="errores.contrasena"
+                        ayuda="Mínimo 8 caracteres.">
+        <input type="password" id="contrasena" name="contrasena" autocomplete="new-password" required
+               v-model="formulario.contrasena" @blur="validarCampo('contrasena')"
+               :aria-invalid="!!errores.contrasena">
+      </campo-formulario>
 
-      <p class="campo__ayuda">
+      <campo-formulario id="confirmar" etiqueta="Confirmar contraseña" obligatorio :error="errores.confirmar">
+        <input type="password" id="confirmar" name="confirmar" autocomplete="new-password" required
+               v-model="formulario.confirmar" @blur="validarCampo('confirmar')"
+               :aria-invalid="!!errores.confirmar">
+      </campo-formulario>
+
+      <button type="submit" class="boton boton--primario boton--ancho-completo" :disabled="enviando">
+        {{ enviando ? 'Creando cuenta…' : 'Crear cuenta' }}
+      </button>
+
+      <p class="campo__ayuda formulario__pie">
         ¿Ya tienes cuenta? <a href="login.html">Ingresa aquí</a>.
       </p>
     </form>
+    </div>
   </main>
 
   <footer class="pie-pagina">
@@ -80,5 +104,8 @@
   </footer>
 
   <script src="assets/js/navegacion.js"></script>
+  <script src="https://unpkg.com/vue@3.4.38/dist/vue.global.prod.js"></script>
+  <script src="assets/js/vue/comun.js"></script>
+  <script src="assets/js/vue/registro.js"></script>
 </body>
 </html>

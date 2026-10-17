@@ -1,15 +1,43 @@
-# Clínica Altavida — Maquetado frontend (Etapas 1, 2 y 3)
+# Clínica Altavida — Etapas 1, 2 y 3
 
-Prototipo de maquetado en HTML y CSS puro (sin frameworks), correspondiente
-únicamente al frontend. No incluye backend, base de datos ni validación
-real de formularios: esto queda pendiente para ser desarrollado durante las 
-etapas posteriores en su debido momento de acuerdo a los respectivos cortes 
-del semestre acádemico.
+Sitio en HTML y CSS con **Vue.js 3** para los formularios y las pantallas
+dinámicas, y un **servidor local (Node.js + Express)** con una **base de
+datos SQLite** donde se guardan usuarios, sesiones, especialidades, médicos,
+disponibilidad y citas.
+
+## Cómo ejecutarlo
+
+Requisito: **Node.js 22.13 o superior** (se usa el módulo integrado
+`node:sqlite`, así que no hay que instalar ningún motor de base de datos).
+
+```bash
+npm install     # solo la primera vez
+npm start       # abre http://localhost:3000
+```
+
+La base de datos se crea sola en `servidor/datos/altavida.db` la primera
+vez, con el catálogo de demostración. Para empezar de cero:
+
+```bash
+npm run reiniciar-bd
+```
+
+> Ya no basta con abrir los HTML con Live Server: las páginas necesitan la
+> API, así que siempre se deben abrir desde `http://localhost:3000`.
+
+Flujo de prueba sugerido: Registrarme → Ingresar → Solicitar cita →
+Confirmación → Mis citas (filtrar, reprogramar o cancelar).
 
 ## Estructura de carpetas
 
 ```
 clinica-altavida/
+├── package.json            Dependencias y scripts (npm start)
+├── servidor/
+│   ├── servidor.js         API REST + archivos del sitio (Express)
+│   ├── bd.js               Conexión SQLite, tablas y catálogo inicial
+│   ├── reiniciar-bd.js     Borra la base de datos (npm run reiniciar-bd)
+│   └── datos/              altavida.db (se crea sola, no se sube a git)
 ├── index.html              Página pública de inicio
 ├── especialidades.html     Página pública de especialidades
 ├── login.html              Inicio de sesión
@@ -30,7 +58,15 @@ clinica-altavida/
     │   ├── publico.css       Estilos exclusivos del sitio público
     │   └── privado.css       Estilos exclusivos del área de paciente
     ├── js/
-    │   └── navegacion.js     Solo abre/cierra el menú móvil (aun no contiene lógica de datos)
+    │   ├── navegacion.js     Menú móvil y marca de la página actual
+    │   └── vue/              Lógica con Vue.js (una app por página)
+    │       ├── comun.js           Cliente de la API, validaciones y
+    │       │                      componentes reutilizables
+    │       ├── login.js           Formulario de inicio de sesión
+    │       ├── registro.js        Formulario de registro
+    │       ├── solicitud-cita.js  Formulario de solicitud / reprogramación de cita
+    │       ├── confirmacion.js    Resumen de la cita registrada
+    │       └── mis-citas.js       Listado, filtro por estado y cancelación
     └── img/                  Reservada (ver PENDIENTE.md)
 ```
 
@@ -41,6 +77,73 @@ clinica-altavida/
 - **Etapa 3:** módulo de citas del paciente: registro, inicio de sesión,
   formulario de solicitud, confirmación y consulta de "Mis citas".
 
+## Uso de Vue.js
+
+Vue se carga desde CDN (`vue@3.4.38`, build global), sin herramientas de
+compilación, para que el sitio siga funcionando igual con Live Server o con
+el contenedor de Docker (nginx). Se usa **solo donde aporta**: formularios y
+pantallas con datos. Las páginas públicas (`index.html`,
+`especialidades.html`) siguen siendo HTML estático.
+
+Las plantillas se escriben directamente en el HTML (directivas `v-model`,
+`v-if`, `v-for`, `@submit.prevent`, etc.) y cada página monta su propia
+aplicación desde su archivo en `assets/js/vue/`.
+
+| Página | Qué hace Vue |
+| --- | --- |
+| `registro.html` | Validación por campo (nombre, correo, teléfono, contraseña y confirmación), detección de correo duplicado y creación de la cuenta. |
+| `login.html` | Validación, verificación de credenciales, mostrar/ocultar contraseña e inicio de sesión. |
+| `paciente/solicitud-cita.html` | Médicos filtrados por especialidad, fecha restringida a días de atención del médico y sin fechas pasadas, horarios que excluyen los ya ocupados, contador del motivo. Con `?reprogramar=<id>` reprograma una cita existente. |
+| `paciente/confirmacion.html` | Muestra los datos reales de la cita recién registrada. |
+| `paciente/mis-citas.html` | Lista las citas del paciente, filtro real por estado, cancelación (libera el horario) y enlace a reprogramar. |
+| Franja de sesión | Muestra el nombre del paciente y cierra sesión. Las páginas de `paciente/` redirigen al login si no hay sesión. |
+
+Componentes reutilizables (en `comun.js`):
+
+- `<campo-formulario>`: etiqueta, campo, texto de ayuda y mensaje de error
+  con las clases existentes (`campo`, `campo--obligatorio`, `campo__ayuda`).
+- `<etiqueta-estado>`: etiqueta de color según el estado de la cita.
+
+Todas las llamadas al servidor están centralizadas en el objeto `Api` de
+`comun.js`.
+
+## Base de datos (SQLite)
+
+| Tabla | Contenido |
+| --- | --- |
+| `especialidades` | Especialidades médicas |
+| `medicos` | Médicos y la especialidad a la que pertenecen |
+| `disponibilidad` | Franjas de atención: médico + día de la semana + hora |
+| `usuarios` | Pacientes registrados (rol preparado para recepcionista, médico y administrador) |
+| `sesiones` | Sesiones activas (cookie `HttpOnly`, duran 8 horas) |
+| `citas` | Citas con su estado: pendiente, confirmada, cancelada o atendida |
+
+Reglas que garantiza la propia base de datos o el servidor:
+
+- Las contraseñas se guardan con hash **scrypt** y sal aleatoria, nunca en texto plano.
+- Un índice único impide que dos citas activas ocupen el mismo médico, fecha y
+  horario (aunque dos personas reserven a la vez). Una cita cancelada libera el cupo.
+- El servidor vuelve a validar todo lo que valida el formulario (no se confía
+  solo en el navegador) y cada paciente solo puede ver y modificar sus propias citas.
+- Las carpetas internas (`servidor/`, `node_modules/`, archivos `.md`, etc.) no
+  se pueden descargar desde el navegador.
+
+### API REST
+
+| Método | Ruta | Descripción |
+| --- | --- | --- |
+| POST | `/api/registro` | Crea una cuenta de paciente |
+| POST | `/api/login` | Inicia sesión |
+| POST | `/api/logout` | Cierra sesión |
+| GET | `/api/sesion` | Usuario de la sesión activa |
+| GET | `/api/catalogo` | Especialidades y médicos (con días de atención) |
+| GET | `/api/horarios-disponibles?medicoId=&fecha=` | Horas libres de un médico en una fecha |
+| GET | `/api/citas` | Citas del paciente |
+| GET | `/api/citas/:id` | Detalle de una cita |
+| POST | `/api/citas` | Solicita una cita |
+| PUT | `/api/citas/:id` | Reprograma una cita (vuelve a quedar pendiente) |
+| PATCH | `/api/citas/:id/cancelar` | Cancela una cita |
+
 ## Decisiones de diseño (paleta y tipografía)
 
 - **Color:** verde pino (`--color-pino`) como color de marca, verde salvia
@@ -50,7 +153,15 @@ clinica-altavida/
 - **Tipografía:** Newsreader (serif) para titulares, IBM Plex Sans para
   texto e interfaz.
 - Los estados de una cita (pendiente, confirmada, cancelada, atendida)
-  tienen colores propios y consistentes en toda la aplicación.
+  tienen colores propios y consistentes en toda la aplicación. Las etiquetas
+  usan fondo suave y texto oscuro del mismo tono para que se lean bien.
+- Tarjetas con bordes redondeados y sombras suaves, encabezado fijo con la
+  página actual resaltada y logotipo dibujado solo con CSS.
+- Inicio de sesión y registro a dos columnas (beneficios + formulario).
+- En la solicitud de cita los horarios se eligen con botones y un resumen
+  lateral se actualiza en vivo mientras se llena el formulario.
+- En pantallas angostas la tabla de "Mis citas" se convierte en tarjetas,
+  para que no haya desplazamiento horizontal.
 
 ## Contenido pendiente de confirmar
 
@@ -72,10 +183,3 @@ Según el propio documento de definición, corresponden a etapas posteriores
 a la 3 y "no han sido incluidas puesto que todavía no son requeridas". Las
 carpetas quedaron creadas y documentadas para no romper la estructura del
 proyecto cuando se aborden.
-
-## Cómo previsualizar
-
-Al ser HTML y CSS puro, basta con abrir `index.html` directamente en un
-navegador, o servir la carpeta con un servidor estático simple
-(por ejemplo, la extensión "Live Server" de VS Code) para que las rutas
-relativas funcionen correctamente.
