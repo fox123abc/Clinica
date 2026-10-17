@@ -38,17 +38,18 @@ clinica-altavida/
 │   ├── bd.js               Conexión SQLite, tablas y catálogo inicial
 │   ├── reiniciar-bd.js     Borra la base de datos (npm run reiniciar-bd)
 │   └── datos/              altavida.db (se crea sola, no se sube a git)
-├── index.html              Página pública de inicio
-├── especialidades.html     Página pública de especialidades
-├── login.html              Inicio de sesión
-├── registro.html           Registro de paciente
-├── paciente/                Área interna del paciente (tras iniciar sesión)
-│   ├── solicitud-cita.html  Formulario de solicitud de cita
-│   ├── confirmacion.html    Resumen posterior a la solicitud
-│   └── mis-citas.html       Consulta de citas del paciente
-├── recepcion/                Reservada — módulo aún no maquetado (ver PENDIENTE.md)
-├── medico/                   Reservada — módulo aún no maquetado (ver PENDIENTE.md)
-├── admin/                    Reservada — módulo aún no maquetado (ver PENDIENTE.md)
+├── index.html              Página pública de inicio (entrada del sitio)
+├── html/                   Todas las demás páginas HTML
+│   ├── especialidades.html     Página pública de especialidades
+│   ├── login.html              Inicio de sesión
+│   ├── registro.html           Registro de paciente
+│   ├── paciente/               Área interna del paciente (tras iniciar sesión)
+│   │   ├── solicitud-cita.html     Formulario de solicitud de cita
+│   │   ├── confirmacion.html       Resumen posterior a la solicitud
+│   │   └── mis-citas.html          Consulta de citas del paciente
+│   ├── recepcion/              Reservada — módulo aún no maquetado (ver PENDIENTE.md)
+│   ├── medico/                 Reservada — módulo aún no maquetado (ver PENDIENTE.md)
+│   └── admin/                  Reservada — módulo aún no maquetado (ver PENDIENTE.md)
 └── assets/
     ├── css/
     │   ├── variables.css     Tokens: color, tipografía, espaciado
@@ -72,7 +73,7 @@ clinica-altavida/
 
 ## Alcance cubierto
 
-- **Etapa 1 y 2:** sitio público (`index.html`, `especialidades.html`) con
+- **Etapa 1 y 2:** sitio público (`index.html`, `html/especialidades.html`) con
   navegación responsive y acceso a la aplicación clínica interna.
 - **Etapa 3:** módulo de citas del paciente: registro, inicio de sesión,
   formulario de solicitud, confirmación y consulta de "Mis citas".
@@ -83,7 +84,7 @@ Vue se carga desde CDN (`vue@3.4.38`, build global), sin herramientas de
 compilación, para que el sitio siga funcionando igual con Live Server o con
 el contenedor de Docker (nginx). Se usa **solo donde aporta**: formularios y
 pantallas con datos. Las páginas públicas (`index.html`,
-`especialidades.html`) siguen siendo HTML estático.
+`html/especialidades.html`) siguen siendo HTML estático.
 
 Las plantillas se escriben directamente en el HTML (directivas `v-model`,
 `v-if`, `v-for`, `@submit.prevent`, etc.) y cada página monta su propia
@@ -91,12 +92,12 @@ aplicación desde su archivo en `assets/js/vue/`.
 
 | Página | Qué hace Vue |
 | --- | --- |
-| `registro.html` | Validación por campo (nombre, correo, teléfono, contraseña y confirmación), detección de correo duplicado y creación de la cuenta. |
-| `login.html` | Validación, verificación de credenciales, mostrar/ocultar contraseña e inicio de sesión. |
-| `paciente/solicitud-cita.html` | Médicos filtrados por especialidad, fecha restringida a días de atención del médico y sin fechas pasadas, horarios que excluyen los ya ocupados, contador del motivo. Con `?reprogramar=<id>` reprograma una cita existente. |
-| `paciente/confirmacion.html` | Muestra los datos reales de la cita recién registrada. |
-| `paciente/mis-citas.html` | Lista las citas del paciente, filtro real por estado, cancelación (libera el horario) y enlace a reprogramar. |
-| Franja de sesión | Muestra el nombre del paciente y cierra sesión. Las páginas de `paciente/` redirigen al login si no hay sesión. |
+| `html/registro.html` | Validación por campo (nombre, correo, teléfono, contraseña y confirmación), detección de correo duplicado y creación de la cuenta. |
+| `html/login.html` | Validación, verificación de credenciales, mostrar/ocultar contraseña e inicio de sesión. |
+| `html/paciente/solicitud-cita.html` | Médicos filtrados por especialidad, fecha restringida a días de atención del médico y sin fechas pasadas, horarios que excluyen los ya ocupados, contador del motivo. Con `?reprogramar=<id>` reprograma una cita existente. |
+| `html/paciente/confirmacion.html` | Muestra los datos reales de la cita recién registrada. |
+| `html/paciente/mis-citas.html` | Lista las citas del paciente, filtro real por estado, cancelación (libera el horario) y enlace a reprogramar. |
+| Franja de sesión | Muestra el nombre del paciente y cierra sesión. Las páginas de `html/paciente/` redirigen al login si no hay sesión. |
 
 Componentes reutilizables (en `comun.js`):
 
