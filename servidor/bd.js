@@ -11,6 +11,7 @@
 const fs = require("node:fs");
 const path = require("node:path");
 const { DatabaseSync } = require("node:sqlite");
+const { generarHash } = require("./seguridad");
 
 const CARPETA_DATOS = path.join(__dirname, "datos");
 const RUTA_BD = process.env.RUTA_BD || path.join(CARPETA_DATOS, "altavida.db");
@@ -100,6 +101,14 @@ const CATALOGO_INICIAL = {
   ]
 };
 
+// Solo para demostración académica: no usar credenciales fijas en un sistema real
+const USUARIO_DEMO = {
+  nombre: "Paciente Demo",
+  correo: "paciente@altavida.com",
+  telefono: "3001234567",
+  contrasena: "Altavida2026"
+};
+
 function cargarCatalogoInicial() {
   const { total } = bd.prepare("SELECT COUNT(*) AS total FROM especialidades").get();
   if (total > 0) return;
@@ -116,6 +125,12 @@ function cargarCatalogoInicial() {
     });
   });
   console.log("Catálogo de demostración cargado en la base de datos.");
+
+  // Paciente de demostración, para que cualquier copia del proyecto
+  // (local o Docker) tenga el mismo usuario para probar
+  bd.prepare("INSERT INTO usuarios (nombre, correo, telefono, contrasena_hash) VALUES (?, ?, ?, ?)")
+    .run(USUARIO_DEMO.nombre, USUARIO_DEMO.correo, USUARIO_DEMO.telefono, generarHash(USUARIO_DEMO.contrasena));
+  console.log("Usuario de demostración: " + USUARIO_DEMO.correo + " / " + USUARIO_DEMO.contrasena);
 }
 
 // node:sqlite no trae un helper de transacciones, así que se hace a mano

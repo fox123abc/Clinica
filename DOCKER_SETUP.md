@@ -1,118 +1,95 @@
-# Clínica — Docker Setup
+# Clínica Altavida — Docker
 
-## ¿Qué es esto?
-
-Tu proyecto de clínica está empaquetado en una **imagen Docker**. Tu compañero solo necesita ejecutar un comando para tenerlo corriendo sin instalar nada.
+Con Docker, tu compañero ejecuta el proyecto **exactamente igual que tú**,
+sin instalar Node.js ni ninguna base de datos. Solo necesita
+[Docker Desktop](https://www.docker.com/products/docker-desktop/) abierto.
 
 ---
 
-## Cómo tu compañero lo usa
-
-### 1. Descarga la imagen desde Docker Hub (cuando la subas)
+## Forma recomendada: clonar y levantar con un comando
 
 ```bash
-docker pull tu-usuario/clinica:latest
+git clone -b mi-nueva-funcionalidad https://github.com/fox123abc/Clinica.git
+cd Clinica
+docker compose up -d --build
 ```
 
-### 2. Ejecuta el contenedor
+Abrir en el navegador: **http://localhost:8080**
 
-```bash
-docker run -d -p 8080:3000 -v clinica-datos:/app/servidor/datos --name clinica tu-usuario/clinica:latest
-```
+Iniciar sesión con el usuario de demostración (se crea solo la primera vez):
 
-### 3. Abre en el navegador
+| Correo | Contraseña |
+| --- | --- |
+| `paciente@altavida.com` | `Altavida2026` |
 
-```
-http://localhost:8080
-```
+> La primera vez tarda uno o dos minutos porque descarga la imagen base de
+> Node.js. Las siguientes veces arranca en segundos.
 
 ---
 
 ## Qué incluye el contenedor
 
-✅ Servidor Node.js (Express) que sirve el sitio y la API
-✅ Base de datos SQLite, guardada en el volumen `clinica-datos` para no perder los datos al reiniciar
-✅ Todos tus archivos HTML, CSS, JS
-✅ Estructura completa de la clínica
+- ✅ Servidor Node.js (Express) que sirve el sitio y la API.
+- ✅ Base de datos SQLite con el catálogo de demostración y el usuario de prueba.
+- ✅ La base se guarda en el volumen `clinica-datos`: **no se pierde** al
+  detener o reiniciar el contenedor.
 
 ---
 
-## ¿Cómo compartir la imagen?
+## Comandos útiles
 
-### Opción 1: Docker Hub (recomendado)
+| Para… | Comando |
+| --- | --- |
+| Levantar (o reconstruir tras un `git pull`) | `docker compose up -d --build` |
+| Ver los mensajes del servidor | `docker compose logs -f` |
+| Detener | `docker compose down` |
+| **Empezar de cero** (borra la base de datos) | `docker compose down -v` y luego `docker compose up -d --build` |
+| Copiar la base de datos a tu PC para verla | `docker compose cp clinica:/app/servidor/datos/altavida.db ./altavida-docker.db` |
+
+---
+
+## Otras formas de compartirlo (sin clonar el repositorio)
+
+### Docker Hub
 
 ```bash
-# Inicia sesión
+# Quien publica
 docker login
+docker tag clinica-altavida:latest tu-usuario/clinica-altavida:latest
+docker push tu-usuario/clinica-altavida:latest
 
-# Etiqueta tu imagen
-docker tag clinica:latest tu-usuario/clinica:latest
-
-# Sube la imagen
-docker push tu-usuario/clinica:latest
+# Quien la usa
+docker run -d -p 8080:3000 -v clinica-datos:/app/servidor/datos --name clinica-altavida tu-usuario/clinica-altavida:latest
 ```
 
-Tu compañero luego hace:
+### Archivo `.tar`
 
 ```bash
-docker pull tu-usuario/clinica:latest
-docker run -d -p 8080:3000 -v clinica-datos:/app/servidor/datos tu-usuario/clinica:latest
-```
+# Quien publica
+docker save clinica-altavida:latest -o clinica-altavida.tar
 
-### Opción 2: Guardar y compartir como archivo
-
-```bash
-# Guarda la imagen en un archivo
-docker save clinica:latest -o clinica.tar
-
-# Comparte clinica.tar con tu compañero
-# Tu compañero la carga con:
-docker load -i clinica.tar
-docker run -d -p 8080:3000 -v clinica-datos:/app/servidor/datos clinica:latest
-```
-
-### Opción 3: Compartir el Dockerfile + código
-
-Tu compañero clona tu GitHub y construye localmente:
-
-```bash
-git clone https://github.com/fox123abc/Clinica
-cd Clinica
-docker build -t clinica:latest .
-docker run -d -p 8080:3000 -v clinica-datos:/app/servidor/datos clinica:latest
+# Quien la usa
+docker load -i clinica-altavida.tar
+docker run -d -p 8080:3000 -v clinica-datos:/app/servidor/datos --name clinica-altavida clinica-altavida:latest
 ```
 
 ---
 
-## Archivos Docker en tu proyecto
+## Archivos Docker en el proyecto
 
-- **Dockerfile**: receta para construir la imagen
-- **.dockerignore**: archivos a ignorar (Git, node_modules, etc.)
+| Archivo | Para qué |
+| --- | --- |
+| `Dockerfile` | Receta de la imagen (Node 24, instala dependencias, copia el código). |
+| `docker-compose.yml` | Levanta todo con un comando: puerto 8080 y volumen de datos. |
+| `.dockerignore` | Excluye `node_modules`, `.git`, la base de datos local y los `.md`. |
 
 ---
 
-## Útiles
+## Problemas comunes
 
-### Ver logs
-
-```bash
-docker logs clinica-app
-```
-
-### Detener el contenedor
-
-```bash
-docker stop clinica-app
-```
-
-### Eliminar el contenedor
-
-```bash
-docker rm clinica-app
-```
-
-### Ver imágenes locales
-
-```bash
-docker images
-```
+| Síntoma | Solución |
+| --- | --- |
+| `failed to connect to the docker API` | Docker Desktop no está abierto. Ábrelo y espera a que diga *Engine running*. |
+| `port is already allocated` | El puerto 8080 está ocupado. Cambia `"8080:3000"` por `"8081:3000"` en `docker-compose.yml`. |
+| No veo mis últimos cambios | Reconstruye: `docker compose up -d --build`. |
+| El usuario de demostración no funciona | La base ya existía de antes con otros datos. Empieza de cero con `docker compose down -v`. |

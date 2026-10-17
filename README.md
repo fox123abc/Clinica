@@ -23,7 +23,11 @@ npm start       # abre http://localhost:3000
 ```
 
 La base de datos se crea sola en `servidor/datos/altavida.db` la primera
-vez, con el catálogo de demostración. Para empezar de cero:
+vez, con el catálogo de demostración y un **usuario de prueba**:
+`paciente@altavida.com` / `Altavida2026`.
+
+**Con Docker** (sin instalar Node.js): `docker compose up -d --build` y abrir
+http://localhost:8080. Detalles en [DOCKER_SETUP.md](DOCKER_SETUP.md). Para empezar de cero:
 
 ```bash
 npm run reiniciar-bd
@@ -40,9 +44,11 @@ Confirmación → Mis citas (filtrar, reprogramar o cancelar).
 ```
 clinica-altavida/
 ├── package.json            Dependencias y scripts (npm start)
+├── docker-compose.yml      Levanta todo con Docker (puerto 8080)
 ├── servidor/
 │   ├── servidor.js         API REST + archivos del sitio (Express)
-│   ├── bd.js               Conexión SQLite, tablas y catálogo inicial
+│   ├── bd.js               Conexión SQLite, tablas, catálogo y usuario de demostración
+│   ├── seguridad.js        Hash de contraseñas (scrypt)
 │   ├── reiniciar-bd.js     Borra la base de datos (npm run reiniciar-bd)
 │   └── datos/              altavida.db (se crea sola, no se sube a git)
 ├── index.html              Página pública de inicio (entrada del sitio)
