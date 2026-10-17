@@ -5,6 +5,13 @@ dinámicas, y un **servidor local (Node.js + Express)** con una **base de
 datos SQLite** donde se guardan usuarios, sesiones, especialidades, médicos,
 disponibilidad y citas.
 
+## Documentación
+
+| Documento | Contenido |
+| --- | --- |
+| [docs/DDD-EVENT-STORMING.md](docs/DDD-EVENT-STORMING.md) | Contextualización del dominio con **DDD y Event Storming**: eventos, comandos, políticas, agregados, bounded contexts, context map y glosario. |
+| [docs/VUE.md](docs/VUE.md) | Guía visual de **dónde y cómo se usa Vue.js**: mapa de páginas, directivas, componentes y flujo de datos. |
+
 ## Cómo ejecutarlo
 
 Requisito: **Node.js 22.13 o superior** (se usa el módulo integrado
