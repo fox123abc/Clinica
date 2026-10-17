@@ -1,0 +1,17 @@
+{
+  "name": "clinica-altavida",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Clínica Altavida: frontend con Vue.js y API local con Express + SQLite",
+  "main": "servidor/servidor.js",
+  "scripts": {
+    "start": "node servidor/servidor.js",
+    "reiniciar-bd": "node servidor/reiniciar-bd.js"
+  },
+  "engines": {
+    "node": ">=22.13"
+  },
+  "dependencies": {
+    "express": "4.21.2"
+  }
+}

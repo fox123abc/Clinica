@@ -1,11 +1,18 @@
-FROM nginx:alpine
+FROM node:24-alpine
 
-# Copiar archivos del proyecto al servidor web
-COPY . /usr/share/nginx/html/
+WORKDIR /app
 
-# Copiar configuración personalizada de Nginx (opcional)
-RUN echo 'server { listen 80; location / { root /usr/share/nginx/html; try_files $uri $uri/ =404; } }' > /etc/nginx/conf.d/default.conf
+# Dependencias primero (aprovecha la caché de Docker)
+COPY package.json package-lock.json ./
+RUN npm ci --omit=dev
 
-EXPOSE 80
+# Código del sitio y del servidor
+COPY . .
 
-CMD ["nginx", "-g", "daemon off;"]
+ENV PUERTO=3000
+# La base de datos SQLite se guarda aquí; montar un volumen para conservarla
+VOLUME /app/servidor/datos
+
+EXPOSE 3000
+
+CMD ["node", "servidor/servidor.js"]

@@ -16,10 +16,13 @@
 </head>
 <body>
 
-  <div class="franja-sesion">
+  <div class="franja-sesion" id="franja-sesion" v-cloak>
     <div class="contenedor">
-      <span>Sesión iniciada como: [Nombre del paciente]</span>
-      <a href="../login.html">Cerrar sesión</a>
+      <span class="franja-sesion__usuario">
+        <span class="franja-sesion__avatar" aria-hidden="true">{{ inicial }}</span>
+        <span class="franja-sesion__nombre">Sesión iniciada como: <strong>{{ nombre }}</strong></span>
+      </span>
+      <a href="../login.html" class="franja-sesion__accion" @click.prevent="salir">Cerrar sesión</a>
     </div>
   </div>
 
@@ -38,33 +41,54 @@
     </div>
   </header>
 
-  <main class="contenedor seccion">
-    <h1>Tu solicitud fue registrada</h1>
-    <p class="aviso">
-      Esta pantalla es un ejemplo de maquetado. El estado real y los datos de
-      la cita se calcularán cuando se implemente la lógica del sistema.
-    </p>
+  <!-- Página gestionada por Vue.js (assets/js/vue/confirmacion.js) -->
+  <main class="contenedor seccion" id="app-confirmacion" v-cloak>
+    <div class="confirmacion">
+      <template v-if="cita">
+        <div class="confirmacion__icono" aria-hidden="true">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+        </div>
+        <h1>Tu solicitud fue registrada</h1>
+        <p class="aviso">
+          Tu cita queda con estado pendiente hasta que la clínica la confirme.
+        </p>
 
-    <dl class="resumen-cita">
-      <dt>Especialidad</dt>
-      <dd>[Especialidad seleccionada]</dd>
+        <dl class="resumen-cita">
+          <dt>Especialidad</dt>
+          <dd>{{ cita.especialidad }}</dd>
 
-      <dt>Médico</dt>
-      <dd>[Médico seleccionado]</dd>
+          <dt>Médico</dt>
+          <dd>{{ cita.medico }}</dd>
 
-      <dt>Fecha</dt>
-      <dd>[Fecha seleccionada]</dd>
+          <dt>Fecha</dt>
+          <dd>{{ fechaLegible }}</dd>
 
-      <dt>Horario</dt>
-      <dd>[Horario seleccionado]</dd>
+          <dt>Horario</dt>
+          <dd>{{ cita.horario }}</dd>
 
-      <dt>Estado</dt>
-      <dd><span class="etiqueta-estado etiqueta-estado--pendiente">Pendiente</span></dd>
-    </dl>
+          <template v-if="cita.motivo">
+            <dt>Motivo</dt>
+            <dd>{{ cita.motivo }}</dd>
+          </template>
 
-    <p style="margin-top: var(--espacio-md);">
-      <a href="mis-citas.html" class="boton boton--contorno">Ir a Mis citas</a>
-    </p>
+          <dt>Estado</dt>
+          <dd><etiqueta-estado :estado="cita.estado"></etiqueta-estado></dd>
+        </dl>
+      </template>
+
+      <template v-else>
+        <div class="confirmacion__icono confirmacion__icono--error" aria-hidden="true">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 7v6M12 17h.01"/></svg>
+        </div>
+        <h1>No encontramos la cita</h1>
+        <p class="aviso aviso--error">La cita que buscas no existe o no pertenece a tu cuenta.</p>
+      </template>
+
+      <div class="acciones">
+        <a href="mis-citas.html" class="boton boton--primario">Ir a Mis citas</a>
+        <a href="solicitud-cita.html" class="boton boton--contorno">Solicitar otra cita</a>
+      </div>
+    </div>
   </main>
 
   <footer class="pie-pagina">
@@ -74,5 +98,8 @@
   </footer>
 
   <script src="../assets/js/navegacion.js"></script>
+  <script src="https://unpkg.com/vue@3.4.38/dist/vue.global.prod.js"></script>
+  <script src="../assets/js/vue/comun.js"></script>
+  <script src="../assets/js/vue/confirmacion.js"></script>
 </body>
 </html>

@@ -16,10 +16,13 @@
 </head>
 <body>
 
-  <div class="franja-sesion">
+  <div class="franja-sesion" id="franja-sesion" v-cloak>
     <div class="contenedor">
-      <span>Sesión iniciada como: [Nombre del paciente]</span>
-      <a href="../login.html">Cerrar sesión</a>
+      <span class="franja-sesion__usuario">
+        <span class="franja-sesion__avatar" aria-hidden="true">{{ inicial }}</span>
+        <span class="franja-sesion__nombre">Sesión iniciada como: <strong>{{ nombre }}</strong></span>
+      </span>
+      <a href="../login.html" class="franja-sesion__accion" @click.prevent="salir">Cerrar sesión</a>
     </div>
   </div>
 
@@ -38,69 +41,69 @@
     </div>
   </header>
 
-  <main class="contenedor seccion">
+  <!-- Página gestionada por Vue.js (assets/js/vue/mis-citas.js) -->
+  <main class="contenedor seccion" id="app-mis-citas" v-cloak>
     <div class="cabecera-panel">
-      <h1>Mis citas</h1>
-      <a href="solicitud-cita.html" class="boton boton--primario">Solicitar nueva cita</a>
+      <div>
+        <h1>Mis citas</h1>
+        <p>Consulta el estado de tus solicitudes y gestiónalas.</p>
+      </div>
+      <a href="solicitud-cita.html" class="boton boton--primario">+ Solicitar nueva cita</a>
     </div>
 
-    <!-- Filtro visual únicamente: sin lógica de filtrado real todavía -->
-    <div class="barra-filtros">
-      <label for="filtro-estado">
-        Filtrar por estado
-        <select id="filtro-estado" name="filtro-estado">
-          <option value="todas">Todas</option>
-          <option value="pendiente">Pendiente</option>
-          <option value="confirmada">Confirmada</option>
-          <option value="cancelada">Cancelada</option>
-          <option value="atendida">Atendida</option>
-        </select>
-      </label>
+    <p v-if="mensaje" class="aviso aviso--exito" role="status">{{ mensaje }}</p>
+    <p v-if="errorGeneral" class="aviso aviso--error" role="alert">{{ errorGeneral }}</p>
+
+    <!-- Filtro por estado -->
+    <ul class="filtros-estado" aria-label="Filtrar por estado">
+      <li>
+        <button type="button" :aria-pressed="filtroEstado === 'todas'" @click="filtroEstado = 'todas'">
+          Todas<span class="filtros-estado__cantidad">{{ citas.length }}</span>
+        </button>
+      </li>
+      <li v-for="estado in estados" :key="estado">
+        <button type="button" :aria-pressed="filtroEstado === estado" @click="filtroEstado = estado">
+          {{ capitalizar(estado) }}<span class="filtros-estado__cantidad">{{ contarPorEstado(estado) }}</span>
+        </button>
+      </li>
+    </ul>
+
+    <div class="tabla-contenedor">
+      <table class="tabla-datos">
+        <caption>Historial de solicitudes</caption>
+        <thead>
+          <tr>
+            <th scope="col">Especialidad</th>
+            <th scope="col">Médico</th>
+            <th scope="col">Fecha</th>
+            <th scope="col">Horario</th>
+            <th scope="col">Estado</th>
+            <th scope="col">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="cita in citasFiltradas" :key="cita.id">
+            <td data-etiqueta="Especialidad">{{ cita.especialidad }}</td>
+            <td data-etiqueta="Médico">{{ cita.medico }}</td>
+            <td data-etiqueta="Fecha">{{ formatearFecha(cita.fecha) }}</td>
+            <td data-etiqueta="Horario">{{ cita.horario }}</td>
+            <td data-etiqueta="Estado"><etiqueta-estado :estado="cita.estado"></etiqueta-estado></td>
+            <td data-etiqueta="Acciones" class="tabla-datos__acciones">
+              <span v-if="esModificable(cita)">
+                <a :href="'solicitud-cita.html?reprogramar=' + encodeURIComponent(cita.id)">Reprogramar</a> ·
+                <button type="button" class="boton-enlace boton-enlace--peligro" @click="cancelar(cita)">Cancelar</button>
+              </span>
+              <span v-else>—</span>
+            </td>
+          </tr>
+          <tr v-if="!citasFiltradas.length">
+            <td colspan="6" class="tabla-datos__vacia">
+              {{ citas.length ? 'No hay citas con el estado seleccionado.' : 'Aún no has solicitado ninguna cita.' }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
-
-    <table class="tabla-datos">
-      <caption>Historial de solicitudes</caption>
-      <thead>
-        <tr>
-          <th scope="col">Especialidad</th>
-          <th scope="col">Médico</th>
-          <th scope="col">Fecha</th>
-          <th scope="col">Horario</th>
-          <th scope="col">Estado</th>
-          <th scope="col">Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>[Especialidad de ejemplo]</td>
-          <td>[Médico de ejemplo]</td>
-          <td>[Fecha de ejemplo]</td>
-          <td>[Horario de ejemplo]</td>
-          <td><span class="etiqueta-estado etiqueta-estado--pendiente">Pendiente</span></td>
-          <td>
-            <a href="#">Reprogramar</a> ·
-            <a href="#">Cancelar</a>
-          </td>
-        </tr>
-        <tr>
-          <td>[Especialidad de ejemplo]</td>
-          <td>[Médico de ejemplo]</td>
-          <td>[Fecha de ejemplo]</td>
-          <td>[Horario de ejemplo]</td>
-          <td><span class="etiqueta-estado etiqueta-estado--confirmada">Confirmada</span></td>
-          <td>
-            <a href="#">Reprogramar</a> ·
-            <a href="#">Cancelar</a>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-
-    <p class="campo__ayuda" style="margin-top: var(--espacio-md);">
-      Nota de maquetado: las filas y el filtro son de ejemplo. La consulta
-      real de citas por paciente se conectará cuando se implemente la
-      lógica y el acceso a datos.
-    </p>
   </main>
 
   <footer class="pie-pagina">
@@ -110,5 +113,8 @@
   </footer>
 
   <script src="../assets/js/navegacion.js"></script>
+  <script src="https://unpkg.com/vue@3.4.38/dist/vue.global.prod.js"></script>
+  <script src="../assets/js/vue/comun.js"></script>
+  <script src="../assets/js/vue/mis-citas.js"></script>
 </body>
 </html>

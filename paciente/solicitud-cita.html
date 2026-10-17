@@ -16,11 +16,14 @@
 </head>
 <body>
 
-  <!-- Franja que indica que el paciente ya inició sesión (dato de ejemplo, sin lógica real aún) -->
-  <div class="franja-sesion">
+  <!-- Franja que indica que el paciente ya inició sesión (Vue.js: comun.js → montarFranjaSesion) -->
+  <div class="franja-sesion" id="franja-sesion" v-cloak>
     <div class="contenedor">
-      <span>Sesión iniciada como: [Nombre del paciente]</span>
-      <a href="../login.html">Cerrar sesión</a>
+      <span class="franja-sesion__usuario">
+        <span class="franja-sesion__avatar" aria-hidden="true">{{ inicial }}</span>
+        <span class="franja-sesion__nombre">Sesión iniciada como: <strong>{{ nombre }}</strong></span>
+      </span>
+      <a href="../login.html" class="franja-sesion__accion" @click.prevent="salir">Cerrar sesión</a>
     </div>
   </div>
 
@@ -39,64 +42,91 @@
     </div>
   </header>
 
-  <main class="contenedor seccion">
+  <!-- Página gestionada por Vue.js (assets/js/vue/solicitud-cita.js) -->
+  <main class="contenedor seccion" id="app-solicitud" v-cloak>
     <div class="cabecera-panel">
-      <h1>Solicitar una cita</h1>
+      <div>
+        <h1>{{ citaReprogramada ? 'Reprogramar cita' : 'Solicitar una cita' }}</h1>
+        <p>Completa los campos marcados con * para registrar tu solicitud.</p>
+      </div>
     </div>
 
-    <p>
-      Por favor asegurate de rellenar los campos solicitados con tus respectivos datos correctamente.
-    </p>
+    <div class="panel-solicitud">
+      <form class="formulario" action="#" method="post" novalidate @submit.prevent="enviar">
+        <p v-if="errorGeneral" class="aviso aviso--error" role="alert">{{ errorGeneral }}</p>
 
-    <form class="formulario" action="#" method="post" novalidate>
+        <campo-formulario id="especialidad" etiqueta="Especialidad" obligatorio :error="errores.especialidadId">
+          <select id="especialidad" name="especialidad" required v-model="formulario.especialidadId">
+            <option value="" disabled>Selecciona una especialidad</option>
+            <option v-for="esp in especialidades" :key="esp.id" :value="esp.id">{{ esp.nombre }}</option>
+          </select>
+        </campo-formulario>
 
-      <div class="campo campo--obligatorio">
-        <label for="especialidad">Especialidad</label>
-        <select id="especialidad" name="especialidad" required>
-          <option value="" selected disabled>Selecciona una especialidad</option>
-          <option value="especialidad-1">[Especialidad 1]</option>
-          <option value="especialidad-2">[Especialidad 2]</option>
-        </select>
-      </div>
+        <campo-formulario id="medico" etiqueta="Médico" obligatorio :error="errores.medicoId"
+                          :ayuda="ayudaMedico">
+          <select id="medico" name="medico" required v-model="formulario.medicoId"
+                  :disabled="!formulario.especialidadId">
+            <option value="" disabled>Selecciona un médico</option>
+            <option v-for="med in medicosDisponibles" :key="med.id" :value="med.id">{{ med.nombre }}</option>
+          </select>
+        </campo-formulario>
 
-      <div class="campo campo--obligatorio">
-        <label for="medico">Médico</label>
-        <select id="medico" name="medico" required>
-          <option value="" selected disabled>Selecciona un médico</option>
-          <option value="medico-1">[Médico disponible 1]</option>
-          <option value="medico-2">[Médico disponible 2]</option>
-        </select>
-        <p class="campo__ayuda">Las opciones se limitarán según la especialidad seleccionada.</p>
-      </div>
+        <campo-formulario id="fecha" etiqueta="Fecha" obligatorio :error="errores.fecha"
+                          :ayuda="formulario.fecha ? fechaLegible : ''">
+          <input type="date" id="fecha" name="fecha" required :min="hoy"
+                 v-model="formulario.fecha" :disabled="!medico">
+        </campo-formulario>
 
-      <div class="campo campo--obligatorio">
-        <label for="fecha">Fecha</label>
-        <input type="date" id="fecha" name="fecha" required>
-      </div>
+        <campo-formulario id="horario" etiqueta="Horario disponible" obligatorio :error="errores.horario"
+                          :ayuda="ayudaHorario">
+          <div v-if="horariosDisponibles.length" class="horarios" role="radiogroup" aria-labelledby="horario-etiqueta">
+            <label v-for="hora in horariosDisponibles" :key="hora" class="horario-chip">
+              <input type="radio" name="horario" :value="hora" v-model="formulario.horario">
+              <span>{{ hora }}</span>
+            </label>
+          </div>
+          <p v-else class="horarios__vacio" id="horario">
+            {{ cargandoHorarios ? 'Consultando horarios…' : 'Aún no hay horarios para mostrar.' }}
+          </p>
+        </campo-formulario>
 
-      <div class="campo campo--obligatorio">
-        <label for="horario">Horario disponible</label>
-        <select id="horario" name="horario" required>
-          <option value="" selected disabled>Selecciona un horario</option>
-          <option value="horario-1">[Horario disponible 1]</option>
-          <option value="horario-2">[Horario disponible 2]</option>
-        </select>
-        <p class="campo__ayuda">Solo se mostrarán los horarios aún no ocupados para el médico elegido.</p>
-      </div>
+        <campo-formulario id="motivo" etiqueta="Motivo general de la consulta" :error="errores.motivo"
+                          :ayuda="formulario.motivo.length + ' / ' + maxMotivo + ' caracteres'">
+          <textarea id="motivo" name="motivo" rows="3" :maxlength="maxMotivo" v-model="formulario.motivo"
+                    placeholder="Opcional: describe brevemente el motivo de tu consulta"></textarea>
+        </campo-formulario>
 
-      <div class="campo">
-        <label for="motivo">Motivo general de la consulta</label>
-        <textarea id="motivo" name="motivo" rows="3"></textarea>
-      </div>
+        <button type="submit" class="boton boton--primario boton--ancho-completo" :disabled="enviando">
+          {{ enviando ? 'Guardando…' : citaReprogramada ? 'Guardar nueva fecha' : 'Confirmar solicitud' }}
+        </button>
+      </form>
 
-      <button type="submit" class="boton boton--primario boton--ancho-completo">Confirmar solicitud</button>
-    </form>
-
-    <p class="campo__ayuda" style="margin-top: var(--espacio-md);">
-      Nota de maquetado: como aún no hay lógica ni backend, este enlace solo
-      permite ver cómo luciría la pantalla posterior a enviar el formulario:
-      <a href="confirmacion.html">ver ejemplo de confirmación</a>.
-    </p>
+      <!-- Resumen que se actualiza en vivo a medida que se llena el formulario -->
+      <aside class="panel-solicitud__resumen tarjeta-resumen" aria-live="polite">
+        <h2>Resumen de tu cita</h2>
+        <dl>
+          <div>
+            <dt>Especialidad</dt>
+            <dd :class="{ 'tarjeta-resumen__vacio': !especialidad }">{{ especialidad ? especialidad.nombre : 'Sin seleccionar' }}</dd>
+          </div>
+          <div>
+            <dt>Médico</dt>
+            <dd :class="{ 'tarjeta-resumen__vacio': !medico }">{{ medico ? medico.nombre : 'Sin seleccionar' }}</dd>
+          </div>
+          <div>
+            <dt>Fecha</dt>
+            <dd :class="{ 'tarjeta-resumen__vacio': !formulario.fecha || errorFecha }">{{ formulario.fecha && !errorFecha ? fechaLegible : 'Sin seleccionar' }}</dd>
+          </div>
+          <div>
+            <dt>Horario</dt>
+            <dd :class="{ 'tarjeta-resumen__vacio': !formulario.horario }">{{ formulario.horario || 'Sin seleccionar' }}</dd>
+          </div>
+        </dl>
+        <p class="tarjeta-resumen__nota">
+          Tu cita quedará en estado <strong>pendiente</strong> hasta que la clínica la confirme.
+        </p>
+      </aside>
+    </div>
   </main>
 
   <footer class="pie-pagina">
@@ -106,5 +136,8 @@
   </footer>
 
   <script src="../assets/js/navegacion.js"></script>
+  <script src="https://unpkg.com/vue@3.4.38/dist/vue.global.prod.js"></script>
+  <script src="../assets/js/vue/comun.js"></script>
+  <script src="../assets/js/vue/solicitud-cita.js"></script>
 </body>
 </html>

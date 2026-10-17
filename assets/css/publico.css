@@ -92,3 +92,164 @@
   color: var(--color-carbon-suave);
   font-style: italic;
 }
+
+/* ==========================================================================
+   Mejoras visuales del sitio público
+   ========================================================================== */
+
+.hero__etiqueta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: var(--espacio-sm);
+  padding: 0.3rem 0.8rem;
+  border-radius: 999px;
+  background-color: var(--color-salvia-suave);
+  color: var(--color-pino);
+  font-size: var(--tamano-pequeno);
+  font-weight: 600;
+}
+
+.hero__etiqueta::before {
+  content: "";
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background-color: var(--color-salvia);
+}
+
+/* Halo claro detrás de la ilustración */
+.hero__ilustracion {
+  background: radial-gradient(circle, var(--color-superficie) 0%, var(--color-superficie) 40%, transparent 70%);
+}
+
+/* Pasos como tarjetas */
+.paso {
+  border-top: none;
+  padding: var(--espacio-md);
+  background-color: var(--color-superficie);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-grande);
+  box-shadow: var(--sombra-suave);
+}
+
+.paso__numero {
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  margin-bottom: var(--espacio-sm);
+  border-radius: 50%;
+  background-color: var(--color-salvia-suave);
+  color: var(--color-pino);
+  font-size: 1.25rem;
+}
+
+.paso p {
+  margin: 0;
+  color: var(--color-carbon-suave);
+}
+
+/* Bloque destacado (acceso del personal / llamado a la acción) */
+.banda-destacada {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--espacio-md);
+  padding: var(--espacio-lg);
+  border-radius: var(--radio-grande);
+  background-color: var(--color-pino);
+  color: var(--color-superficie);
+  box-shadow: var(--sombra-media);
+}
+
+.banda-destacada h2 {
+  color: var(--color-superficie);
+  margin-bottom: 0.35rem;
+}
+
+.banda-destacada p {
+  margin: 0;
+  color: var(--color-salvia-suave);
+}
+
+.seccion--sin-borde {
+  border-bottom: none;
+}
+
+/* Especialidades: tarjetas con icono */
+.especialidad {
+  border-radius: var(--radio-grande);
+  box-shadow: var(--sombra-suave);
+  transition: box-shadow var(--transicion-rapida), transform var(--transicion-rapida);
+}
+
+.especialidad:hover {
+  box-shadow: var(--sombra-media);
+  transform: translateY(-2px);
+}
+
+.especialidad::before {
+  content: "";
+  display: block;
+  width: 2.5rem;
+  height: 2.5rem;
+  margin-bottom: var(--espacio-sm);
+  border-radius: 12px;
+  background:
+    linear-gradient(var(--color-sienna), var(--color-sienna)) center / 1rem 0.25rem no-repeat,
+    linear-gradient(var(--color-sienna), var(--color-sienna)) center / 0.25rem 1rem no-repeat,
+    var(--color-salvia-suave);
+}
+
+/* -------------------- Inicio de sesión y registro -------------------- */
+.acceso {
+  display: grid;
+  gap: var(--espacio-lg);
+  align-items: center;
+}
+
+@media (min-width: 52rem) {
+  .acceso {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 28rem);
+    gap: var(--espacio-xl);
+  }
+}
+
+.acceso .formulario {
+  max-width: none;
+}
+
+.acceso__beneficios {
+  list-style: none;
+  padding: 0;
+  margin: var(--espacio-md) 0 0;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.acceso__beneficios li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+}
+
+/* Marca de verificación dibujada con SVG en línea */
+.acceso__beneficios li::before {
+  content: "";
+  flex: none;
+  width: 1.4rem;
+  height: 1.4rem;
+  margin-top: 0.1rem;
+  border-radius: 50%;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4 8.5l2.5 2.5L12 5.5' fill='none' stroke='%232F5236' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 0.9rem no-repeat,
+    var(--color-salvia-suave);
+}
+
+.acceso__nota {
+  margin-top: var(--espacio-md);
+  font-size: var(--tamano-pequeno);
+  color: var(--color-carbon-suave);
+}
