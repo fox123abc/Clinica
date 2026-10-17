@@ -320,4 +320,9 @@ app.use((err, req, res, next) => {
 app.listen(PUERTO, () => {
   console.log("Clínica Altavida en http://localhost:" + PUERTO);
   console.log("Base de datos: " + RUTA_BD);
+}).on("error", (err) => {
+  if (err.code !== "EADDRINUSE") throw err;
+  console.log("El puerto " + PUERTO + " ya está en uso: probablemente el servidor ya está corriendo.");
+  console.log("Abre http://localhost:" + PUERTO + " en el navegador.");
+  process.exit(1);
 });

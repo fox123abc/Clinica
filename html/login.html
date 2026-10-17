@@ -50,6 +50,13 @@
       <p v-if="mensajeExito" class="aviso aviso--exito">{{ mensajeExito }}</p>
       <p v-if="errorGeneral" class="aviso aviso--error" role="alert">{{ errorGeneral }}</p>
 
+      <div class="aviso">
+        <strong>Usuario de prueba</strong><br>
+        Correo: <code>paciente@altavida.com</code><br>
+        Contraseña: <code>Altavida2026</code><br>
+        <button type="button" class="boton-enlace" @click="usarUsuarioPrueba">Usar estos datos</button>
+      </div>
+
       <campo-formulario id="correo" etiqueta="Correo electrónico" obligatorio :error="errores.correo">
         <input type="email" id="correo" name="correo" autocomplete="email" required
                v-model.trim="formulario.correo" @blur="validarCampo('correo')"

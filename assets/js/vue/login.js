@@ -38,6 +38,12 @@
       }
     },
     methods: {
+      // Rellena el formulario con el usuario de demostración (servidor/bd.js)
+      usarUsuarioPrueba: function () {
+        this.formulario.correo = "paciente@altavida.com";
+        this.formulario.contrasena = "Altavida2026";
+        this.errores = {};
+      },
       validarCampo: function (campo) {
         var parcial = {};
         parcial[campo] = esquema[campo];
