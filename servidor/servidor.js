@@ -11,6 +11,7 @@ const path = require("node:path");
 const crypto = require("node:crypto");
 const express = require("express");
 const { bd, RUTA_BD } = require("./bd");
+const { generarHash, verificarContrasena } = require("./seguridad");
 
 const PUERTO = process.env.PUERTO || 3000;
 const RAIZ_SITIO = path.join(__dirname, "..");
@@ -24,19 +25,6 @@ app.use(express.json({ limit: "20kb" }));
 /* ==================================================================
  * Utilidades
  * ================================================================== */
-
-// Contraseñas: hash con scrypt y sal aleatoria (nunca se guardan en texto plano)
-function generarHash(contrasena) {
-  const sal = crypto.randomBytes(16).toString("hex");
-  const hash = crypto.scryptSync(contrasena, sal, 64).toString("hex");
-  return sal + ":" + hash;
-}
-
-function verificarContrasena(contrasena, guardado) {
-  const [sal, hash] = guardado.split(":");
-  const calculado = crypto.scryptSync(contrasena, sal, 64);
-  return crypto.timingSafeEqual(calculado, Buffer.from(hash, "hex"));
-}
 
 function leerCookie(req, nombre) {
   const cookies = req.headers.cookie || "";

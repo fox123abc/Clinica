@@ -1,0 +1,17 @@
+# Levanta Clínica Altavida con un solo comando:
+#   docker compose up -d --build
+# Luego abrir http://localhost:8080
+services:
+  clinica:
+    build: .
+    image: clinica-altavida:latest
+    container_name: clinica-altavida
+    ports:
+      - "8080:3000"
+    volumes:
+      # La base de datos SQLite se conserva aunque se reinicie o borre el contenedor
+      - clinica-datos:/app/servidor/datos
+    restart: unless-stopped
+
+volumes:
+  clinica-datos:
