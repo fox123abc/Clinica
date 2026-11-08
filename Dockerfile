@@ -2,6 +2,9 @@ FROM node:24-alpine
 
 WORKDIR /app
 
+# Datos de zona horaria (Alpine no los trae): permiten que TZ afecte a Node y a SQLite
+RUN apk add --no-cache tzdata
+
 # Dependencias primero (aprovecha la caché de Docker)
 COPY package.json package-lock.json ./
 RUN npm ci --omit=dev
