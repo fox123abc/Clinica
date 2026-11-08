@@ -35,12 +35,12 @@
 
   <main class="contenedor seccion acceso">
     <div class="acceso__intro">
-      <h1>Ingresar a tu cuenta</h1>
-      <p>Accede a tu área de paciente para gestionar tus citas médicas.</p>
+      <h1>Inicia sesión en tu cuenta.</h1>
+      <p>Sí eres paciente, recuerda que desde tu cuenta podrás realizar las siguientes acciones ágilmente:</p>
       <ul class="acceso__beneficios">
-        <li>Solicita citas viendo solo los horarios realmente disponibles.</li>
+        <li>Solicita tus citas de acuerdo a los horarios disponibles.</li>
         <li>Consulta el estado de tus citas en cualquier momento.</li>
-        <li>Reprograma o cancela sin tener que llamar a la clínica.</li>
+        <li>Reprograma o cancela tus citas sin tener que llamar a la clínica.</li>
       </ul>
     </div>
 
@@ -51,10 +51,11 @@
       <p v-if="errorGeneral" class="aviso aviso--error" role="alert">{{ errorGeneral }}</p>
 
       <div class="aviso">
-        <strong>Usuario de prueba</strong><br>
-        Correo: <code>paciente@altavida.com</code><br>
-        Contraseña: <code>Altavida2026</code><br>
-        <button type="button" class="boton-enlace" @click="usarUsuarioPrueba">Usar estos datos</button>
+        <strong>Usuarios de prueba</strong> (contraseña <code>Altavida2026</code>)<br>
+        <button type="button" class="boton-enlace" @click="usarUsuarioPrueba('paciente@altavida.com')">Paciente</button> ·
+        <button type="button" class="boton-enlace" @click="usarUsuarioPrueba('recepcion@altavida.com')">Recepción</button> ·
+        <button type="button" class="boton-enlace" @click="usarUsuarioPrueba('medico@altavida.com')">Médico</button> ·
+        <button type="button" class="boton-enlace" @click="usarUsuarioPrueba('admin@altavida.com')">Administrador</button>
       </div>
 
       <campo-formulario id="correo" etiqueta="Correo electrónico" obligatorio :error="errores.correo">

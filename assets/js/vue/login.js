@@ -39,8 +39,8 @@
     },
     methods: {
       // Rellena el formulario con el usuario de demostración (servidor/bd.js)
-      usarUsuarioPrueba: function () {
-        this.formulario.correo = "paciente@altavida.com";
+      usarUsuarioPrueba: function (correo) {
+        this.formulario.correo = correo;
         this.formulario.contrasena = "Altavida2026";
         this.errores = {};
       },
@@ -58,8 +58,8 @@
         this.enviando = true;
         var vm = this;
         A.Api.iniciarSesion(this.formulario.correo, this.formulario.contrasena)
-          .then(function () {
-            window.location.href = "paciente/mis-citas.html";
+          .then(function (usuario) {
+            window.location.href = A.rutaInicio(usuario.rol);
           })
           .catch(function (e) {
             vm.errorGeneral = e.mensaje;

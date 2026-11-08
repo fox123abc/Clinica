@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Administración | Clínica Altavida</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../../assets/css/variables.css">
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/layout.css">
+  <link rel="stylesheet" href="../../assets/css/componentes.css">
+  <link rel="stylesheet" href="../../assets/css/privado.css">
+</head>
+<body>
+
+  <div class="franja-sesion" id="franja-sesion" v-cloak>
+    <div class="contenedor">
+      <span class="franja-sesion__usuario">
+        <span class="franja-sesion__avatar" aria-hidden="true">{{ inicial }}</span>
+        <span class="franja-sesion__nombre">Sesión iniciada como: <strong>{{ nombre }}</strong> · Administración</span>
+      </span>
+      <a href="../login.html" class="franja-sesion__accion" @click.prevent="salir">Cerrar sesión</a>
+    </div>
+  </div>
+
+  <header class="encabezado">
+    <div class="contenedor">
+      <a href="../../index.html" class="marca">Clínica Altavida</a>
+      <nav class="nav-principal" aria-label="Navegación del área de administración">
+        <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="menu-principal">
+          Menú
+        </button>
+        <ul class="nav-principal__enlaces" id="menu-principal">
+          <li><a href="catalogo.html">Catálogo clínico</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Página gestionada por Vue.js (assets/js/vue/admin.js) -->
+  <main class="contenedor seccion" id="app-admin" v-cloak>
+    <div class="cabecera-panel">
+      <div>
+        <h1>Catálogo clínico</h1>
+        <p>Administra las especialidades, los médicos y sus horarios de atención.</p>
+      </div>
+    </div>
+
+    <p v-if="mensaje" class="aviso aviso--exito" role="status">{{ mensaje }}</p>
+    <p v-if="errorGeneral" class="aviso aviso--error" role="alert">{{ errorGeneral }}</p>
+
+    <div class="rejilla-admin">
+      <form class="formulario" novalidate @submit.prevent="crearEspecialidad">
+        <h2>Nueva especialidad</h2>
+        <campo-formulario id="esp-nombre" etiqueta="Nombre de la especialidad" obligatorio :error="errores.especialidad">
+          <input type="text" id="esp-nombre" v-model.trim="nuevaEspecialidad" maxlength="60">
+        </campo-formulario>
+        <button type="submit" class="boton boton--primario" :disabled="enviando">Agregar especialidad</button>
+      </form>
+
+      <form class="formulario" novalidate @submit.prevent="crearMedico">
+        <h2>Nuevo médico</h2>
+        <campo-formulario id="med-nombre" etiqueta="Nombre del médico" obligatorio :error="errores.medicoNombre">
+          <input type="text" id="med-nombre" v-model.trim="nuevoMedico.nombre" maxlength="80">
+        </campo-formulario>
+        <campo-formulario id="med-esp" etiqueta="Especialidad" obligatorio :error="errores.medicoEspecialidad">
+          <select id="med-esp" v-model="nuevoMedico.especialidadId">
+            <option value="" disabled>Selecciona una especialidad</option>
+            <option v-for="esp in catalogo.especialidades" :key="esp.id" :value="esp.id">{{ esp.nombre }}</option>
+          </select>
+        </campo-formulario>
+        <button type="submit" class="boton boton--primario" :disabled="enviando">Agregar médico</button>
+      </form>
+    </div>
+
+    <h2 class="titulo-seccion">Médicos y disponibilidad</h2>
+    <div class="tabla-contenedor">
+      <table class="tabla-datos">
+        <caption>Médicos registrados</caption>
+        <thead>
+          <tr>
+            <th scope="col">Médico</th>
+            <th scope="col">Especialidad</th>
+            <th scope="col">Horarios de atención</th>
+            <th scope="col">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="medico in catalogo.medicos" :key="medico.id">
+            <td data-etiqueta="Médico">{{ medico.nombre }}</td>
+            <td data-etiqueta="Especialidad">{{ nombreEspecialidad(medico.especialidadId) }}</td>
+            <td data-etiqueta="Horarios">{{ resumen(medico) }}</td>
+            <td data-etiqueta="Acciones" class="tabla-datos__acciones">
+              <button type="button" class="boton-enlace" @click="editar(medico)">Editar horarios</button>
+            </td>
+          </tr>
+          <tr v-if="!catalogo.medicos.length">
+            <td colspan="4" class="tabla-datos__vacia">Aún no hay médicos registrados.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Editor de disponibilidad del médico seleccionado -->
+    <form v-if="editando" class="formulario editor-horarios" novalidate @submit.prevent="guardarHorarios">
+      <h2>Horarios de {{ editando.nombre }}</h2>
+      <p class="campo__ayuda">Escribe las horas de cada día separadas por comas, en formato HH:MM (por ejemplo 08:00, 08:30). Deja vacío un día sin atención.</p>
+      <p v-if="errorEditor" class="aviso aviso--error" role="alert">{{ errorEditor }}</p>
+      <div class="editor-horarios__fila" v-for="fila in filas" :key="fila.dia">
+        <label :for="'dia-' + fila.dia">{{ fila.nombre }}</label>
+        <div class="campo"><input type="text" :id="'dia-' + fila.dia" v-model="fila.texto" placeholder="Sin atención"></div>
+      </div>
+      <div class="acciones">
+        <button type="submit" class="boton boton--primario" :disabled="enviando">Guardar horarios</button>
+        <button type="button" class="boton boton--contorno" @click="cancelarEdicion">Cancelar</button>
+      </div>
+    </form>
+  </main>
+
+  <footer class="pie-pagina">
+    <div class="contenedor">
+      <span>&copy; 2026 Clínica Altavida. Proyecto académico con fines demostrativos.</span>
+    </div>
+  </footer>
+
+  <script src="../../assets/js/navegacion.js"></script>
+  <script src="https://unpkg.com/vue@3.4.38/dist/vue.global.prod.js"></script>
+  <script src="../../assets/js/vue/comun.js"></script>
+  <script src="../../assets/js/vue/admin.js"></script>
+</body>
+</html>

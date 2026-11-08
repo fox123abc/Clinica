@@ -65,7 +65,21 @@
     obtenerCita: function (id) { return api("GET", "/citas/" + encodeURIComponent(id)); },
     crearCita: function (datos) { return api("POST", "/citas", datos); },
     reprogramarCita: function (id, datos) { return api("PUT", "/citas/" + encodeURIComponent(id), datos); },
-    cancelarCita: function (id) { return api("PATCH", "/citas/" + encodeURIComponent(id) + "/cancelar"); }
+    cancelarCita: function (id) { return api("PATCH", "/citas/" + encodeURIComponent(id) + "/cancelar"); },
+
+    recepcionCitas: function () { return api("GET", "/recepcion/citas"); },
+    confirmarCita: function (id) { return api("PATCH", "/recepcion/citas/" + encodeURIComponent(id) + "/confirmar"); },
+    cancelarCitaRecepcion: function (id) { return api("PATCH", "/recepcion/citas/" + encodeURIComponent(id) + "/cancelar"); },
+
+    agendaMedico: function () { return api("GET", "/medico/agenda"); },
+    atenderCita: function (id) { return api("PATCH", "/medico/citas/" + encodeURIComponent(id) + "/atender"); },
+
+    catalogoAdmin: function () { return api("GET", "/admin/catalogo"); },
+    crearEspecialidad: function (nombre) { return api("POST", "/admin/especialidades", { nombre: nombre }); },
+    crearMedico: function (datos) { return api("POST", "/admin/medicos", datos); },
+    guardarDisponibilidad: function (medicoId, franjas) {
+      return api("PUT", "/admin/medicos/" + encodeURIComponent(medicoId) + "/disponibilidad", { franjas: franjas });
+    }
   };
 
   var ESTADOS = ["pendiente", "confirmada", "cancelada", "atendida"];
@@ -177,9 +191,28 @@
    * servidor y, si no hay una activa, redirige al inicio de sesión.
    * Devuelve una promesa con los datos del usuario.
    */
-  function requerirSesion(rutaLogin) {
-    return Api.obtenerSesion().catch(function (e) {
-      if (e.estado === 401) window.location.replace(rutaLogin);
+  // Página de inicio de cada rol (rutas desde la raíz del sitio)
+  var INICIO = {
+    paciente: "/html/paciente/mis-citas.html",
+    recepcionista: "/html/recepcion/citas.html",
+    medico: "/html/medico/agenda.html",
+    administrador: "/html/admin/catalogo.html"
+  };
+
+  function rutaInicio(rol) {
+    return INICIO[rol] || "/index.html";
+  }
+
+  // Si se indica rolEsperado y la sesión es de otro rol, se envía al usuario a su propia página de inicio
+  function requerirSesion(rutaLogin, rolEsperado) {
+    return Api.obtenerSesion().then(function (sesion) {
+      if (rolEsperado && sesion.rol !== rolEsperado) {
+        window.location.replace(rutaInicio(sesion.rol));
+        throw { estado: 401, redirigido: true, mensaje: "", campos: {} };
+      }
+      return sesion;
+    }).catch(function (e) {
+      if (e.estado === 401 && !e.redirigido) window.location.replace(rutaLogin);
       throw e;
     });
   }
@@ -230,6 +263,7 @@
     formatearFecha: formatearFecha,
     registrarComponentes: registrarComponentes,
     requerirSesion: requerirSesion,
+    rutaInicio: rutaInicio,
     montarFranjaSesion: montarFranjaSesion
   };
 })();
