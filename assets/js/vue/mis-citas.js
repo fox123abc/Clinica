@@ -55,7 +55,7 @@
     });
   }
 
-  A.requerirSesion("../login.html").then(function (sesion) {
+  A.requerirSesion("../login.html", "paciente").then(function (sesion) {
     A.montarFranjaSesion("#franja-sesion", sesion, "../login.html");
     return A.Api.listarCitas().then(function (citas) {
       A.registrarComponentes(crearApp(citas)).mount("#app-mis-citas");

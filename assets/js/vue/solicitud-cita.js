@@ -179,7 +179,7 @@
       .catch(function () { return null; });
   }
 
-  A.requerirSesion("../login.html").then(function (sesion) {
+  A.requerirSesion("../login.html", "paciente").then(function (sesion) {
     A.montarFranjaSesion("#franja-sesion", sesion, "../login.html");
     return Promise.all([A.Api.obtenerCatalogo(), cargarCitaAReprogramar()]).then(function (resultados) {
       A.registrarComponentes(crearApp(sesion, resultados[0], resultados[1])).mount("#app-solicitud");

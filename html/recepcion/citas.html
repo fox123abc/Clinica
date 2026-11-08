@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestión de citas | Clínica Altavida</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../../assets/css/variables.css">
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/layout.css">
+  <link rel="stylesheet" href="../../assets/css/componentes.css">
+  <link rel="stylesheet" href="../../assets/css/privado.css">
+</head>
+<body>
+
+  <div class="franja-sesion" id="franja-sesion" v-cloak>
+    <div class="contenedor">
+      <span class="franja-sesion__usuario">
+        <span class="franja-sesion__avatar" aria-hidden="true">{{ inicial }}</span>
+        <span class="franja-sesion__nombre">Sesión iniciada como: <strong>{{ nombre }}</strong> · Recepción</span>
+      </span>
+      <a href="../login.html" class="franja-sesion__accion" @click.prevent="salir">Cerrar sesión</a>
+    </div>
+  </div>
+
+  <header class="encabezado">
+    <div class="contenedor">
+      <a href="../../index.html" class="marca">Clínica Altavida</a>
+      <nav class="nav-principal" aria-label="Navegación del área de recepción">
+        <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="menu-principal">
+          Menú
+        </button>
+        <ul class="nav-principal__enlaces" id="menu-principal">
+          <li><a href="citas.html">Gestión de citas</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Página gestionada por Vue.js (assets/js/vue/recepcion.js) -->
+  <main class="contenedor seccion" id="app-recepcion" v-cloak>
+    <div class="cabecera-panel">
+      <div>
+        <h1>Gestión de citas</h1>
+        <p>Confirma o cancela las citas solicitadas por los pacientes.</p>
+      </div>
+    </div>
+
+    <p v-if="mensaje" class="aviso aviso--exito" role="status">{{ mensaje }}</p>
+    <p v-if="errorGeneral" class="aviso aviso--error" role="alert">{{ errorGeneral }}</p>
+
+    <ul class="filtros-estado" aria-label="Filtrar por estado">
+      <li>
+        <button type="button" :aria-pressed="filtroEstado === 'todas'" @click="filtroEstado = 'todas'">
+          Todas<span class="filtros-estado__cantidad">{{ citas.length }}</span>
+        </button>
+      </li>
+      <li v-for="estado in estados" :key="estado">
+        <button type="button" :aria-pressed="filtroEstado === estado" @click="filtroEstado = estado">
+          {{ capitalizar(estado) }}<span class="filtros-estado__cantidad">{{ contarPorEstado(estado) }}</span>
+        </button>
+      </li>
+    </ul>
+
+    <div class="tabla-contenedor">
+      <table class="tabla-datos">
+        <caption>Citas registradas</caption>
+        <thead>
+          <tr>
+            <th scope="col">Paciente</th>
+            <th scope="col">Teléfono</th>
+            <th scope="col">Especialidad</th>
+            <th scope="col">Médico</th>
+            <th scope="col">Fecha</th>
+            <th scope="col">Horario</th>
+            <th scope="col">Estado</th>
+            <th scope="col">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="cita in citasFiltradas" :key="cita.id">
+            <td data-etiqueta="Paciente">{{ cita.paciente }}</td>
+            <td data-etiqueta="Teléfono">{{ cita.telefono }}</td>
+            <td data-etiqueta="Especialidad">{{ cita.especialidad }}</td>
+            <td data-etiqueta="Médico">{{ cita.medico }}</td>
+            <td data-etiqueta="Fecha">{{ formatearFecha(cita.fecha) }}</td>
+            <td data-etiqueta="Horario">{{ cita.horario }}</td>
+            <td data-etiqueta="Estado"><etiqueta-estado :estado="cita.estado"></etiqueta-estado></td>
+            <td data-etiqueta="Acciones" class="tabla-datos__acciones">
+              <span v-if="cita.estado === 'pendiente' || cita.estado === 'confirmada'">
+                <template v-if="cita.estado === 'pendiente'">
+                  <button type="button" class="boton-enlace" @click="confirmar(cita)">Confirmar</button> ·
+                </template>
+                <button type="button" class="boton-enlace boton-enlace--peligro" @click="cancelar(cita)">Cancelar</button>
+              </span>
+              <span v-else>—</span>
+            </td>
+          </tr>
+          <tr v-if="!citasFiltradas.length">
+            <td colspan="8" class="tabla-datos__vacia">
+              {{ citas.length ? 'No hay citas con el estado seleccionado.' : 'Aún no hay citas registradas.' }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <footer class="pie-pagina">
+    <div class="contenedor">
+      <span>&copy; 2026 Clínica Altavida. Proyecto académico con fines demostrativos.</span>
+    </div>
+  </footer>
+
+  <script src="../../assets/js/navegacion.js"></script>
+  <script src="https://unpkg.com/vue@3.4.38/dist/vue.global.prod.js"></script>
+  <script src="../../assets/js/vue/comun.js"></script>
+  <script src="../../assets/js/vue/recepcion.js"></script>
+</body>
+</html>

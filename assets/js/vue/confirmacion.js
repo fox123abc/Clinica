@@ -22,7 +22,7 @@
     });
   }
 
-  A.requerirSesion("../login.html").then(function (sesion) {
+  A.requerirSesion("../login.html", "paciente").then(function (sesion) {
     A.montarFranjaSesion("#franja-sesion", sesion, "../login.html");
     var id = new URLSearchParams(window.location.search).get("id");
     var cargarCita = id

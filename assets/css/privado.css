@@ -258,3 +258,31 @@
     padding: var(--espacio-md);
   }
 }
+
+/* ---------- Administración del catálogo ---------- */
+.rejilla-admin {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+  gap: var(--espacio-lg);
+  margin-bottom: var(--espacio-xl);
+}
+
+.titulo-seccion {
+  margin-bottom: var(--espacio-md);
+}
+
+.editor-horarios {
+  margin-top: var(--espacio-lg);
+}
+
+.editor-horarios__fila .campo {
+  margin: 0;
+}
+
+.editor-horarios__fila {
+  display: grid;
+  grid-template-columns: 8rem 1fr;
+  align-items: center;
+  gap: var(--espacio-sm);
+  margin-bottom: var(--espacio-sm);
+}
