@@ -146,6 +146,32 @@ function enTransaccion(fn) {
   }
 }
 
+// Usuarios de demostración del personal (misma contraseña que el paciente de prueba)
+const PERSONAL_DEMO = [
+  { nombre: "Recepción Demo", correo: "recepcion@altavida.com", telefono: "3001230001", rol: "recepcionista", medicoId: null },
+  { nombre: "Médico Demo", correo: "medico@altavida.com", telefono: "3001230002", rol: "medico", medicoId: "medico-1" },
+  { nombre: "Administrador Demo", correo: "admin@altavida.com", telefono: "3001230003", rol: "administrador", medicoId: null }
+];
+
+// Agrega usuarios.medico_id si falta (bases creadas antes de los roles) y carga el personal de demostración
+function prepararPersonal() {
+  const columnas = bd.prepare("PRAGMA table_info(usuarios)").all().map((c) => c.name);
+  if (!columnas.includes("medico_id")) {
+    bd.exec("ALTER TABLE usuarios ADD COLUMN medico_id TEXT REFERENCES medicos(id)");
+  }
+  const existe = bd.prepare("SELECT 1 FROM usuarios WHERE correo = ?");
+  const hayMedico = bd.prepare("SELECT 1 FROM medicos WHERE id = ?");
+  const insertar = bd.prepare(
+    "INSERT INTO usuarios (nombre, correo, telefono, contrasena_hash, rol, medico_id) VALUES (?, ?, ?, ?, ?, ?)"
+  );
+  PERSONAL_DEMO.forEach((p) => {
+    if (existe.get(p.correo)) return;
+    const medicoId = p.medicoId && hayMedico.get(p.medicoId) ? p.medicoId : null;
+    insertar.run(p.nombre, p.correo, p.telefono, generarHash(USUARIO_DEMO.contrasena), p.rol, medicoId);
+  });
+}
+
 cargarCatalogoInicial();
+prepararPersonal();
 
 module.exports = { bd, enTransaccion, RUTA_BD };
