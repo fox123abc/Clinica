@@ -8,6 +8,9 @@ services:
     container_name: clinica-altavida
     ports:
       - "8080:3000"
+    environment:
+      # Hora de Colombia: el servidor valida fechas y horas con la hora local
+      TZ: America/Bogota
     volumes:
       # La base de datos SQLite se conserva aunque se reinicie o borre el contenedor
       - clinica-datos:/app/servidor/datos

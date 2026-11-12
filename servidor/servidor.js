@@ -10,7 +10,7 @@
 const path = require("node:path");
 const crypto = require("node:crypto");
 const express = require("express");
-const { bd, RUTA_BD } = require("./bd");
+const { bd, enTransaccion, RUTA_BD } = require("./bd");
 const { generarHash, verificarContrasena } = require("./seguridad");
 
 const PUERTO = process.env.PUERTO || 3000;
@@ -76,10 +76,18 @@ function usuarioDeSesion(req) {
   const token = leerCookie(req, COOKIE_SESION);
   if (!token) return null;
   return bd.prepare(`
-    SELECT u.id, u.nombre, u.correo, u.rol
+    SELECT u.id, u.nombre, u.correo, u.rol, u.medico_id AS medicoId
     FROM sesiones s JOIN usuarios u ON u.id = s.usuario_id
     WHERE s.token = ? AND s.expira_en > ?
   `).get(token, new Date().toISOString()) || null;
+}
+
+// Middleware: exige una sesión activa con alguno de los roles indicados
+function requiereRol(...roles) {
+  return [
+    requiereSesion,
+    (req, res, next) => (roles.includes(req.usuario.rol) ? next() : error(res, 403, "No tienes permiso para esta acción."))
+  ];
 }
 
 // Middleware: exige una sesión activa
@@ -237,6 +245,8 @@ function esConflictoDeHorario(e) {
   return /UNIQUE constraint failed/i.test(e.message);
 }
 
+app.use("/api/citas", requiereRol("paciente"));
+
 app.get("/api/citas", requiereSesion, (req, res) => {
   const citas = bd.prepare(CONSULTA_CITA + " WHERE c.paciente_id = ? ORDER BY c.fecha, c.horario").all(req.usuario.id);
   res.json(citas);
@@ -294,21 +304,34 @@ app.patch("/api/citas/:id/cancelar", requiereSesion, (req, res) => {
   res.json(obtenerCitaDelPaciente(cita.id, req.usuario.id));
 });
 
+require("./personal").registrarRutasPersonal(app, { bd, enTransaccion, requiereRol, error, texto, fechaHoy });
+
 app.use("/api", (req, res) => error(res, 404, "Ruta de la API no encontrada."));
 
 /* ==================================================================
  * Archivos del sitio
- * Se bloquean las carpetas y archivos internos para que nunca se
- * descarguen por el navegador (código del servidor, base de datos, etc.).
+ * Solo se publican index.html y las carpetas html/ y assets/ (lista blanca).
+ * Cualquier otra ruta (código del servidor, base de datos, configuración)
+ * responde 404, también con variantes como "/./", "//" o "%2e".
  * ================================================================== */
 
-const RUTAS_PRIVADAS = /^\/(servidor|node_modules)(\/|$)|^\/(package(-lock)?\.json|Dockerfile)$|\.md$/i;
+const RUTA_MARKDOWN = /\.md$/i;
 
 app.use((req, res, next) => {
-  if (RUTAS_PRIVADAS.test(decodeURIComponent(req.path))) return res.status(404).send("No encontrado");
+  let ruta;
+  try {
+    ruta = decodeURIComponent(req.path);
+  } catch {
+    return res.status(400).send("Ruta no válida");
+  }
+  if (RUTA_MARKDOWN.test(ruta)) return res.status(404).send("No encontrado");
   next();
 });
-app.use(express.static(RAIZ_SITIO, { extensions: ["html"] }));
+
+app.get(["/", "/index.html"], (req, res) => res.sendFile("index.html", { root: RAIZ_SITIO }));
+app.use("/html", express.static(path.join(RAIZ_SITIO, "html"), { extensions: ["html"] }));
+app.use("/assets", express.static(path.join(RAIZ_SITIO, "assets")));
+app.use((req, res) => res.status(404).send("No encontrado"));
 
 // Errores no controlados: respuesta genérica sin exponer detalles internos
 app.use((err, req, res, next) => {

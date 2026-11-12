@@ -19,10 +19,10 @@ reglas se cumplen y cómo se divide el sistema en contextos.
 10. [Del modelo al código](#10-del-modelo-al-código)
 
 > **Estado del alcance.** Las etapas 1 a 3 implementan el flujo del
-> **paciente**. Los flujos de **recepción**, **médico** y **administración**
-> se modelan aquí como **pendientes** (etapas posteriores) para que el diseño
-> futuro ya tenga un marco. En las tablas se marcan así:
-> ✅ implementado · 🕓 pendiente.
+> **paciente**, y hay una primera versión de los flujos de **recepción**,
+> **médico** y **administración**, con reglas provisionales a la espera de las
+> decisiones abiertas (sección 9). En las tablas se marcan así:
+> ✅ implementado · 🟡 implementado con regla provisional · 🕓 pendiente.
 
 ---
 
@@ -49,9 +49,9 @@ importantes.
 | Actor                          | Rol en el dominio                                                     | Estado |
 | ------------------------------ | --------------------------------------------------------------------- | ------ |
 | 🧑 **Paciente**          | Se registra, solicita, reprograma y cancela sus citas.                | ✅     |
-| 🧑‍💼 **Recepcionista** | Gestiona las citas: las confirma o cancela.                           | 🕓     |
-| 🩺 **Médico**           | Consulta su agenda y marca las citas como atendidas.                  | 🕓     |
-| 🛠️ **Administrador**   | Gestiona especialidades, médicos y horarios.                         | 🕓     |
+| 🧑‍💼 **Recepcionista** | Gestiona las citas: las confirma o cancela.                           | 🟡     |
+| 🩺 **Médico**           | Consulta su agenda y marca las citas como atendidas.                  | ✅     |
+| 🛠️ **Administrador**   | Gestiona especialidades, médicos y horarios.                         | ✅     |
 | ⚙️ **Sistema**         | Aplica las políticas automáticas (liberar horarios, validar cupos). | ✅     |
 
 ---
@@ -93,11 +93,11 @@ cronológico**, de izquierda a derecha.
 
 ```mermaid
 flowchart LR
-    subgraph ADM["🛠️ Preparación (Administrador) 🕓"]
+    subgraph ADM["🛠️ Preparación (Administrador) ✅"]
         direction TB
-        E1["Especialidad creada"]:::pendiente
-        E2["Médico registrado"]:::pendiente
-        E3["Disponibilidad definida"]:::pendiente
+        E1["Especialidad creada"]:::evento
+        E2["Médico registrado"]:::evento
+        E3["Disponibilidad definida"]:::evento
         E1 --> E2 --> E3
     end
 
@@ -120,12 +120,12 @@ flowchart LR
         E7 --> E9 --> E10
     end
 
-    subgraph REC["🧑‍💼 Gestión (Recepción) 🕓"]
-        E11["Cita confirmada"]:::pendiente
+    subgraph REC["🧑‍💼 Gestión (Recepción) 🟡"]
+        E11["Cita confirmada"]:::evento
     end
 
-    subgraph MED["🩺 Atención (Médico) 🕓"]
-        E12["Cita atendida"]:::pendiente
+    subgraph MED["🩺 Atención (Médico) ✅"]
+        E12["Cita atendida"]:::evento
     end
 
     E13["Sesión cerrada"]:::evento
@@ -137,26 +137,26 @@ flowchart LR
     classDef pendiente fill:#FCE3BE,stroke:#B5651D,color:#1A1A1A,stroke-dasharray: 5 3
 ```
 
-> Los eventos con borde punteado y color claro pertenecen a etapas
-> posteriores (🕓). Hoy el catálogo de especialidades, médicos y horarios se
-> carga como **datos de demostración** al crear la base de datos.
+> Todos los eventos del recorrido ya tienen una primera versión implementada.
+> El catálogo se crea con **datos de demostración** al iniciar la base de datos
+> y el administrador puede ampliarlo desde la aplicación.
 
 ### Catálogo de eventos de dominio
 
 | #  | Evento 🟧                         | Lo provoca                        | Datos que lleva                           | Estado |
 | -- | --------------------------------- | --------------------------------- | ----------------------------------------- | ------ |
-| 1  | **Especialidad creada**     | Administrador                     | id, nombre                                | 🕓     |
-| 2  | **Médico registrado**      | Administrador                     | id, nombre, especialidad                  | 🕓     |
-| 3  | **Disponibilidad definida** | Administrador                     | médico, día de la semana, horas         | 🕓     |
+| 1  | **Especialidad creada**     | Administrador                     | id, nombre                                | ✅     |
+| 2  | **Médico registrado**      | Administrador                     | id, nombre, especialidad                  | ✅     |
+| 3  | **Disponibilidad definida** | Administrador                     | médico, día de la semana, horas         | ✅     |
 | 4  | **Paciente registrado**     | Paciente                          | nombre, correo, teléfono                 | ✅     |
 | 5  | **Sesión iniciada**        | Paciente                          | usuario, vencimiento (8 h)                | ✅     |
 | 6  | **Cita solicitada**         | Paciente                          | paciente, médico, fecha, horario, motivo | ✅     |
 | 7  | **Horario reservado**       | Sistema (política)               | médico, fecha, horario                   | ✅     |
 | 8  | **Cita reprogramada**       | Paciente                          | cita, nuevo médico/fecha/horario         | ✅     |
-| 9  | **Cita cancelada**          | Paciente (🕓 también Recepción) | cita                                      | ✅     |
+| 9  | **Cita cancelada**          | Paciente o Recepcionista | cita                                      | ✅     |
 | 10 | **Horario liberado**        | Sistema (política)               | médico, fecha, horario                   | ✅     |
-| 11 | **Cita confirmada**         | Recepcionista                     | cita                                      | 🕓     |
-| 12 | **Cita atendida**           | Médico                           | cita                                      | 🕓     |
+| 11 | **Cita confirmada**         | Recepcionista                     | cita                                      | 🟡     |
+| 12 | **Cita atendida**           | Médico                           | cita                                      | ✅     |
 | 13 | **Sesión cerrada**         | Paciente                          | usuario                                   | ✅     |
 
 ---
@@ -175,7 +175,7 @@ flowchart LR
     E1 --> A2["🧑 Paciente"]:::actor --> C2["Iniciar sesión"]:::comando --> G2["Sesión"]:::agregado --> E2["Sesión iniciada"]:::evento
     E2 --> R1["Mis citas"]:::lectura
 
-    H1["¿Pedir tipo y número de documento?"]:::hotspot -.- C1
+    H1["H1 · ¿Pedir tipo y número de documento?"]:::hotspot -.- C1
 
     classDef evento fill:#F5A623,stroke:#B5651D,color:#1A1A1A
     classDef comando fill:#4A90E2,stroke:#2C5A8C,color:#FFFFFF
@@ -202,7 +202,7 @@ flowchart LR
     E1 --> P2["Reservar el horario<br/>del médico"]:::politica --> E2["Horario reservado"]:::evento
     E2 --> R3["Resumen de la cita<br/>(confirmación)"]:::lectura
 
-    H1["¿Cuántas citas activas<br/>puede tener un paciente?"]:::hotspot -.- G1
+    H1["H2 · ¿Cuántas citas activas<br/>puede tener un paciente?"]:::hotspot -.- G1
 
     classDef evento fill:#F5A623,stroke:#B5651D,color:#1A1A1A
     classDef comando fill:#4A90E2,stroke:#2C5A8C,color:#FFFFFF
@@ -235,7 +235,7 @@ flowchart LR
     E2 --> P3["Liberar el horario"]:::politica --> E3["Horario liberado"]:::evento
     E3 --> R2["Horarios disponibles"]:::lectura
 
-    H1["¿Hasta cuántas horas antes<br/>se puede cancelar?"]:::hotspot -.- C2
+    H1["H3 · ¿Hasta cuántas horas antes<br/>se puede cancelar?"]:::hotspot -.- C2
 
     classDef evento fill:#F5A623,stroke:#B5651D,color:#1A1A1A
     classDef comando fill:#4A90E2,stroke:#2C5A8C,color:#FFFFFF
@@ -247,21 +247,23 @@ flowchart LR
 ```
 
 Solo se pueden reprogramar o cancelar las citas en estado **pendiente** o
-**confirmada**, y únicamente por el paciente dueño de la cita.
+**confirmada**. Reprogramar lo hace únicamente el paciente dueño de la cita;
+cancelar también puede hacerlo la recepcionista.
 
-### 4.4 Gestión de recepción y atención médica 🕓
+### 4.4 Gestión de recepción y atención médica 🟡
 
 ```mermaid
 flowchart LR
-    R1["Citas pendientes<br/>del día"]:::lectura -.-> A1["🧑‍💼 Recepcionista"]:::actor
+    R1["Citas de los pacientes<br/>(filtro por estado)"]:::lectura -.-> A1["🧑‍💼 Recepcionista"]:::actor
     A1 --> C1["Confirmar cita"]:::comando --> G1["Cita"]:::agregado --> E1["Cita confirmada"]:::evento
     E1 --> P1["Notificar al paciente"]:::politica
 
     R2["Agenda del médico"]:::lectura -.-> A2["🩺 Médico"]:::actor
     A2 --> C2["Marcar como atendida"]:::comando --> G2["Cita"]:::agregado --> E2["Cita atendida"]:::evento
 
-    H1["¿Cómo se notifica?<br/>¿correo, SMS?"]:::hotspot -.- P1
-    H2["¿Existe estado<br/>'no asistió'?"]:::hotspot -.- G2
+    H1["H5 · ¿Cómo se notifica?<br/>¿correo, SMS?"]:::hotspot -.- P1
+    H2["H6 · ¿Existe estado<br/>'no asistió'?"]:::hotspot -.- G2
+    H3["H4 · ¿Quién confirma y cuándo?<br/>(hoy: manual)"]:::hotspot -.- C1
 
     classDef evento fill:#F5A623,stroke:#B5651D,color:#1A1A1A
     classDef comando fill:#4A90E2,stroke:#2C5A8C,color:#FFFFFF
@@ -272,6 +274,12 @@ flowchart LR
     classDef hotspot fill:#F1948A,stroke:#B03A2E,color:#1A1A1A
 ```
 
+**Implementación actual (primera versión).** La recepcionista ve las citas de todos
+los pacientes con filtro por estado (no solo las del día), confirma las pendientes y
+cancela las activas. El médico ve sus citas desde hoy, sin las canceladas, y marca
+como atendida solo una cita confirmada de su propia agenda. La notificación al
+paciente (H5) sigue pendiente.
+
 ### Resumen de comandos
 
 | Comando 🟦             | Actor                    | Agregado     | Evento 🟧                            | Estado  |
@@ -281,12 +289,12 @@ flowchart LR
 | Cerrar sesión         | Paciente                 | Sesión      | Sesión cerrada                      | ✅      |
 | Solicitar cita         | Paciente                 | Cita         | Cita solicitada → Horario reservado | ✅      |
 | Reprogramar cita       | Paciente                 | Cita         | Cita reprogramada                    | ✅      |
-| Cancelar cita          | Paciente / Recepcionista | Cita         | Cita cancelada → Horario liberado   | ✅ / 🕓 |
-| Confirmar cita         | Recepcionista            | Cita         | Cita confirmada                      | 🕓      |
-| Marcar como atendida   | Médico                  | Cita         | Cita atendida                        | 🕓      |
-| Crear especialidad     | Administrador            | Especialidad | Especialidad creada                  | 🕓      |
-| Registrar médico      | Administrador            | Médico      | Médico registrado                   | 🕓      |
-| Definir disponibilidad | Administrador            | Médico      | Disponibilidad definida              | 🕓      |
+| Cancelar cita          | Paciente / Recepcionista | Cita         | Cita cancelada → Horario liberado   | ✅ / 🟡 |
+| Confirmar cita         | Recepcionista            | Cita         | Cita confirmada                      | 🟡      |
+| Marcar como atendida   | Médico                  | Cita         | Cita atendida                        | ✅      |
+| Crear especialidad     | Administrador            | Especialidad | Especialidad creada                  | ✅      |
+| Registrar médico      | Administrador            | Médico      | Médico registrado                   | ✅      |
+| Definir disponibilidad | Administrador            | Médico      | Disponibilidad definida              | ✅      |
 
 ### Políticas 🟪
 
@@ -306,8 +314,8 @@ flowchart LR
 | Horarios disponibles                                         | Paciente      | qué horario reservar              | ✅     |
 | Resumen de la cita                                           | Paciente      | verificar lo que solicitó         | ✅     |
 | Mis citas (con filtro por estado)                            | Paciente      | qué cita reprogramar o cancelar   | ✅     |
-| Citas pendientes del día                                    | Recepcionista | qué citas confirmar               | 🕓     |
-| Agenda del médico                                           | Médico       | a quién atender                   | 🕓     |
+| Citas de todos los pacientes (filtro por estado)                                    | Recepcionista | qué citas confirmar               | ✅     |
+| Agenda del médico                                           | Médico       | a quién atender                   | ✅     |
 
 ---
 
@@ -319,12 +327,12 @@ estos cuatro estados:
 ```mermaid
 stateDiagram-v2
     [*] --> Pendiente: Solicitar cita ✅
-    Pendiente --> Confirmada: Confirmar cita 🕓 (Recepción)
+    Pendiente --> Confirmada: Confirmar cita 🟡 (Recepción)
     Pendiente --> Pendiente: Reprogramar ✅
     Confirmada --> Pendiente: Reprogramar ✅
     Pendiente --> Cancelada: Cancelar ✅
     Confirmada --> Cancelada: Cancelar ✅
-    Confirmada --> Atendida: Marcar como atendida 🕓 (Médico)
+    Confirmada --> Atendida: Marcar como atendida ✅ (Médico)
     Cancelada --> [*]
     Atendida --> [*]
 ```
@@ -354,6 +362,7 @@ classDiagram
         telefono
         contrasenaHash
         rol: paciente | recepcionista | medico | administrador
+        medicoId «solo para el rol médico»
         registrar()
         iniciarSesion()
     }
@@ -410,7 +419,7 @@ classDiagram
     Cita --> EstadoCita : estado
 ```
 
-> `confirmar()` y `marcarAtendida()` corresponden a etapas posteriores 🕓.
+> `confirmar()` y `marcarAtendida()` ya están implementados (primera versión).
 
 | Agregado          | Invariantes (reglas que siempre se cumplen)                                        | Dónde se garantizan                                                                        |
 | ----------------- | ---------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
@@ -419,8 +428,12 @@ classDiagram
 |                   | Solo las citas **pendientes o confirmadas** se reprograman o cancelan.       | `ESTADOS_MODIFICABLES` en el servidor                                                     |
 |                   | El estado es siempre uno de los cuatro definidos.                                  | `CHECK (estado IN (...))` en la tabla `citas`                                           |
 |                   | Un paciente solo ve y modifica **sus** citas.                                | Consultas filtradas por `paciente_id`                                                     |
+|                   | Solo se confirman las citas **pendientes** y solo se atienden las **confirmadas**. | Validaciones en `servidor/personal.js`                                                      |
+|                   | Un médico solo atiende las citas de **su** agenda.                                 | Consulta filtrada por `usuarios.medico_id` en `servidor/personal.js`                        |
+|                   | Cada rol solo accede a las rutas de su área.                                       | Middleware `requiereRol` en `servidor/servidor.js` (responde 403)                           |
 | **Usuario** | El correo es único.                                                               | `UNIQUE` en `usuarios.correo`                                                           |
 |                   | La contraseña nunca se guarda en texto plano.                                     | Hash scrypt con sal aleatoria                                                               |
+|                   | El registro público solo crea pacientes: el rol no se acepta desde el cliente.   | `INSERT` de `/api/registro` sin rol (valor por defecto `paciente`)                          |
 | **Médico** | Pertenece a una sola especialidad.                                                 | Llave foránea `especialidad_id`                                                          |
 |                   | Cada franja (día + hora) aparece una sola vez.                                    | Llave primaria de `disponibilidad`                                                        |
 
@@ -434,9 +447,9 @@ significado. El sistema se divide en cuatro:
 | Contexto                                      | Responsabilidad                                    | Términos propios                        | Actores                 | Estado                       |
 | --------------------------------------------- | -------------------------------------------------- | ---------------------------------------- | ----------------------- | ---------------------------- |
 | 🔐 **Identidad y Acceso**               | Registro, inicio de sesión, sesiones y roles      | Usuario, Sesión, Rol                    | Todos                   | ✅                           |
-| 🏥 **Catálogo Clínico**               | Especialidades, médicos y su disponibilidad       | Especialidad, Médico, Franja disponible | Administrador           | ✅ lectura · 🕓 gestión    |
-| 📅 **Agendamiento de Citas** *(Core)* | Solicitar, reprogramar, cancelar y confirmar citas | Cita, Horario disponible, Estado         | Paciente, Recepcionista | ✅ paciente · 🕓 recepción |
-| 🩺 **Atención Médica**                | Agenda del médico y registro de la atención      | Agenda, Consulta atendida                | Médico                 | 🕓                           |
+| 🏥 **Catálogo Clínico**               | Especialidades, médicos y su disponibilidad       | Especialidad, Médico, Franja disponible | Administrador           | ✅ lectura · ✅ gestión básica    |
+| 📅 **Agendamiento de Citas** *(Core)* | Solicitar, reprogramar, cancelar y confirmar citas | Cita, Horario disponible, Estado         | Paciente, Recepcionista | ✅ paciente · 🟡 recepción |
+| 🩺 **Atención Médica**                | Agenda del médico y registro de la atención      | Agenda, Consulta atendida                | Médico                 | ✅                           |
 
 > **Ejemplo de por qué separar contextos:** "Usuario" en *Identidad y Acceso*
 > es quien inicia sesión (correo y contraseña). En *Agendamiento* la misma
@@ -448,7 +461,7 @@ flowchart TB
     IA["🔐 Identidad y Acceso<br/><i>Generic</i>"]
     CC["🏥 Catálogo Clínico<br/><i>Supporting</i>"]
     AC["📅 Agendamiento de Citas<br/><b>CORE</b>"]
-    AM["🩺 Atención Médica<br/><i>Supporting</i> 🕓"]
+    AM["🩺 Atención Médica<br/><i>Supporting</i>"]
 
     IA -- "U → D · Open Host Service<br/>(GET /api/sesion)" --> AC
     IA -- "U → D" --> AM
@@ -467,9 +480,13 @@ flowchart TB
 
 | Relación                         | Tipo                            | Significado                                                                                                           |
 | --------------------------------- | ------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| Identidad → Agendamiento         | **Open Host Service**     | Identidad expone una API estable (`/api/sesion`) que cualquier contexto puede usar para saber quién es el usuario. |
+| Identidad → Agendamiento         | **Open Host Service**     | Identidad expone una API estable (`/api/sesion`) que cualquier contexto puede usar para saber quién es el usuario, su rol y el médico vinculado. |
 | Catálogo → Agendamiento         | **Customer / Supplier**   | Agendamiento (cliente) necesita médicos y franjas; Catálogo (proveedor) se las entrega según esas necesidades.     |
-| Agendamiento → Atención Médica | **Published Language** 🕓 | Atención Médica se enterará de las citas confirmadas o canceladas mediante eventos con un formato acordado.        |
+| Agendamiento → Atención Médica | **Published Language** (objetivo) 🕓 | Atención Médica se enterará de las citas confirmadas o canceladas mediante eventos con un formato acordado.        |
+
+> **Estado actual:** hoy no se publican eventos. Atención Médica consulta directamente
+> la tabla `citas` (`GET /api/medico/agenda`). La relación *Published Language* sigue
+> siendo el objetivo de diseño si los contextos llegan a separarse.
 
 ---
 
@@ -483,15 +500,16 @@ mismo significado, en las conversaciones, en la interfaz y en el código.
 | **Paciente**                | Persona registrada que solicita citas.                                   | `usuarios` con `rol = 'paciente'`                     |
 | **Especialidad**            | Área médica (los nombres reales están pendientes de confirmar).       | `especialidades`                                        |
 | **Médico**                 | Profesional que atiende una especialidad.                                | `medicos`                                               |
+| **Médico (cuenta)**         | Usuario con rol médico, vinculado a un médico del catálogo.              | `usuarios.medico_id`                                      |
 | **Disponibilidad / Franja** | Día de la semana y hora en que un médico atiende.                      | `disponibilidad`                                        |
 | **Horario disponible**      | Franja del médico en una fecha concreta que **no** está ocupada. | `horariosLibres()` · `GET /api/horarios-disponibles` |
 | **Cita**                    | Reserva de un paciente con un médico en una fecha y horario.            | `citas`                                                 |
 | **Cita activa**             | Cita que ocupa su horario (todo estado excepto *cancelada*).           | `WHERE estado <> 'cancelada'`                           |
 | **Solicitar**               | Crear una cita nueva (queda pendiente).                                  | `POST /api/citas`                                       |
 | **Reprogramar**             | Cambiar médico, fecha u horario de una cita; vuelve a pendiente.        | `PUT /api/citas/:id`                                    |
-| **Cancelar**                | Anular una cita; libera su horario.                                      | `PATCH /api/citas/:id/cancelar`                         |
-| **Confirmar**               | La clínica aprueba la cita. 🕓                                          | —                                                        |
-| **Atendida**                | La consulta se realizó. 🕓                                              | —                                                        |
+| **Cancelar**                | Anular una cita; libera su horario.                                      | `PATCH /api/citas/:id/cancelar` (paciente) · `PATCH /api/recepcion/citas/:id/cancelar` (recepción)                         |
+| **Confirmar**               | La clínica aprueba la cita. 🟡                                          | `PATCH /api/recepcion/citas/:id/confirmar` |
+| **Atendida**                | La consulta se realizó. ✅                                              | `PATCH /api/medico/citas/:id/atender` |
 | **Motivo**                  | Descripción opcional de la consulta (máx. 300 caracteres).             | `citas.motivo`                                          |
 | **Sesión**                 | Acceso autenticado de un usuario, dura 8 horas.                          | `sesiones` · cookie `altavida_sesion`                |
 
@@ -513,6 +531,13 @@ las siguientes etapas. No se inventaron reglas para ellas.
 | H7 | ¿Cuánto dura cada cita? ¿Varía según la especialidad?         | Catálogo  | Hoy cada franja es un horario fijo.        |
 | H8 | ¿Un médico puede atender varias especialidades?                  | Catálogo  | Hoy pertenece a una sola.                  |
 | H9 | ¿Se manejan festivos o ausencias del médico?                     | Catálogo  | Hoy solo cuenta el día de la semana.      |
+| H10 | ¿Cómo se crean las cuentas del personal y quién las administra?    | Identidad  | Hoy son cuentas de demostración con contraseña compartida. |
+| H11 | ¿Se pueden editar o desactivar especialidades y médicos ya creados? | Catálogo  | Hoy el administrador solo crea y define horarios; no se borra nada. |
+
+> **Decisiones provisionales ya implementadas** (por confirmar con la clínica):
+> **H2** sin límite de citas activas por paciente; **H3** sin plazo mínimo para
+> cancelar o reprogramar; **H4** confirmación manual por la recepcionista, sin plazo.
+> Si la respuesta cambia, hay que ajustar `validarDatosCita()` y `servidor/personal.js`.
 
 ---
 
@@ -527,13 +552,17 @@ Cómo se refleja cada concepto del dominio en la implementación actual:
 | Horario disponible (lectura)    | Agendamiento       | consulta sobre `disponibilidad` y `citas`       | `/api/horarios-disponibles`                                       | botones de horario                                                 |
 | Cita (agregado raíz)           | Agendamiento       | `citas` + índice `ux_citas_horario_activo`     | `/api/citas` (GET, POST, PUT, PATCH)                              | `solicitud-cita.html`, `confirmacion.html`, `mis-citas.html` |
 | Estado de la cita               | Agendamiento       | `CHECK` en `citas.estado`                       | `ESTADOS_MODIFICABLES`                                            | `<etiqueta-estado>`                                              |
+| Recepción de citas              | Agendamiento       | `citas`                                             | `/api/recepcion/citas` (GET, PATCH confirmar y cancelar)           | `html/recepcion/citas.html`                                        |
+| Agenda y atención               | Atención Médica    | `citas`, `usuarios.medico_id`                       | `/api/medico/agenda`, `/api/medico/citas/:id/atender`              | `html/medico/agenda.html`                                          |
+| Gestión del catálogo            | Catálogo Clínico | `especialidades`, `medicos`, `disponibilidad`       | `/api/admin/catalogo`, `/api/admin/especialidades`, `/api/admin/medicos` | `html/admin/catalogo.html`                                   |
 
 ### Próximos pasos sugeridos
 
-1. Resolver los **hotspots** H2 a H4 con la clínica antes de la etapa de recepción.
-2. Implementar **Confirmar cita** (contexto Agendamiento, rol recepcionista), aprovechando que el rol ya existe en la tabla `usuarios`.
-3. Implementar la **Agenda médica** como un contexto separado que consuma las citas confirmadas.
-4. Implementar la **gestión del Catálogo** (administrador) para reemplazar los datos de demostración.
+1. Resolver con la clínica los **hotspots** H2 a H4 (hoy con reglas provisionales) y confirmar H10 y H11.
+2. Definir cómo se crean las cuentas del personal y reemplazar las contraseñas de demostración.
+3. Implementar la **notificación** al paciente cuando se confirma una cita (H5).
+4. Completar la gestión del Catálogo (editar o desactivar especialidades y médicos) y paginar el listado de recepción.
+5. Agregar pruebas automáticas para las reglas de las citas y de los roles.
 
 ---
 
