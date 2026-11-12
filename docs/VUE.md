@@ -19,13 +19,13 @@ necesidad de leer todo el código.
 
 ## 1. Resumen rápido
 
-| Pregunta | Respuesta |
-| --- | --- |
-| ¿Qué versión? | Vue **3.4.38**, cargado desde CDN (sin instalar ni compilar nada). |
-| ¿Dónde se usa? | Solo en las páginas con **formularios o datos**: login, registro y las 3 páginas del paciente. |
-| ¿Dónde **no** se usa? | `index.html` y `html/especialidades.html` (son contenido estático). |
-| ¿Dónde está el código? | Una carpeta: [`assets/js/vue/`](../assets/js/vue/) — un archivo por página + `comun.js`. |
-| ¿Dónde está la plantilla? | Directamente en el HTML de cada página (atributos `v-…`, `@…`, `:…` y `{{ }}`). |
+| Pregunta                      | Respuesta                                                                                              |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------ |
+| ¿Qué versión?              | Vue **3.4.38**, cargado desde CDN (sin instalar ni compilar nada).                               |
+| ¿Dónde se usa?              | Solo en las páginas con **formularios o datos**: login, registro y las 3 páginas del paciente. |
+| ¿Dónde **no** se usa? | `index.html` y `html/especialidades.html` (son contenido estático).                               |
+| ¿Dónde está el código?    | Una carpeta: [`assets/js/vue/`](../assets/js/vue/) — un archivo por página + `comun.js`.          |
+| ¿Dónde está la plantilla?  | Directamente en el HTML de cada página (atributos `v-…`, `@…`, `:…` y `{{ }}`).            |
 
 > **Idea clave:** cada página HTML tiene un contenedor con un `id="app-…"`.
 > Su archivo `.js` crea una aplicación Vue y la "monta" en ese contenedor.
@@ -57,14 +57,14 @@ flowchart LR
     E --> R
 ```
 
-| Página (plantilla) | Archivo Vue | Se monta en | Qué hace Vue ahí |
-| --- | --- | --- | --- |
-| [html/registro.html](../html/registro.html) | [registro.js](../assets/js/vue/registro.js) | `#app-registro` | Valida 5 campos, comprueba que las contraseñas coincidan, crea la cuenta. |
-| [html/login.html](../html/login.html) | [login.js](../assets/js/vue/login.js) | `#app-login` | Valida, inicia sesión, muestra/oculta la contraseña. |
-| [html/paciente/solicitud-cita.html](../html/paciente/solicitud-cita.html) | [solicitud-cita.js](../assets/js/vue/solicitud-cita.js) | `#app-solicitud` | Selects encadenados, validación de fecha, horarios libres, resumen en vivo. |
-| [html/paciente/confirmacion.html](../html/paciente/confirmacion.html) | [confirmacion.js](../assets/js/vue/confirmacion.js) | `#app-confirmacion` | Muestra la cita recién creada (o un aviso si no existe). |
-| [html/paciente/mis-citas.html](../html/paciente/mis-citas.html) | [mis-citas.js](../assets/js/vue/mis-citas.js) | `#app-mis-citas` | Lista las citas, filtro por estado, cancelación. |
-| Las 3 páginas de paciente | [comun.js](../assets/js/vue/comun.js) | `#franja-sesion` | Franja "Sesión iniciada como…" y botón de cerrar sesión. |
+| Página (plantilla)                                                      | Archivo Vue                                            | Se monta en           | Qué hace Vue ahí                                                           |
+| ------------------------------------------------------------------------ | ------------------------------------------------------ | --------------------- | ---------------------------------------------------------------------------- |
+| [html/registro.html](../html/registro.html)                               | [registro.js](../assets/js/vue/registro.js)             | `#app-registro`     | Valida 5 campos, comprueba que las contraseñas coincidan, crea la cuenta.   |
+| [html/login.html](../html/login.html)                                     | [login.js](../assets/js/vue/login.js)                   | `#app-login`        | Valida, inicia sesión, muestra/oculta la contraseña.                       |
+| [html/paciente/solicitud-cita.html](../html/paciente/solicitud-cita.html) | [solicitud-cita.js](../assets/js/vue/solicitud-cita.js) | `#app-solicitud`    | Selects encadenados, validación de fecha, horarios libres, resumen en vivo. |
+| [html/paciente/confirmacion.html](../html/paciente/confirmacion.html)     | [confirmacion.js](../assets/js/vue/confirmacion.js)     | `#app-confirmacion` | Muestra la cita recién creada (o un aviso si no existe).                    |
+| [html/paciente/mis-citas.html](../html/paciente/mis-citas.html)           | [mis-citas.js](../assets/js/vue/mis-citas.js)           | `#app-mis-citas`    | Lista las citas, filtro por estado, cancelación.                            |
+| Las 3 páginas de paciente                                               | [comun.js](../assets/js/vue/comun.js)                   | `#franja-sesion`    | Franja "Sesión iniciada como…" y botón de cerrar sesión.                 |
 
 ---
 
@@ -85,13 +85,13 @@ Al final de cada página con Vue hay **tres scripts, siempre en este orden**
 
 Qué hay en [comun.js](../assets/js/vue/comun.js):
 
-| Pieza | Para qué sirve |
-| --- | --- |
-| [`Api`](../assets/js/vue/comun.js#L53) | Todas las llamadas al servidor (`registrar`, `iniciarSesion`, `crearCita`, …). |
-| [`Reglas`](../assets/js/vue/comun.js#L81) y [`validar()`](../assets/js/vue/comun.js#L101) | Reglas de validación reutilizables (obligatorio, correo, teléfono…). |
-| [`<campo-formulario>`](../assets/js/vue/comun.js#L142) y [`<etiqueta-estado>`](../assets/js/vue/comun.js#L159) | Los dos componentes propios (ver sección 6). |
-| [`requerirSesion()`](../assets/js/vue/comun.js#L180) | Protege las páginas del paciente: sin sesión, redirige al login. |
-| [`montarFranjaSesion()`](../assets/js/vue/comun.js#L188) | La mini-app Vue de la franja superior. |
+| Pieza                                                                                                            | Para qué sirve                                                                       |
+| ---------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| [`Api`](../assets/js/vue/comun.js#L53)                                                                          | Todas las llamadas al servidor (`registrar`, `iniciarSesion`, `crearCita`, …). |
+| [`Reglas`](../assets/js/vue/comun.js#L81) y [`validar()`](../assets/js/vue/comun.js#L101)                      | Reglas de validación reutilizables (obligatorio, correo, teléfono…).               |
+| [`<campo-formulario>`](../assets/js/vue/comun.js#L142) y [`<etiqueta-estado>`](../assets/js/vue/comun.js#L159) | Los dos componentes propios (ver sección 6).                                         |
+| [`requerirSesion()`](../assets/js/vue/comun.js#L180)                                                            | Protege las páginas del paciente: sin sesión, redirige al login.                    |
+| [`montarFranjaSesion()`](../assets/js/vue/comun.js#L188)                                                        | La mini-app Vue de la franja superior.                                                |
 
 ---
 
@@ -176,29 +176,29 @@ A.registrarComponentes(app).mount("#app-login");  // Conecta la lógica con la p
 
 ## 5. Directivas de Vue usadas y dónde
 
-| Directiva | Qué hace | Ejemplo real | Se usa en |
-| --- | --- | --- | --- |
-| `{{ }}` | Muestra un valor como texto | `{{ cita.medico }}` | Todas |
-| `v-model` | Enlaza un campo con un dato (en ambos sentidos) | `v-model="formulario.fecha"` | login, registro, solicitud-cita |
-| `v-if` / `v-else` | Muestra u oculta un elemento según una condición | `v-if="errorGeneral"` | Todas |
-| `v-for` | Repite un elemento por cada dato de una lista | `v-for="cita in citasFiltradas"` | solicitud-cita, mis-citas |
-| `@submit.prevent` | Ejecuta un método al enviar, sin recargar la página | `@submit.prevent="enviar"` | login, registro, solicitud-cita |
-| `@click` | Ejecuta código al hacer clic | `@click="cancelar(cita)"` | login, mis-citas, franja de sesión |
-| `@blur` | Ejecuta código al salir de un campo | `@blur="validarCampo('correo')"` | login, registro |
-| `:disabled` | Activa/desactiva un control según un dato | `:disabled="!formulario.especialidadId"` | login, registro, solicitud-cita |
-| `:class` | Agrega clases CSS según condiciones | `:class="{ 'tarjeta-resumen__vacio': !medico }"` | solicitud-cita |
-| `:key` | Identifica cada elemento de un `v-for` | `:key="cita.id"` | solicitud-cita, mis-citas |
-| `v-cloak` | Oculta la plantilla hasta que Vue termina de cargar | `<main v-cloak>` | Todas |
+| Directiva             | Qué hace                                             | Ejemplo real                                       | Se usa en                           |
+| --------------------- | ----------------------------------------------------- | -------------------------------------------------- | ----------------------------------- |
+| `{{ }}`             | Muestra un valor como texto                           | `{{ cita.medico }}`                              | Todas                               |
+| `v-model`           | Enlaza un campo con un dato (en ambos sentidos)       | `v-model="formulario.fecha"`                     | login, registro, solicitud-cita     |
+| `v-if` / `v-else` | Muestra u oculta un elemento según una condición    | `v-if="errorGeneral"`                            | Todas                               |
+| `v-for`             | Repite un elemento por cada dato de una lista         | `v-for="cita in citasFiltradas"`                 | solicitud-cita, mis-citas           |
+| `@submit.prevent`   | Ejecuta un método al enviar, sin recargar la página | `@submit.prevent="enviar"`                       | login, registro, solicitud-cita     |
+| `@click`            | Ejecuta código al hacer clic                         | `@click="cancelar(cita)"`                        | login, mis-citas, franja de sesión |
+| `@blur`             | Ejecuta código al salir de un campo                  | `@blur="validarCampo('correo')"`                 | login, registro                     |
+| `:disabled`         | Activa/desactiva un control según un dato            | `:disabled="!formulario.especialidadId"`         | login, registro, solicitud-cita     |
+| `:class`            | Agrega clases CSS según condiciones                  | `:class="{ 'tarjeta-resumen__vacio': !medico }"` | solicitud-cita                      |
+| `:key`              | Identifica cada elemento de un `v-for`              | `:key="cita.id"`                                 | solicitud-cita, mis-citas           |
+| `v-cloak`           | Oculta la plantilla hasta que Vue termina de cargar   | `<main v-cloak>`                                 | Todas                               |
 
 Y las **opciones** de una app Vue que aparecen en los archivos `.js`:
 
-| Opción | Qué es | Ejemplo en el proyecto |
-| --- | --- | --- |
-| `data` | Los valores de la página | `formulario`, `errores`, `citas` |
-| `computed` | Valores **calculados** que se actualizan solos | [`medicosDisponibles`](../assets/js/vue/solicitud-cita.js#L43): médicos de la especialidad elegida |
-| `watch` | Código que se ejecuta **cuando cambia** un dato | [Al cambiar la especialidad](../assets/js/vue/solicitud-cita.js#L85) se borra el médico elegido |
-| `methods` | Acciones (enviar, cancelar, validar…) | [`enviar()`](../assets/js/vue/solicitud-cita.js#L140), `cancelar(cita)` |
-| `mounted` | Se ejecuta una vez, al aparecer la página | Carga los horarios al reprogramar |
+| Opción      | Qué es                                                | Ejemplo en el proyecto                                                                               |
+| ------------ | ------------------------------------------------------ | ---------------------------------------------------------------------------------------------------- |
+| `data`     | Los valores de la página                              | `formulario`, `errores`, `citas`                                                               |
+| `computed` | Valores **calculados** que se actualizan solos   | [`medicosDisponibles`](../assets/js/vue/solicitud-cita.js#L43): médicos de la especialidad elegida |
+| `watch`    | Código que se ejecuta **cuando cambia** un dato | [Al cambiar la especialidad](../assets/js/vue/solicitud-cita.js#L85) se borra el médico elegido      |
+| `methods`  | Acciones (enviar, cancelar, validar…)                 | [`enviar()`](../assets/js/vue/solicitud-cita.js#L140), `cancelar(cita)`                           |
+| `mounted`  | Se ejecuta una vez, al aparecer la página             | Carga los horarios al reprogramar                                                                    |
 
 ---
 
@@ -226,13 +226,13 @@ texto de ayuda y el mensaje de error.
 </div>
 ```
 
-| Propiedad | Para qué |
-| --- | --- |
-| `id` | Une la etiqueta con el campo (`<label for>`) |
-| `etiqueta` | Texto de la etiqueta |
-| `obligatorio` | Agrega el asterisco rojo |
-| `error` | Si tiene texto, se muestra en rojo y el campo se marca |
-| `ayuda` | Texto gris debajo del campo (se oculta si hay error) |
+| Propiedad       | Para qué                                              |
+| --------------- | ------------------------------------------------------ |
+| `id`          | Une la etiqueta con el campo (`<label for>`)         |
+| `etiqueta`    | Texto de la etiqueta                                   |
+| `obligatorio` | Agrega el asterisco rojo                               |
+| `error`       | Si tiene texto, se muestra en rojo y el campo se marca |
+| `ayuda`       | Texto gris debajo del campo (se oculta si hay error)   |
 
 ### `<etiqueta-estado>`
 
@@ -352,9 +352,9 @@ y su ruta en [servidor/servidor.js](../servidor/servidor.js).
 
 ### Errores comunes
 
-| Síntoma | Causa | Solución |
-| --- | --- | --- |
-| Se ven los `{{ }}` en la página | Vue no cargó (sin internet o script mal escrito) | Revisar el orden de los 3 scripts y la consola del navegador. |
-| El formulario recarga la página | La directiva `@submit.prevent` está en el **mismo** elemento donde se monta Vue | Montar Vue en un `<div>` que **envuelva** al `<form>`. |
-| "Esta página no está conectada al servidor…" | Se abrió con Live Server | Ejecutar `npm start` y entrar por `http://localhost:3000`. |
-| Un componente no aparece | Faltó `A.registrarComponentes(app)` antes de `.mount()` | Agregarlo. |
+| Síntoma                                        | Causa                                                                                    | Solución                                                        |
+| ----------------------------------------------- | ---------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| Se ven los `{{ }}` en la página              | Vue no cargó (sin internet o script mal escrito)                                        | Revisar el orden de los 3 scripts y la consola del navegador.    |
+| El formulario recarga la página                | La directiva `@submit.prevent` está en el **mismo** elemento donde se monta Vue | Montar Vue en un `<div>` que **envuelva** al `<form>`. |
+| "Esta página no está conectada al servidor…" | Se abrió con Live Server                                                                | Ejecutar `npm start` y entrar por `http://localhost:3000`.   |
+| Un componente no aparece                        | Faltó `A.registrarComponentes(app)` antes de `.mount()`                             | Agregarlo.                                                       |

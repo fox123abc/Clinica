@@ -60,8 +60,27 @@ Flujos de prueba sugeridos:
   confirmar o cancelar.
 - **Médico:** ingresar como médico → ver la agenda → marcar como atendida una
   cita confirmada.
+- **Panel de administración:** al ingresar como administrador se abre el
+  **Panel**: avisos de lo que impide agendar (especialidades sin médicos,
+  médicos sin horario, citas pendientes), citas de hoy y de la semana, citas y
+  órdenes por estado, montos pagados y por cobrar, y la ocupación de cada
+  médico en los próximos 7 días frente a sus cupos.
 - **Administración:** ingresar como administrador → crear una especialidad o un
-  médico y definir sus horarios; el paciente los ve al solicitar una cita.
+  médico y definir sus horarios y sus **cupos por día**; el paciente los ve al
+  solicitar una cita. En **Empresas clientes** se registran y editan las empresas.
+- **Órdenes de empresas** (recepción o administración): **Órdenes de empresas**
+  → «+ Nueva orden» → elegir o registrar la empresa → agregar especialidades y
+  cantidad de citas (se cotiza con valores de ejemplo) → «Rectificar y emitir
+  orden de pago» → «Ver orden de pago» para imprimirla o guardarla en PDF y
+  enviarla → cuando la empresa pague, «Registrar pago y asignar citas». El
+  sistema reparte las citas entre los médicos de cada especialidad desde el día
+  siguiente, respetando sus horarios y sus cupos por día; si un día se llena,
+  continúa con el siguiente. Las citas aparecen en recepción y en la agenda del
+  médico con el nombre de la empresa.
+  **Si hubo un error:** en borrador se cambian especialidades, cantidades y la
+  empresa («Cambiar empresa»); una orden emitida se corrige con «Editar orden»
+  (vuelve a borrador y la orden de pago anterior deja de valer). Una orden
+  pagada no se edita: las citas que sobren se cancelan en recepción.
 
 ## Estructura de carpetas
 
@@ -162,12 +181,15 @@ Todas las llamadas al servidor están centralizadas en el objeto `Api` de
 
 | Tabla | Contenido |
 | --- | --- |
-| `especialidades` | Especialidades médicas |
-| `medicos` | Médicos y la especialidad a la que pertenecen |
+| `especialidades` | Especialidades médicas, con su `precio` (valor de ejemplo en COP para las órdenes de empresas) |
+| `medicos` | Médicos, la especialidad a la que pertenecen y sus `cupos_diarios` (máximo de pacientes por día) |
 | `disponibilidad` | Franjas de atención: médico + día de la semana + hora |
 | `usuarios` | Cuentas con su rol (paciente, recepcionista, médico o administrador). `medico_id` vincula la cuenta de un médico con su registro en `medicos`. El registro público solo crea pacientes |
 | `sesiones` | Sesiones activas (cookie `HttpOnly`, duran 8 horas) |
-| `citas` | Citas con su estado: pendiente, confirmada, cancelada o atendida |
+| `citas` | Citas con su estado: pendiente, confirmada, cancelada o atendida. Una cita es de un paciente (`paciente_id`) o de una orden de empresa (`orden_id`) |
+| `empresas` | Empresas clientes: nombre, NIT (único), contacto, correo y teléfono |
+| `ordenes` | Órdenes de empresas: borrador → emitida → pagada (o anulada), con su total |
+| `orden_items` | Renglones de cada orden: especialidad, cantidad de citas y valor unitario fijado al emitir |
 
 Reglas que garantiza la propia base de datos o el servidor:
 
@@ -214,22 +236,20 @@ cada una responde 403 si la cuenta no tiene el rol indicado:
 
 ## Decisiones de diseño (paleta y tipografía)
 
-- **Color:** verde pino (`--color-pino`) como color de marca, verde salvia
-  como acento secundario, sienna como color de llamada a la acción y un
-  fondo hueso cálido. Se definieron intencionalmente para evitar combinaciones
-  genéricas (crema + terracota) y transmitir calma y confianza clínica.
-- **Tipografía:** Newsreader (serif) para titulares, IBM Plex Sans para
-  texto e interfaz.
-- Los estados de una cita (pendiente, confirmada, cancelada, atendida)
-  tienen colores propios y consistentes en toda la aplicación. Las etiquetas
-  usan fondo suave y texto oscuro del mismo tono para que se lean bien.
-- Tarjetas con bordes redondeados y sombras suaves, encabezado fijo con la
-  página actual resaltada y logotipo dibujado solo con CSS.
-- Inicio de sesión y registro a dos columnas (beneficios + formulario).
-- En la solicitud de cita los horarios se eligen con botones y un resumen
-  lateral se actualiza en vivo mientras se llena el formulario.
-- En pantallas angostas la tabla de "Mis citas" se convierte en tarjetas,
-  para que no haya desplazamiento horizontal.
+El sistema visual completo está en [DESIGN.md](DESIGN.md). En resumen:
+
+- **Mundo "Carné de citas":** el sitio se viste como el carné de citas impreso
+  de una clínica. Fondo de cartulina celeste, tinta casi negra para textos y
+  filetes, campos numerados (01, 02…) y líneas perforadas.
+- **Tipografía:** Archivo (titulares y rótulos de imprenta), Public Sans
+  (lectura) y Courier Prime para los valores "escritos a máquina" (fechas,
+  horas, precios).
+- **Sellos de estado:** cada estado de una cita es un sello de goma con su
+  propia tinta: pendiente (violeta), confirmada (verde), atendida (azul) y
+  cancelada (rojo).
+- La portada muestra la agenda real: se elige una hora libre y cae el sello.
+- En pantallas angostas las tablas se convierten en fichas, sin
+  desplazamiento horizontal de la página.
 
 ## Contenido pendiente de confirmar
 

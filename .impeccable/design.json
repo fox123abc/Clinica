@@ -1,0 +1,151 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-11T23:50:00-05:00",
+  "title": "Design System: Clínica Altavida",
+  "extensions": {
+    "colorMeta": {
+      "tinta": { "role": "primary", "displayName": "Tinta de imprenta", "canonical": "#14181F", "tonalRamp": ["#0D1015", "#0F1218", "#12151B", "#14181F", "#5B5D62", "#95979A", "#C4C5C7", "#E8E8E9"] },
+      "sello-pendiente": { "role": "secondary", "displayName": "Violeta de sello pendiente", "canonical": "#5B3FA0", "tonalRamp": ["#221B3B", "#332658", "#47327C", "#5B3FA0", "#8C79BD", "#B5A9D4", "#D6CFE7", "#EFECF6"] },
+      "sello-confirmada": { "role": "tertiary", "displayName": "Verde de sello confirmada", "canonical": "#1F6B45", "tonalRamp": ["#102920", "#153C2B", "#1A5338", "#1F6B45", "#62977D", "#9ABCAB", "#C7DAD1", "#E9F0EC"] },
+      "sello-atendida": { "role": "tertiary", "displayName": "Azul de sello atendida", "canonical": "#1E4E8C", "tonalRamp": ["#102035", "#142D4E", "#193E6D", "#1E4E8C", "#6283AF", "#9AAFCB", "#C7D3E2", "#E9EDF4"] },
+      "sello-cancelada": { "role": "tertiary", "displayName": "Rojo de sello cancelada", "canonical": "#B42E28", "tonalRamp": ["#3D1617", "#5F1D1C", "#8A2622", "#B42E28", "#CB6D69", "#DDA19E", "#ECCBC9", "#F8EAEA"] },
+      "cartulina": { "role": "neutral", "displayName": "Cartulina celeste", "canonical": "#BFD6EA", "tonalRamp": ["#404951", "#65717D", "#92A4B4", "#BFD6EA", "#D2E2F0", "#E2EDF6", "#EFF5FA", "#F9FBFD"] },
+      "cartulina-honda": { "role": "neutral", "displayName": "Cartulina honda", "canonical": "#A9C7E1", "tonalRamp": ["#3A444F", "#5A6A79", "#8198AD", "#A9C7E1", "#C3D8EA", "#D8E6F2", "#EAF1F8", "#F6F9FC"] },
+      "cara": { "role": "neutral", "displayName": "Cara del carné", "canonical": "#E8F1F9", "tonalRamp": ["#4D5156", "#797F85", "#B1B8BF", "#E8F1F9", "#EFF5FB", "#F5F9FC", "#F9FCFE", "#FDFEFE"] },
+      "papel": { "role": "neutral", "displayName": "Papel", "canonical": "#F7FAFD", "tonalRamp": ["#515357", "#818387", "#BCBFC2", "#F7FAFD", "#F9FCFE", "#FBFDFE", "#FDFEFF", "#FEFFFF"] },
+      "blanco": { "role": "neutral", "displayName": "Blanco", "canonical": "#FFFFFF", "tonalRamp": ["#4D4D4D", "#808080", "#BFBFBF", "#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF"] },
+      "tinta-suave": { "role": "neutral", "displayName": "Tinta suave", "canonical": "#3A4452", "tonalRamp": ["#181D24", "#222831", "#2E3642", "#3A4452", "#757C86", "#A6ABB1", "#CED0D4", "#EBECEE"] },
+      "linea": { "role": "neutral", "displayName": "Línea de tinta", "canonical": "rgba(20, 24, 31, 0.85)" },
+      "linea-tenue": { "role": "neutral", "displayName": "Línea tenue", "canonical": "rgba(20, 24, 31, 0.28)" }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Solo el titular de la primera pantalla; Archivo 900 condensado, mayúsculas." },
+      "headline": { "displayName": "Headline", "purpose": "Titulares de sección (reverso, talonarios); mayúsculas." },
+      "title": { "displayName": "Title", "purpose": "Cabecera del carné, rol de talón, título de normas, marca; Archivo expandido en mayúsculas." },
+      "stamp": { "displayName": "Sello", "purpose": "Texto de los sellos de estado; 1.2rem en tablas, hasta 2.4rem sobre el carné." },
+      "label": { "displayName": "Label", "purpose": "Rótulos de campo numerados y cabeceras de tabla; mayúsculas en tinta suave." },
+      "action": { "displayName": "Action", "purpose": "Navegación, botones y enlaces de acción; mayúsculas." },
+      "body-lead": { "displayName": "Body lead", "purpose": "Subtítulo de portada, máx. 30ch." },
+      "body": { "displayName": "Body", "purpose": "Lectura general; párrafos hasta 52ch." },
+      "body-small": { "displayName": "Body small", "purpose": "Notas, ayudas, normas, leyendas y pie." },
+      "typed": { "displayName": "Máquina de escribir", "purpose": "Todo valor que el carné rellena: selects, horas, días, fecha del estado; cifras tabulares." }
+    },
+    "shadows": [
+      { "name": "carne-apoyado", "value": "0 2px 4px rgba(20, 24, 31, 0.1), 0 24px 48px -16px rgba(20, 24, 31, 0.35)", "purpose": "Exclusiva del carné interactivo: tarjeta física sobre la mesa." },
+      { "name": "boton-tinta", "value": "0 2px 4px rgba(20, 24, 31, 0.25)", "purpose": "Botón principal en reposo; se quita al deshabilitar." },
+      { "name": "menu-desplegado", "value": "0 10px 24px rgba(20, 24, 31, 0.18)", "purpose": "Panel de navegación móvil abierto." }
+    ],
+    "motion": [
+      { "name": "golpe-sello", "value": "140ms cubic-bezier(0.5, 0, 0.75, 0) both; scale 1.25 → 0.98 → 1 con rotate(-7deg)", "purpose": "Única animación del sistema: el sello cae una vez al elegir hora; sin fundido; desactivada con prefers-reduced-motion." },
+      { "name": "salida", "value": "cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "Desplazamiento de 1px del botón principal al pulsar (150ms)." },
+      { "name": "cambio-de-tinta", "value": "120–150ms ease", "purpose": "Cambios de fondo y color de casillas y botón." }
+    ],
+    "breakpoints": [
+      { "name": "angosto", "value": "40rem" },
+      { "name": "medio", "value": "60rem" },
+      { "name": "ancho", "value": "64rem" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Botón de tinta",
+      "kind": "button",
+      "refersTo": "boton-tinta",
+      "description": "Acción principal (p. ej. reservar): bloque de tinta que vira a violeta pendiente al pasar.",
+      "html": "<button class=\"ds-boton-tinta\" type=\"button\">Reservar este horario</button> <button class=\"ds-boton-tinta\" type=\"button\" disabled>Reservar este horario</button>",
+      "css": ".ds-boton-tinta { font-family: Archivo, 'Arial Narrow', Arial, sans-serif; font-weight: 800; font-stretch: 105%; font-size: 1.05rem; letter-spacing: 0.06em; text-transform: uppercase; padding: 1rem 1.6rem; color: #FFFFFF; background-color: var(--tinta, #14181F); border: 2px solid var(--tinta, #14181F); border-radius: 8px; cursor: pointer; box-shadow: 0 2px 4px rgba(20, 24, 31, 0.25); transition: background-color 150ms ease, transform 150ms cubic-bezier(0.16, 1, 0.3, 1); } .ds-boton-tinta:hover:not(:disabled) { background-color: var(--sello-pendiente, #5B3FA0); border-color: var(--sello-pendiente, #5B3FA0); } .ds-boton-tinta:active:not(:disabled) { transform: translateY(1px); } .ds-boton-tinta:focus-visible { outline: 3px solid var(--sello-pendiente, #5B3FA0); outline-offset: 3px; } .ds-boton-tinta:disabled { color: var(--tinta-suave, #3A4452); background-color: transparent; border-color: rgba(20, 24, 31, 0.28); box-shadow: none; cursor: not-allowed; }"
+    },
+    {
+      "name": "Navegación del membrete",
+      "kind": "nav",
+      "refersTo": "nav-enlace",
+      "description": "Franja impresa con logo de la cruz, enlaces en mayúsculas y un enlace destacado en tinta.",
+      "html": "<header class=\"ds-membrete\"><a class=\"ds-marca\" href=\"#\"><span class=\"ds-logo-cruz\" aria-hidden=\"true\"></span>Clínica Altavida</a><nav><a class=\"ds-nav-enlace\" href=\"#\">Especialidades</a><a class=\"ds-nav-enlace\" href=\"#\">Ingresar</a><a class=\"ds-nav-enlace ds-nav-destacado\" href=\"#\">Registrarme</a></nav></header>",
+      "css": ".ds-membrete { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem 1.5rem; background: var(--cartulina, #BFD6EA); color: var(--tinta, #14181F); border-bottom: 2px solid var(--tinta, #14181F); } .ds-membrete nav { display: flex; gap: 0.25rem; } .ds-marca { display: inline-flex; align-items: center; gap: 0.7rem; text-decoration: none; color: inherit; font-family: Archivo, 'Arial Narrow', Arial, sans-serif; font-weight: 800; font-stretch: 112%; font-size: 1.15rem; letter-spacing: 0.04em; text-transform: uppercase; } .ds-logo-cruz { position: relative; width: 1.9rem; height: 1.9rem; border-radius: 6px; background: var(--sello-cancelada, #B42E28); } .ds-logo-cruz::before, .ds-logo-cruz::after { content: ''; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); background: #FFFFFF; border-radius: 1px; } .ds-logo-cruz::before { width: 1.05rem; height: 0.3rem; } .ds-logo-cruz::after { width: 0.3rem; height: 1.05rem; } .ds-nav-enlace { display: block; padding: 0.5rem 0.9rem; color: inherit; font-family: Archivo, 'Arial Narrow', Arial, sans-serif; font-weight: 700; font-size: 0.95rem; letter-spacing: 0.06em; text-transform: uppercase; text-decoration: none; border: 1.5px solid transparent; border-radius: 6px; } .ds-nav-enlace:hover { border-color: var(--tinta, #14181F); } .ds-nav-enlace:focus-visible { outline: 3px solid var(--sello-pendiente, #5B3FA0); outline-offset: 3px; } .ds-nav-destacado { background: var(--tinta, #14181F); color: #FFFFFF; } .ds-nav-destacado:hover { background: var(--sello-pendiente, #5B3FA0); border-color: var(--sello-pendiente, #5B3FA0); }"
+    },
+    {
+      "name": "Campo numerado con select",
+      "kind": "input",
+      "refersTo": "campo-control",
+      "description": "Rótulo impreso numerado sobre un select sin caja, escrito a máquina sobre un renglón discontinuo.",
+      "html": "<div class=\"ds-campo\"><label class=\"ds-campo-etiqueta\" for=\"ds-esp\"><span>01</span> Especialidad</label><select id=\"ds-esp\" class=\"ds-campo-control\"><option>[Especialidad 1]</option><option>[Especialidad 2]</option></select></div>",
+      "css": ".ds-campo { padding: 0.9rem 1.5rem 1.1rem; background: var(--cara, #E8F1F9); border-bottom: 1.5px solid rgba(20, 24, 31, 0.85); } .ds-campo-etiqueta { display: block; margin-bottom: 0.5rem; font-family: Archivo, 'Arial Narrow', Arial, sans-serif; font-weight: 700; font-size: 0.75rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--tinta-suave, #3A4452); } .ds-campo-etiqueta span { color: var(--tinta, #14181F); margin-right: 0.35rem; } .ds-campo-control { width: 100%; appearance: none; font-family: 'Courier Prime', 'Courier New', monospace; font-size: 1.15rem; font-weight: 700; color: var(--tinta, #14181F); background: transparent url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%2314181F' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E\") no-repeat right 0.2rem center; border: 0; border-bottom: 1.5px dashed rgba(20, 24, 31, 0.28); border-radius: 0; padding: 0.25rem 1.6rem 0.35rem 0; cursor: pointer; } .ds-campo-control:hover { border-bottom-color: var(--tinta, #14181F); } .ds-campo-control:focus-visible { outline: 3px solid var(--sello-pendiente, #5B3FA0); outline-offset: 3px; } .ds-campo-control:disabled { color: var(--tinta-suave, #3A4452); cursor: not-allowed; }"
+    },
+    {
+      "name": "Casillas de día",
+      "kind": "chip",
+      "refersTo": "casilla-dia",
+      "description": "Días de atención como casillas de calendario impreso; la elegida se rellena de tinta.",
+      "html": "<div class=\"ds-dias\"><button class=\"ds-dia\" type=\"button\" aria-pressed=\"false\"><span class=\"ds-dia-sm\">Mié</span><span class=\"ds-dia-num\">11</span><span class=\"ds-dia-sm\">Nov</span></button><button class=\"ds-dia\" type=\"button\" aria-pressed=\"true\"><span class=\"ds-dia-sm\">Vie</span><span class=\"ds-dia-num\">13</span><span class=\"ds-dia-sm\">Nov</span></button><button class=\"ds-dia\" type=\"button\" aria-pressed=\"false\"><span class=\"ds-dia-sm\">Lun</span><span class=\"ds-dia-num\">16</span><span class=\"ds-dia-sm\">Nov</span></button></div>",
+      "css": ".ds-dias { display: grid; grid-template-columns: repeat(3, 5.5rem); gap: 0.5rem; } .ds-dia { display: grid; justify-items: center; gap: 0.05rem; padding: 0.5rem 0.25rem 0.55rem; font-family: Archivo, 'Arial Narrow', Arial, sans-serif; color: var(--tinta, #14181F); background: var(--papel, #F7FAFD); border: 1.5px solid var(--tinta, #14181F); border-radius: 6px; cursor: pointer; transition: background-color 120ms ease, color 120ms ease; } .ds-dia:hover { background: #FFFFFF; } .ds-dia:focus-visible { outline: 3px solid var(--sello-pendiente, #5B3FA0); outline-offset: 3px; } .ds-dia[aria-pressed='true'], .ds-dia[aria-pressed='true']:hover { background: var(--tinta, #14181F); color: #FFFFFF; } .ds-dia-sm { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; } .ds-dia-num { font-family: 'Courier Prime', 'Courier New', monospace; font-size: 1.5rem; font-weight: 700; line-height: 1.1; font-variant-numeric: tabular-nums; }"
+    },
+    {
+      "name": "Casillas de hora",
+      "kind": "chip",
+      "refersTo": "casilla-hora",
+      "description": "Horas libres como casillas escritas a máquina; la elegida en violeta pendiente; las tomadas, tachadas con rayado diagonal.",
+      "html": "<div class=\"ds-horas\"><button class=\"ds-hora\" type=\"button\" aria-pressed=\"false\">08:00</button><button class=\"ds-hora\" type=\"button\" aria-pressed=\"true\">08:30</button><button class=\"ds-hora ds-hora-tomada\" type=\"button\" disabled aria-label=\"09:00, ocupada\">09:00</button><button class=\"ds-hora\" type=\"button\" aria-pressed=\"false\">09:30</button></div>",
+      "css": ".ds-horas { display: grid; grid-template-columns: repeat(4, 5.5rem); gap: 0.5rem; } .ds-hora { font-family: 'Courier Prime', 'Courier New', monospace; font-size: 1.1rem; font-weight: 700; font-variant-numeric: tabular-nums; padding: 0.65rem 0.25rem; color: var(--tinta, #14181F); background: #FFFFFF; border: 1.5px solid var(--tinta, #14181F); border-radius: 6px; cursor: pointer; transition: background-color 120ms ease, color 120ms ease; } .ds-hora:hover:not(:disabled) { background: var(--cartulina, #BFD6EA); } .ds-hora:focus-visible { outline: 3px solid var(--sello-pendiente, #5B3FA0); outline-offset: 3px; } .ds-hora[aria-pressed='true'], .ds-hora[aria-pressed='true']:hover:not(:disabled) { background: var(--sello-pendiente, #5B3FA0); border-color: var(--sello-pendiente, #5B3FA0); color: #FFFFFF; } .ds-hora-tomada { color: var(--tinta-suave, #3A4452); background: repeating-linear-gradient(135deg, transparent 0 7px, rgba(20, 24, 31, 0.28) 7px 8.5px), var(--cara, #E8F1F9); border-color: rgba(20, 24, 31, 0.28); text-decoration: line-through; text-decoration-thickness: 1.5px; cursor: not-allowed; }"
+    },
+    {
+      "name": "Sellos de estado",
+      "kind": "custom",
+      "refersTo": "sello-pendiente",
+      "description": "Componente firma: sello de goma de doble borde girado, una tinta por estado de la cita. La máscara de tinta irregular del proyecto (assets/img/tinta-sello.svg) se omite aquí por ser un recurso externo.",
+      "html": "<div class=\"ds-sellos\"><span class=\"ds-sello ds-sello-pendiente\">Pendiente</span><span class=\"ds-sello ds-sello-confirmada\">Confirmada</span><span class=\"ds-sello ds-sello-atendida\">Atendida</span><span class=\"ds-sello ds-sello-cancelada\">Cancelada</span></div>",
+      "css": ".ds-sellos { display: flex; flex-wrap: wrap; gap: 1.5rem; padding: 1.5rem; background: var(--cara, #E8F1F9); } .ds-sello { display: inline-block; font-family: Archivo, 'Arial Narrow', Arial, sans-serif; font-weight: 900; font-stretch: 85%; font-size: 1.6rem; line-height: 1; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.35rem 0.8rem 0.3rem; border: 4px double currentColor; border-radius: 6px; transform: rotate(-7deg); animation: ds-golpe-sello 140ms cubic-bezier(0.5, 0, 0.75, 0) both; } .ds-sello-pendiente { color: var(--sello-pendiente, #5B3FA0); } .ds-sello-confirmada { color: var(--sello-confirmada, #1F6B45); } .ds-sello-atendida { color: var(--sello-atendida, #1E4E8C); } .ds-sello-cancelada { color: var(--sello-cancelada, #B42E28); } @keyframes ds-golpe-sello { 0% { transform: rotate(-7deg) scale(1.25); } 80% { transform: rotate(-7deg) scale(0.98); } 100% { transform: rotate(-7deg) scale(1); } } @media (prefers-reduced-motion: reduce) { .ds-sello { animation: none; } }"
+    },
+    {
+      "name": "Carné de citas",
+      "kind": "card",
+      "refersTo": "carne",
+      "description": "El único objeto con sombra amplia: cara pálida con borde de tinta, campos numerados, perforación antes del talón de acción.",
+      "html": "<div class=\"ds-carne\"><div class=\"ds-carne-cabecera\"><span class=\"ds-carne-titulo\">Carné de citas</span><span class=\"ds-carne-nota\">Datos reales de la agenda</span></div><div class=\"ds-carne-estado\"><span class=\"ds-carne-etiqueta\"><span>05</span> Estado</span><p class=\"ds-carne-valor\">viernes, 13 de noviembre de 2026, 08:30</p></div><div class=\"ds-carne-accion\"><p>Para reservar necesitas una cuenta de paciente.</p></div></div>",
+      "css": ".ds-carne { max-width: 34rem; background: var(--cara, #E8F1F9); color: var(--tinta, #14181F); border: 2px solid var(--tinta, #14181F); border-radius: 14px; box-shadow: 0 2px 4px rgba(20, 24, 31, 0.1), 0 24px 48px -16px rgba(20, 24, 31, 0.35); font-family: 'Public Sans', 'Segoe UI', Arial, sans-serif; } .ds-carne-cabecera { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 0.5rem; padding: 1rem 1.5rem; border-bottom: 2px solid var(--tinta, #14181F); } .ds-carne-titulo { font-family: Archivo, 'Arial Narrow', Arial, sans-serif; font-weight: 800; font-stretch: 115%; font-size: 1.1rem; letter-spacing: 0.12em; text-transform: uppercase; } .ds-carne-nota { font-size: 0.8125rem; color: var(--tinta-suave, #3A4452); } .ds-carne-estado { padding: 0.9rem 1.5rem 1.1rem; border-bottom: 2px dashed rgba(20, 24, 31, 0.85); } .ds-carne-etiqueta { display: block; margin-bottom: 0.5rem; font-family: Archivo, 'Arial Narrow', Arial, sans-serif; font-weight: 700; font-size: 0.75rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--tinta-suave, #3A4452); } .ds-carne-etiqueta span { color: var(--tinta, #14181F); margin-right: 0.35rem; } .ds-carne-valor { margin: 0; font-family: 'Courier Prime', 'Courier New', monospace; font-size: 1.1rem; font-weight: 700; } .ds-carne-accion { padding: 1.25rem 1.5rem 1.5rem; font-size: 0.875rem; color: var(--tinta-suave, #3A4452); } .ds-carne-accion p { margin: 0; }"
+    },
+    {
+      "name": "Talonarios por rol",
+      "kind": "card",
+      "refersTo": "talonario",
+      "description": "Tira de talones separados por perforación, uno por rol, sobre la cartulina honda.",
+      "html": "<div class=\"ds-talonarios\"><ul class=\"ds-talonarios-lista\"><li class=\"ds-talon\"><h3>Paciente</h3><p>Reserva, reprograma o cancela tus citas.</p><a href=\"#\">Crear mi cuenta</a></li><li class=\"ds-talon\"><h3>Recepción</h3><p>Confirma o cancela las citas solicitadas.</p><a href=\"#\">Ingresar</a></li></ul></div>",
+      "css": ".ds-talonarios { padding: 2rem; background: var(--cartulina-honda, #A9C7E1); } .ds-talonarios-lista { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); background: var(--cara, #E8F1F9); border: 2px solid var(--tinta, #14181F); border-radius: 12px; color: var(--tinta, #14181F); font-family: 'Public Sans', 'Segoe UI', Arial, sans-serif; } .ds-talon { display: flex; flex-direction: column; gap: 0.6rem; padding: 1.5rem; border-left: 2px dashed rgba(20, 24, 31, 0.85); } .ds-talon:first-child { border-left: 0; } .ds-talon h3 { margin: 0; font-family: Archivo, 'Arial Narrow', Arial, sans-serif; font-weight: 800; font-stretch: 112%; font-size: 1.15rem; letter-spacing: 0.08em; text-transform: uppercase; } .ds-talon p { margin: 0; flex: 1; color: var(--tinta-suave, #3A4452); } .ds-talon a { align-self: flex-start; color: inherit; font-family: Archivo, 'Arial Narrow', Arial, sans-serif; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; text-underline-offset: 0.2em; text-decoration-thickness: 1.5px; } .ds-talon a:hover { color: var(--sello-pendiente, #5B3FA0); } .ds-talon a:focus-visible { outline: 3px solid var(--sello-pendiente, #5B3FA0); outline-offset: 3px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "El carné de citas",
+    "overview": "Clínica Altavida se viste como el carné de citas impreso de una clínica: cartulina celeste que inunda regiones enteras, una cara más pálida donde se escribe, tinta de imprenta casi negra para filetes y letras, y cuatro tintas de sello de goma, una por cada estado de la cita. Cada horario es una casilla impresa; cada cambio de estado, una impresión de sello. La interfaz no describe el mecanismo: lo muestra funcionando sobre el formulario.\n\nLa densidad es la de un impreso administrativo: campos numerados en orden fijo (01, 02, 03…), filetes de tinta de 1.5–2px que dividen el espacio en lugar de tarjetas flotantes, líneas perforadas discontinuas que separan el cuerpo del talón, casillas ocupadas tachadas con rayado diagonal y letra pequeña densa a dos columnas en el reverso. La tipografía es la de una imprenta: Archivo en anchos extremos (condensada para titulares, expandida para rótulos) frente a Courier Prime para todo lo que \"se escribe a máquina\" en el carné (valores, fechas, horas).\n\nEl movimiento es único y físico: el sello cae una sola vez, de golpe, sin fundido. El resto del sistema es estático y responde con cambios de tinta, no con animación.\n\nAlcance actual y deriva conocida. Este mundo es la dirección de diseño del proyecto a partir de ahora, pero hoy solo está construido en la portada (index.html, con su hoja independiente assets/css/inicio.css). Las demás páginas —html/login.html, html/registro.html, html/especialidades.html y los paneles de paciente, recepción, médico y administración— siguen con el sistema anterior (assets/css/variables.css, base.css, layout.css, componentes.css, publico.css, privado.css: pino, salvia y siena sobre hueso cálido, con Newsreader e IBM Plex Sans). Son páginas sin migrar, no una segunda autoridad: cualquier pantalla nueva o rediseñada toma sus valores de este documento.",
+    "keyCharacteristics": [
+      "Cartulina celeste a sangre; la cara del carné un tono más pálida.",
+      "Filetes de tinta, campos numerados 01–05, líneas perforadas, casillas tachadas.",
+      "Archivo en anchos extremos + Public Sans para leer + Courier Prime para lo \"escrito\".",
+      "Cuatro tintas de sello, una por estado: pendiente, confirmada, atendida, cancelada.",
+      "Una sola animación: el golpe del sello, sin fundido."
+    ],
+    "rules": [
+      { "name": "La Regla de la Tinta con Significado", "body": "Las cuatro tintas de sello se reservan para los estados de la cita (y el violeta, para la acción en curso del visitante). Nunca se usan como decoración, fondo de sección ni acento de marca genérico.", "section": "colors" },
+      { "name": "La Regla de la Cartulina a Sangre", "body": "La cartulina inunda regiones completas de borde a borde; las zonas se distinguen por cambio de tono de cartulina (cartulina → cara → cartulina-honda) y filetes de tinta, no por tarjetas sueltas sobre blanco.", "section": "colors" },
+      { "name": "La Regla de la Máquina de Escribir", "body": "Todo valor que el carné \"rellena\" (especialidad, médico, día, hora, fecha resultante) va en Courier Prime con cifras tabulares. Los rótulos impresos que lo enmarcan van en Archivo. Nunca al revés.", "section": "typography" },
+      { "name": "La Regla del Ancho Extremo", "body": "Archivo se usa en los extremos de su eje: condensado (70–85%) para titulares y sellos, expandido (105–115%) para rótulos y marca. El ancho medio por defecto queda para enlaces y acciones.", "section": "typography" },
+      { "name": "La Regla del Único Objeto", "body": "Solo el carné proyecta sombra amplia. Reverso, normas, talonarios y casillas se separan con filetes y cambios de cartulina, nunca con sombra.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do tomar tokens y componentes de este documento para toda pantalla nueva o rediseñada, incluidas las páginas aún sin migrar cuando se toquen.",
+      "Do expresar cada estado de cita con su sello y su tinta: pendiente violeta, confirmada verde, atendida azul, cancelada roja.",
+      "Do escribir los valores del carné (fechas, horas, selecciones) en Courier Prime con cifras tabulares, y sus rótulos en Archivo mayúsculas con tracking 0.14em.",
+      "Do dividir el espacio con filetes de tinta (1.5–2px), perforaciones discontinuas y cambios de cartulina antes que con tarjetas o sombras.",
+      "Do numerar los campos de un formulario de citas en orden fijo (01, 02, 03…) cuando el orden importa.",
+      "Do marcar lo no disponible con el tachado diagonal y deshabilitarlo, en lugar de ocultarlo.",
+      "Do mantener el foco visible: contorno de 3px sello-pendiente con separación de 3px (blanco sobre el pie)."
+    ],
+    "donts": [
+      "Don't usar las tintas de sello como decoración, fondos de sección o acentos sin significado de estado.",
+      "Don't animar el sello con fundidos ni repetir la animación en sellos de tablas; el golpe ocurre una sola vez y solo al elegir.",
+      "Don't tomar como referencia variables.css, base.css, layout.css, componentes.css, publico.css o privado.css (pino, salvia, siena, Newsreader, IBM Plex Sans): describen páginas sin migrar, no el sistema.",
+      "Don't mezclar el mundo anterior con este dentro de una misma página.",
+      "Don't dar sombra amplia a nada que no sea el carné.",
+      "Don't poner valores rellenados en Public Sans ni rótulos impresos en Courier Prime.",
+      "Don't inventar datos de la clínica para poblar el carné o los talonarios; los datos de demostración deben leerse como ejemplo."
+    ]
+  }
+}

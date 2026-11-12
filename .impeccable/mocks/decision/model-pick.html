@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="UTF-8"><title>Tablero de turnos</title>
+<style>
+  body{margin:0;width:1440px;height:900px;background:#0E1013;color:#F2F2EE;font-family:Arial,sans-serif;overflow:hidden}
+  .barra{display:flex;justify-content:space-between;padding:22px 64px;border-bottom:1px solid #2A2E35;font-weight:700;font-size:18px}
+  .cuerpo{display:grid;grid-template-columns:1fr 1fr;gap:56px;padding:64px}
+  h1{font-size:84px;line-height:.95;margin:0 0 24px}
+  .sub{font-size:22px;color:#B9BCC2;max-width:30ch;line-height:1.4}
+  .accion{display:inline-block;margin-top:28px;background:#FFB000;color:#0E1013;font-weight:800;font-size:22px;padding:18px 30px;border-radius:6px}
+  .tablero{background:#000;border:6px solid #23262C;border-radius:10px;padding:24px}
+  .fila{display:grid;grid-template-columns:140px 1fr 160px;gap:16px;padding:14px 0;border-bottom:1px dashed #333;font-family:"Courier New",monospace;font-size:30px}
+  .led{color:#FF5A1F;text-shadow:0 0 8px rgba(255,90,31,.7)}
+  .ok{color:#44E07A;text-shadow:0 0 8px rgba(68,224,122,.6)}
+  .cab{font-size:16px;color:#8C9098;text-transform:uppercase;letter-spacing:.15em}
+</style></head><body>
+<div class="barra"><span>✚ CLÍNICA ALTAVIDA</span><span>Especialidades · Ingresar · Registrarme</span></div>
+<div class="cuerpo">
+  <div><h1>Tu turno ya tiene hora</h1><p class="sub">El tablero de la sala de espera, sin la sala de espera: elige un horario libre y queda tuyo.</p><span class="accion">Elegir mi horario</span></div>
+  <div class="tablero">
+    <div class="fila cab"><span>Hora</span><span>Especialidad</span><span>Estado</span></div>
+    <div class="fila"><span class="led">08:00</span><span>[Especialidad 1]</span><span class="ok">LIBRE</span></div>
+    <div class="fila"><span class="led">08:30</span><span>[Especialidad 1]</span><span class="led">OCUPADO</span></div>
+    <div class="fila"><span class="led">09:00</span><span>[Especialidad 2]</span><span class="ok">LIBRE</span></div>
+    <div class="fila"><span class="led">09:30</span><span>[Especialidad 3]</span><span class="ok">LIBRE</span></div>
+    <div class="fila"><span class="led">10:00</span><span>[Especialidad 1]</span><span class="led">OCUPADO</span></div>
+  </div>
+</div>
+</body></html>
