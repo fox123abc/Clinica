@@ -1,10 +1,54 @@
-node_modules/
-servidor/datos/
+# ==========================================================
+# Archivos que NUNCA se suben a GitHub
+# ==========================================================
 
-# Archivos de trabajo de la herramienta de diseño (solo locales)
+# ---------- Datos de pacientes (base de datos) ----------
+# Contiene nombres, correos, teléfonos, contraseñas cifradas y citas
+servidor/datos/
+*.db
+*.db-wal
+*.db-shm
+*.db-journal
+*.sqlite
+*.sqlite3
+
+# ---------- Contraseñas, claves y certificados ----------
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+secretos/
+credenciales*
+
+# ---------- Docker local ----------
+# Ajustes propios de cada equipo (puertos, claves)
+docker-compose.override.yml
+
+# ---------- Copias de respaldo y exportaciones ----------
+*.bak
+*.backup
+*.sql.gz
+*.dump
+
+# ---------- Registros (pueden contener datos de usuarios) ----------
+logs/
+*.log
+npm-debug.log*
+
+# ---------- Dependencias ----------
+node_modules/
+
+# ---------- Herramienta de diseño (solo local) ----------
 .impeccable/
 
-# Sistema y editor
+# ---------- Sistema operativo y editores ----------
 .DS_Store
 Thumbs.db
-.env
+desktop.ini
+.vscode/
+.idea/
+*.swp

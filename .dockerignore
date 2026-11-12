@@ -1,8 +1,38 @@
+# Lo que NO entra en la imagen de Docker
+
+# Git y documentación
 .git
 .gitignore
 *.md
-.DS_Store
-__pycache__
-node_modules
-.env
+docs/
+
+# Datos y respaldos: la base vive en el volumen clinica-datos, nunca en la imagen
 servidor/datos
+*.db
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+*.bak
+
+# Contraseñas, claves y certificados
+.env
+.env.*
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+
+# Dependencias (se instalan dentro de la imagen) y pruebas
+node_modules
+test/
+
+# Registros, herramientas y sistema
+*.log
+.impeccable
+.vscode
+.idea
+.DS_Store
+Thumbs.db
+__pycache__
