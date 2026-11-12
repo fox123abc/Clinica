@@ -1,4 +1,10 @@
 node_modules/
 servidor/datos/
-# Capturas de revisión del diseño (se regeneran, no hacen falta en el repositorio)
-.impeccable/review/
+
+# Archivos de trabajo de la herramienta de diseño (solo locales)
+.impeccable/
+
+# Sistema y editor
+.DS_Store
+Thumbs.db
+.env
