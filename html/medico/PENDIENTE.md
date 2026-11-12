@@ -4,7 +4,7 @@
 
 - Página: `agenda.html`, con su lógica en `assets/js/vue/medico.js`.
 - API: `/api/medico/agenda` y `/api/medico/citas/:id/atender` en
-  `servidor/personal.js`, solo para el rol `medico`.
+  `servidor/rutas/personal.js`, solo para el rol `medico`.
 - El médico ve sus citas desde hoy (sin las canceladas), con filtro "Hoy", y
   marca como atendida una cita confirmada de su propia agenda.
 - La cuenta debe estar vinculada a un médico del catálogo

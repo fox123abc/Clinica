@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- Modelo de datos de Clínica Altavida. Se abre directo en el navegador; los diagramas los dibuja Mermaid (requiere internet). Fuente: docs/BASE-DE-DATOS.md -->
+<title>Modelo de datos Altavida</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Courier+Prime:wght@400;700&family=Public+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: one column of "carné" cards on a blue card-stock ground, a diagram per card, each table in its own scroller */
+:root {
+  --fondo: #BFD6EA;
+  --cara: #F7FAFD;
+  --tinta: #14181F;
+  --tinta-suave: #3A4452;
+  --linea: rgba(20, 24, 31, 0.8);
+  --linea-tenue: rgba(20, 24, 31, 0.22);
+  --sello: #5B3FA0;
+  --sello-verde: #1F6B45;
+  --sello-azul: #1E4E8C;
+  --sello-rojo: #B42E28;
+  --fuente-impresa: "Archivo", "Arial Narrow", Arial, sans-serif;
+  --fuente-lectura: "Public Sans", "Segoe UI", Arial, sans-serif;
+  --fuente-maquina: "Courier Prime", "Courier New", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --fondo: #101722; --cara: #18212E; --tinta: #E6EDF5; --tinta-suave: #A9B6C6;
+    --linea: rgba(230, 237, 245, 0.7); --linea-tenue: rgba(230, 237, 245, 0.18);
+    --sello: #B6A2EE; --sello-verde: #7FCFA2; --sello-azul: #8DB5EE; --sello-rojo: #F08E86;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --fondo: #101722; --cara: #18212E; --tinta: #E6EDF5; --tinta-suave: #A9B6C6;
+  --linea: rgba(230, 237, 245, 0.7); --linea-tenue: rgba(230, 237, 245, 0.18);
+  --sello: #B6A2EE; --sello-verde: #7FCFA2; --sello-azul: #8DB5EE; --sello-rojo: #F08E86;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--fondo);
+  color: var(--tinta);
+  font: 400 1rem/1.55 var(--fuente-lectura);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 2.5rem 4rem;
+}
+.pagina { max-width: 68rem; margin: 0 auto; display: grid; gap: 1.75rem; }
+
+.cabecera { display: grid; gap: 0.75rem; max-width: 46rem; }
+.rotulo {
+  font: 700 0.75rem/1 var(--fuente-maquina);
+  letter-spacing: 0.12em; text-transform: uppercase; color: var(--tinta-suave);
+}
+h1, h2 { font-family: var(--fuente-impresa); font-stretch: 78%; text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(2.2rem, 3vw + 1.2rem, 3.4rem); line-height: 0.95; font-weight: 850; }
+h2 { font-size: clamp(1.35rem, 1vw + 1rem, 1.75rem); line-height: 1.05; font-weight: 800; }
+p { margin: 0; max-width: 65ch; }
+.cabecera p { color: var(--tinta-suave); font-size: 1.05rem; }
+
+.cifras { display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; font-family: var(--fuente-maquina); font-size: 0.9rem; }
+.cifras b { font-variant-numeric: tabular-nums; }
+
+.tarjeta {
+  background: var(--cara);
+  border: 1.5px solid var(--linea);
+  border-radius: 6px;
+  padding: 1.5rem clamp(1rem, 2.5vw, 2rem);
+  display: grid; gap: 1rem;
+  min-width: 0;
+}
+.tarjeta__cabeza { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0.5rem 1rem; border-bottom: 1px dashed var(--linea-tenue); padding-bottom: 0.75rem; }
+
+.diagrama { overflow-x: auto; min-width: 0; }
+.diagrama pre.mermaid { margin: 0; min-width: 40rem; background: transparent; display: flex; justify-content: center; }
+.diagrama--casos pre.mermaid { min-width: 46rem; }
+
+.tabla { overflow-x: auto; min-width: 0; }
+table { border-collapse: collapse; width: 100%; min-width: 34rem; font-size: 0.92rem; }
+th, td { text-align: left; padding: 0.55rem 0.75rem 0.55rem 0; border-bottom: 1px solid var(--linea-tenue); vertical-align: top; }
+th { font: 700 0.72rem/1.2 var(--fuente-maquina); letter-spacing: 0.08em; text-transform: uppercase; color: var(--tinta-suave); border-bottom-color: var(--linea); }
+code { font-family: var(--fuente-maquina); font-size: 0.9em; overflow-wrap: anywhere; }
+
+.borrar { font: 700 0.72rem/1 var(--fuente-maquina); letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; padding: 0.25rem 0.45rem; border: 1.5px solid currentColor; border-radius: 3px; display: inline-block; }
+.borrar--impide { color: var(--sello-rojo); }
+.borrar--cascada { color: var(--sello-azul); }
+
+.versiones { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.75rem; }
+.versiones li { display: grid; grid-template-columns: 3.25rem 1fr; gap: 1rem; align-items: baseline; }
+.versiones .num { font: 700 1.6rem/1 var(--fuente-impresa); font-stretch: 78%; color: var(--sello); font-variant-numeric: tabular-nums; }
+
+.pie { color: var(--tinta-suave); font-size: 0.85rem; }
+
+h3 { font: 800 0.95rem/1.2 var(--fuente-impresa); font-stretch: 85%; text-transform: uppercase; letter-spacing: 0.06em; margin: 0; }
+.sub { color: var(--tinta-suave); }
+.historias { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); gap: 1.5rem 1.25rem; }
+.grupo { display: grid; gap: 0.6rem; align-content: start; min-width: 0; }
+.grupo h3 { padding-bottom: 0.35rem; border-bottom: 1.5px solid var(--linea); }
+.hu { display: grid; gap: 0.3rem; padding-block: 0.4rem 0.6rem; border-bottom: 1px dashed var(--linea-tenue); }
+.hu p { font-size: 0.92rem; }
+.hu__id { font: 700 0.75rem/1 var(--fuente-maquina); color: var(--sello); letter-spacing: 0.06em; }
+.hu__tablas { font-family: var(--fuente-maquina); font-size: 0.8rem !important; color: var(--tinta-suave); }
+.matriz { min-width: 52rem; }
+.matriz td:not(:first-child), .matriz th:not(:first-child) { text-align: center; padding-right: 0.5rem; }
+.matriz th:not(:first-child) { font-size: 0.66rem; letter-spacing: 0.02em; text-transform: none; }
+.matriz td.l, .matriz td.e { font: 700 0.85rem/1 var(--fuente-maquina); }
+.matriz td.l { color: var(--sello-azul); }
+.matriz td.e { color: var(--sello-rojo); }
+</style>
+</head>
+<body>
+<main class="pagina">
+  <header class="cabecera">
+    <span class="rotulo">Clínica Altavida · servidor/bd/esquema.sql · versión 3</span>
+    <h1>Modelo de datos de la clínica</h1>
+    <p>Base relacional SQLite con 9 tablas enlazadas por claves foráneas. Aquí está el modelo, quién lo usa y qué tablas toca cada historia de usuario.</p>
+    <div class="cifras"><span><b>9</b> tablas</span><span><b>12</b> claves foráneas</span><span><b>7</b> índices</span><span><b>4</b> roles</span></div>
+  </header>
+
+  <section class="tarjeta" aria-labelledby="t-er">
+    <div class="tarjeta__cabeza">
+      <h2 id="t-er">Diagrama entidad-relación</h2>
+      <span class="rotulo">PK clave primaria · FK clave foránea · UK única</span>
+    </div>
+    <div class="diagrama">
+<pre class="mermaid">
+erDiagram
+    ESPECIALIDADES ||--o{ MEDICOS : "agrupa"
+    MEDICOS ||--o{ DISPONIBILIDAD : "atiende en"
+    MEDICOS ||--o| USUARIOS : "ingresa con"
+    USUARIOS ||--o{ SESIONES : "abre"
+    USUARIOS ||--o{ CITAS : "pide"
+    MEDICOS ||--o{ CITAS : "atiende"
+    EMPRESAS ||--o{ ORDENES : "solicita"
+    USUARIOS ||--o{ ORDENES : "crea"
+    ORDENES ||--|{ ORDEN_ITEMS : "contiene"
+    ESPECIALIDADES ||--o{ ORDEN_ITEMS : "se cotiza en"
+    ORDENES ||--o{ CITAS : "genera al pagar"
+
+    ESPECIALIDADES {
+        TEXT id PK
+        TEXT nombre
+        TEXT descripcion
+        INTEGER precio
+    }
+    MEDICOS {
+        TEXT id PK
+        TEXT nombre
+        TEXT especialidad_id FK
+        INTEGER cupos_diarios
+    }
+    DISPONIBILIDAD {
+        TEXT medico_id PK,FK
+        INTEGER dia_semana PK
+        TEXT hora PK
+    }
+    USUARIOS {
+        INTEGER id PK
+        TEXT nombre
+        TEXT correo UK
+        TEXT telefono
+        TEXT contrasena_hash
+        TEXT rol
+        TEXT medico_id FK
+        TEXT creado_en
+    }
+    SESIONES {
+        TEXT token PK
+        INTEGER usuario_id FK
+        TEXT expira_en
+    }
+    EMPRESAS {
+        INTEGER id PK
+        TEXT nombre
+        TEXT nit UK
+        TEXT contacto
+        TEXT correo
+        TEXT telefono
+    }
+    ORDENES {
+        INTEGER id PK
+        INTEGER empresa_id FK
+        TEXT estado
+        INTEGER total
+        INTEGER creada_por FK
+        TEXT emitida_en
+        TEXT pagada_en
+    }
+    ORDEN_ITEMS {
+        INTEGER orden_id PK,FK
+        TEXT especialidad_id PK,FK
+        INTEGER cantidad
+        INTEGER precio_unitario
+    }
+    CITAS {
+        INTEGER id PK
+        INTEGER paciente_id FK
+        INTEGER orden_id FK
+        TEXT medico_id FK
+        TEXT fecha
+        TEXT horario
+        TEXT motivo
+        TEXT estado
+    }
+</pre>
+    </div>
+  </section>
+
+  <section class="tarjeta" aria-labelledby="t-rel">
+    <div class="tarjeta__cabeza">
+      <h2 id="t-rel">Relaciones</h2>
+      <span class="rotulo">Qué pasa al borrar el registro padre</span>
+    </div>
+    <div class="tabla">
+      <table>
+        <thead><tr><th>Relación</th><th>Cardinalidad</th><th>Clave foránea</th><th>Al borrar</th></tr></thead>
+        <tbody>
+          <tr><td>Especialidad → médicos</td><td>1 a muchos</td><td><code>medicos.especialidad_id</code></td><td><span class="borrar borrar--impide">Se impide</span></td></tr>
+          <tr><td>Médico → franjas de atención</td><td>1 a muchos</td><td><code>disponibilidad.medico_id</code></td><td><span class="borrar borrar--cascada">En cascada</span></td></tr>
+          <tr><td>Médico → cuenta de acceso</td><td>1 a 0 o 1</td><td><code>usuarios.medico_id</code></td><td><span class="borrar borrar--impide">Se impide</span></td></tr>
+          <tr><td>Usuario → sesiones</td><td>1 a muchos</td><td><code>sesiones.usuario_id</code></td><td><span class="borrar borrar--cascada">En cascada</span></td></tr>
+          <tr><td>Paciente → citas</td><td>1 a muchos</td><td><code>citas.paciente_id</code></td><td><span class="borrar borrar--impide">Se impide</span></td></tr>
+          <tr><td>Médico → citas</td><td>1 a muchos</td><td><code>citas.medico_id</code></td><td><span class="borrar borrar--impide">Se impide</span></td></tr>
+          <tr><td>Empresa → órdenes</td><td>1 a muchos</td><td><code>ordenes.empresa_id</code></td><td><span class="borrar borrar--impide">Se impide</span></td></tr>
+          <tr><td>Personal → órdenes que creó</td><td>1 a muchos</td><td><code>ordenes.creada_por</code></td><td><span class="borrar borrar--impide">Se impide</span></td></tr>
+          <tr><td>Orden → renglones</td><td>1 a muchos</td><td><code>orden_items.orden_id</code></td><td><span class="borrar borrar--cascada">En cascada</span></td></tr>
+          <tr><td>Especialidad → renglones</td><td>1 a muchos</td><td><code>orden_items.especialidad_id</code></td><td><span class="borrar borrar--impide">Se impide</span></td></tr>
+          <tr><td>Orden pagada → citas asignadas</td><td>1 a muchos</td><td><code>citas.orden_id</code></td><td><span class="borrar borrar--impide">Se impide</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p><code>orden_items</code> es la tabla puente de la relación muchos a muchos entre órdenes y especialidades. Su clave primaria es el par <code>(orden_id, especialidad_id)</code>, así que una especialidad no se repite dentro de una orden.</p>
+  </section>
+
+  <section class="tarjeta" aria-labelledby="t-casos">
+    <div class="tarjeta__cabeza">
+      <h2 id="t-casos">Casos de uso</h2>
+      <span class="rotulo">Quién hace qué, y qué tablas toca</span>
+    </div>
+    <div class="diagrama diagrama--casos">
+<pre class="mermaid">
+flowchart LR
+    paciente(["Paciente"])
+    recepcion(["Recepción"])
+    medico(["Médico"])
+    admin(["Administrador"])
+    empresa(["Empresa cliente"])
+
+    subgraph sistema["Sistema Clínica Altavida"]
+        direction TB
+        cu1["Registrarse e iniciar sesión<br/><i>usuarios, sesiones</i>"]
+        cu2["Consultar horas libres<br/><i>medicos, disponibilidad, citas</i>"]
+        cu3["Reservar, reprogramar o cancelar su cita<br/><i>citas</i>"]
+        cu4["Confirmar o cancelar citas<br/><i>citas</i>"]
+        cu5["Ver su agenda y marcar atendida<br/><i>citas</i>"]
+        cu6["Gestionar especialidades, médicos y horarios<br/><i>especialidades, medicos, disponibilidad</i>"]
+        cu7["Crear cuenta de acceso de un médico<br/><i>usuarios</i>"]
+        cu8["Registrar empresas clientes<br/><i>empresas</i>"]
+        cu9["Armar, editar y emitir orden de pago<br/><i>ordenes, orden_items</i>"]
+        cu10["Registrar pago y asignar citas por cupos<br/><i>ordenes, citas</i>"]
+        cu11["Ver panel de indicadores<br/><i>todas, solo lectura</i>"]
+    end
+
+    paciente --- cu1
+    paciente --- cu2
+    paciente --- cu3
+    recepcion --- cu4
+    recepcion --- cu9
+    recepcion --- cu10
+    medico --- cu5
+    admin --- cu6
+    admin --- cu7
+    admin --- cu8
+    admin --- cu9
+    admin --- cu10
+    admin --- cu11
+    empresa -. "pide citas y paga" .- cu9
+</pre>
+    </div>
+    <p>Todo el personal inicia sesión igual que el paciente; el rol de la cuenta decide a qué página entra.</p>
+  </section>
+
+  <section class="tarjeta" aria-labelledby="t-hu">
+    <div class="tarjeta__cabeza">
+      <h2 id="t-hu">Historias de usuario</h2>
+      <span class="rotulo">17 historias · L lee · E escribe</span>
+    </div>
+    <div class="historias">
+      <div class="grupo">
+        <h3>Paciente</h3>
+        <article class="hu"><span class="hu__id">HU-01</span><p>Como <b>paciente</b>, quiero <b>registrarme</b> con mi correo, para pedir citas sin llamar.</p><p class="hu__tablas">usuarios E · correo único</p></article>
+        <article class="hu"><span class="hu__id">HU-02</span><p>Como <b>usuario de cualquier rol</b>, quiero <b>iniciar sesión</b>, para llegar a mi página.</p><p class="hu__tablas">usuarios L · sesiones E</p></article>
+        <article class="hu"><span class="hu__id">HU-03</span><p>Como <b>paciente</b>, quiero <b>ver las horas libres</b> por especialidad, médico y día.</p><p class="hu__tablas">especialidades · medicos · disponibilidad · citas L</p></article>
+        <article class="hu"><span class="hu__id">HU-04</span><p>Como <b>paciente</b>, quiero <b>reservar</b> la hora elegida, para que nadie más la ocupe.</p><p class="hu__tablas">citas E · índice único de horario</p></article>
+        <article class="hu"><span class="hu__id">HU-05</span><p>Como <b>paciente</b>, quiero <b>reprogramar o cancelar</b> mi cita mientras esté pendiente o confirmada.</p><p class="hu__tablas">citas E · cancelar libera la hora</p></article>
+      </div>
+      <div class="grupo">
+        <h3>Recepción y médico</h3>
+        <article class="hu"><span class="hu__id">HU-06</span><p>Como <b>recepcionista</b>, quiero <b>confirmar o cancelar</b> las citas que piden los pacientes.</p><p class="hu__tablas">usuarios · medicos L · citas E</p></article>
+        <article class="hu"><span class="hu__id">HU-07</span><p>Como <b>médico</b>, quiero <b>ver mi agenda</b> de hoy en adelante, solo con mis citas.</p><p class="hu__tablas">usuarios.medico_id → citas L</p></article>
+        <article class="hu"><span class="hu__id">HU-08</span><p>Como <b>médico</b>, quiero <b>marcar como atendida</b> una consulta confirmada.</p><p class="hu__tablas">citas E</p></article>
+      </div>
+      <div class="grupo">
+        <h3>Administración</h3>
+        <article class="hu"><span class="hu__id">HU-09</span><p>Como <b>administrador</b>, quiero <b>crear especialidades, médicos y horarios</b>.</p><p class="hu__tablas">especialidades · medicos · disponibilidad E</p></article>
+        <article class="hu"><span class="hu__id">HU-10</span><p>Como <b>administrador</b>, quiero <b>fijar los cupos diarios</b> de cada médico (1 a 40).</p><p class="hu__tablas">medicos E</p></article>
+        <article class="hu"><span class="hu__id">HU-11</span><p>Como <b>administrador</b>, quiero <b>crear la cuenta de acceso</b> de cada médico.</p><p class="hu__tablas">medicos · usuarios E · una cuenta por médico</p></article>
+        <article class="hu"><span class="hu__id">HU-12</span><p>Como <b>administrador</b>, quiero <b>un panel</b> con citas, ocupación y órdenes.</p><p class="hu__tablas">especialidades · medicos · disponibilidad · citas · ordenes L</p></article>
+      </div>
+      <div class="grupo">
+        <h3>Empresas clientes</h3>
+        <article class="hu"><span class="hu__id">HU-13</span><p>Como <b>personal</b>, quiero <b>registrar empresas clientes</b>, para emitirles órdenes de pago.</p><p class="hu__tablas">empresas E · NIT único</p></article>
+        <article class="hu"><span class="hu__id">HU-14</span><p>Como <b>personal</b>, quiero <b>cotizar y editar una orden</b> por especialidad y cantidad.</p><p class="hu__tablas">ordenes · orden_items E</p></article>
+        <article class="hu"><span class="hu__id">HU-15</span><p>Como <b>personal</b>, quiero <b>emitir la orden de pago</b> con los precios congelados.</p><p class="hu__tablas">especialidades L · ordenes · orden_items E</p></article>
+        <article class="hu"><span class="hu__id">HU-16</span><p>Como <b>personal</b>, quiero <b>registrar el pago</b> y que el sistema asigne fechas según los cupos.</p><p class="hu__tablas">medicos · disponibilidad L · citas · ordenes E · todo o nada</p></article>
+        <article class="hu"><span class="hu__id">HU-17</span><p>Como <b>personal</b>, quiero <b>anular una orden</b> que aún no se ha pagado.</p><p class="hu__tablas">ordenes E</p></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="tarjeta" aria-labelledby="t-matriz">
+    <div class="tarjeta__cabeza">
+      <h2 id="t-matriz">Matriz historia × tabla</h2>
+      <span class="rotulo">L lee · E escribe</span>
+    </div>
+    <div class="tabla">
+      <table class="matriz">
+        <thead><tr><th>Historia</th><th>especialidades</th><th>medicos</th><th>disponibilidad</th><th>usuarios</th><th>sesiones</th><th>citas</th><th>empresas</th><th>ordenes</th><th>orden_items</th></tr></thead>
+        <tbody>
+          <tr><td>HU-01 Registro</td><td></td><td></td><td></td><td class="e">E</td><td></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td>HU-02 Ingreso</td><td></td><td></td><td></td><td class="l">L</td><td class="e">E</td><td></td><td></td><td></td><td></td></tr>
+          <tr><td>HU-03 Horas libres</td><td class="l">L</td><td class="l">L</td><td class="l">L</td><td></td><td></td><td class="l">L</td><td></td><td></td><td></td></tr>
+          <tr><td>HU-04 Reservar</td><td></td><td></td><td class="l">L</td><td></td><td></td><td class="e">E</td><td></td><td></td><td></td></tr>
+          <tr><td>HU-05 Reprogramar o cancelar</td><td></td><td></td><td class="l">L</td><td></td><td></td><td class="e">E</td><td></td><td></td><td></td></tr>
+          <tr><td>HU-06 Confirmar</td><td></td><td class="l">L</td><td></td><td class="l">L</td><td></td><td class="e">E</td><td></td><td></td><td></td></tr>
+          <tr><td>HU-07 Agenda del médico</td><td></td><td></td><td></td><td class="l">L</td><td></td><td class="l">L</td><td></td><td></td><td></td></tr>
+          <tr><td>HU-08 Atender</td><td></td><td></td><td></td><td></td><td></td><td class="e">E</td><td></td><td></td><td></td></tr>
+          <tr><td>HU-09 Catálogo</td><td class="e">E</td><td class="e">E</td><td class="e">E</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td>HU-10 Cupos</td><td></td><td class="e">E</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td>HU-11 Cuenta del médico</td><td></td><td class="e">E</td><td></td><td class="e">E</td><td></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td>HU-12 Panel</td><td class="l">L</td><td class="l">L</td><td class="l">L</td><td></td><td></td><td class="l">L</td><td></td><td class="l">L</td><td></td></tr>
+          <tr><td>HU-13 Empresa</td><td></td><td></td><td></td><td></td><td></td><td></td><td class="e">E</td><td></td><td></td></tr>
+          <tr><td>HU-14 Cotizar</td><td class="l">L</td><td class="l">L</td><td class="l">L</td><td></td><td></td><td></td><td class="l">L</td><td class="e">E</td><td class="e">E</td></tr>
+          <tr><td>HU-15 Emitir</td><td class="l">L</td><td></td><td></td><td></td><td></td><td></td><td></td><td class="e">E</td><td class="e">E</td></tr>
+          <tr><td>HU-16 Pagar y asignar</td><td></td><td class="l">L</td><td class="l">L</td><td></td><td></td><td class="e">E</td><td></td><td class="e">E</td><td class="l">L</td></tr>
+          <tr><td>HU-17 Anular</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td class="e">E</td><td></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="tarjeta" aria-labelledby="t-ciclos">
+    <div class="tarjeta__cabeza">
+      <h2 id="t-ciclos">Ciclo de vida de citas y órdenes</h2>
+      <span class="rotulo">Columna estado · cada flecha es una historia</span>
+    </div>
+    <h3 class="sub">Cita</h3>
+    <div class="diagrama">
+<pre class="mermaid">
+stateDiagram-v2
+    direction LR
+    [*] --> pendiente: paciente reserva (HU-04)
+    [*] --> confirmada: orden pagada (HU-16)
+    pendiente --> confirmada: recepción confirma (HU-06)
+    pendiente --> cancelada: paciente o recepción (HU-05, HU-06)
+    confirmada --> cancelada: paciente o recepción (HU-05, HU-06)
+    confirmada --> atendida: médico (HU-08)
+    cancelada --> [*]
+    atendida --> [*]
+</pre>
+    </div>
+    <h3 class="sub">Orden de empresa</h3>
+    <div class="diagrama">
+<pre class="mermaid">
+stateDiagram-v2
+    direction LR
+    [*] --> borrador: crear orden (HU-14)
+    borrador --> emitida: emitir (HU-15)
+    emitida --> borrador: reabrir para corregir (HU-14)
+    emitida --> pagada: registrar pago y asignar citas (HU-16)
+    borrador --> anulada: anular (HU-17)
+    emitida --> anulada: anular (HU-17)
+    pagada --> [*]
+    anulada --> [*]
+</pre>
+    </div>
+  </section>
+
+  <section class="tarjeta" aria-labelledby="t-reglas">
+    <div class="tarjeta__cabeza">
+      <h2 id="t-reglas">Reglas que hace cumplir la base</h2>
+      <span class="rotulo">Valen aunque el servidor falle</span>
+    </div>
+    <div class="tabla">
+      <table>
+        <thead><tr><th>Regla</th><th>Cómo</th></tr></thead>
+        <tbody>
+          <tr><td>Un horario de un médico no tiene dos citas activas</td><td>Índice único parcial <code>ux_citas_horario_activo</code> sobre <code>(medico_id, fecha, horario)</code> sin las canceladas</td></tr>
+          <tr><td>Una cita es de un paciente o de una orden</td><td><code>CHECK (paciente_id IS NOT NULL OR orden_id IS NOT NULL)</code></td></tr>
+          <tr><td>Un médico tiene como máximo una cuenta</td><td>Índice único parcial <code>ux_usuarios_medico</code></td></tr>
+          <tr><td>Solo una cuenta de médico se enlaza a un médico</td><td><code>CHECK (medico_id IS NULL OR rol = 'medico')</code></td></tr>
+          <tr><td>Un correo por cuenta, un NIT por empresa</td><td><code>UNIQUE</code> en <code>usuarios.correo</code> y <code>empresas.nit</code></td></tr>
+          <tr><td>Estados y roles válidos</td><td><code>CHECK (estado IN (…))</code>, <code>CHECK (rol IN (…))</code></td></tr>
+          <tr><td>Cupos, cantidades y precios en rango</td><td><code>cupos_diarios</code> de 1 a 40, <code>cantidad</code> de 1 a 200, <code>precio ≥ 0</code></td></tr>
+          <tr><td>Pagar y asignar citas se guarda todo o nada</td><td>Transacción con <code>enTransaccion()</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="tarjeta" aria-labelledby="t-ver">
+    <div class="tarjeta__cabeza">
+      <h2 id="t-ver">Versiones del esquema</h2>
+      <span class="rotulo">PRAGMA user_version</span>
+    </div>
+    <ol class="versiones">
+      <li><span class="num">1</span><p>La cuenta de un médico se enlaza con su ficha (<code>usuarios.medico_id</code>).</p></li>
+      <li><span class="num">2</span><p>Órdenes de empresas: precio por especialidad, cupos diarios por médico y citas asignadas a una orden.</p></li>
+      <li><span class="num">3</span><p>Índices en las claves foráneas y una sola cuenta por médico.</p></li>
+    </ol>
+    <p>Una base nueva se crea con <code>esquema.sql</code>. Una base existente aplica solo las migraciones que le faltan, en una transacción y sin perder datos.</p>
+  </section>
+
+  <p class="pie">Proyecto académico con fines demostrativos. Fuente: <code>docs/BASE-DE-DATOS.md</code> del repositorio.</p>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
+<script>
+  var oscuro = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+  mermaid.initialize({ startOnLoad: true, theme: oscuro ? "dark" : "neutral", securityLevel: "strict" });
+</script>
+</body>
+</html>

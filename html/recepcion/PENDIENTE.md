@@ -3,7 +3,7 @@
 ## Implementado (primera versión)
 
 - Página: `citas.html`, con su lógica en `assets/js/vue/recepcion.js`.
-- API: rutas `/api/recepcion/...` en `servidor/personal.js`, solo para el rol
+- API: rutas `/api/recepcion/...` en `servidor/rutas/personal.js`, solo para el rol
   `recepcionista`.
 - La recepcionista ve las citas de todos los pacientes con filtro por estado,
   confirma las pendientes y cancela las pendientes o confirmadas (el horario

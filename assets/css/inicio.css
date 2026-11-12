@@ -2,33 +2,12 @@
    INICIO.CSS
    Página de inicio con el mundo "Carné de citas": cartulina celeste,
    tinta de imprenta, casillas numeradas y sellos de goma para los estados.
-   Hoja independiente: la portada no carga los estilos del resto del sitio.
+   Los tokens (colores, fuentes, espacios) vienen de variables.css, que la
+   portada carga antes; esta hoja no usa base, layout ni componentes.
    ========================================================================== */
 
 :root {
-  /* Cartulina y tinta */
-  --cartulina: #BFD6EA;
-  --cartulina-honda: #A9C7E1;
-  --cara: #E8F1F9;
-  --papel: #F7FAFD;
-  --tinta: #14181F;
-  --tinta-suave: #3A4452;
-  --linea: rgba(20, 24, 31, 0.85);
-  --linea-tenue: rgba(20, 24, 31, 0.28);
-
-  /* Tintas de sello (una por estado de la cita) */
-  --sello-pendiente: #5B3FA0;
-  --sello-confirmada: #1F6B45;
-  --sello-atendida: #1E4E8C;
-  --sello-cancelada: #B42E28;
-
-  --fuente-impresa: "Archivo", "Arial Narrow", Arial, sans-serif;
-  --fuente-lectura: "Public Sans", "Segoe UI", Arial, sans-serif;
-  --fuente-maquina: "Courier Prime", "Courier New", monospace;
-
-  --margen: clamp(1rem, 4vw, 4rem);
-  --ancho: 84rem;
-  --salida: cubic-bezier(0.16, 1, 0.3, 1);
+  --ancho: var(--ancho-maximo-contenido);
 }
 
 /* -------------------- Base -------------------- */

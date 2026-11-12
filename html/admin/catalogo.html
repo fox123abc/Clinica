@@ -75,6 +75,21 @@
             <option v-for="esp in catalogo.especialidades" :key="esp.id" :value="esp.id">{{ esp.nombre }}</option>
           </select>
         </campo-formulario>
+        <label class="casilla-cuenta">
+          <input type="checkbox" v-model="nuevoMedico.conCuenta">
+          Crear su cuenta de acceso (rol médico)
+        </label>
+        <template v-if="nuevoMedico.conCuenta">
+          <campo-formulario id="med-correo" etiqueta="Correo de acceso" obligatorio :error="errores.cuentaCorreo">
+            <input type="email" id="med-correo" v-model.trim="nuevoMedico.cuenta.correo" autocomplete="off" :aria-invalid="!!errores.cuentaCorreo">
+          </campo-formulario>
+          <campo-formulario id="med-telefono" etiqueta="Teléfono" obligatorio :error="errores.cuentaTelefono">
+            <input type="tel" id="med-telefono" v-model.trim="nuevoMedico.cuenta.telefono" autocomplete="off" :aria-invalid="!!errores.cuentaTelefono">
+          </campo-formulario>
+          <campo-formulario id="med-contrasena" etiqueta="Contraseña inicial" obligatorio :error="errores.cuentaContrasena">
+            <input type="password" id="med-contrasena" v-model="nuevoMedico.cuenta.contrasena" autocomplete="new-password" :aria-invalid="!!errores.cuentaContrasena">
+          </campo-formulario>
+        </template>
         <button type="submit" class="boton boton--primario" :disabled="enviando">Agregar médico</button>
       </form>
     </div>
@@ -89,6 +104,7 @@
             <th scope="col">Especialidad</th>
             <th scope="col">Horarios de atención</th>
             <th scope="col" class="numero">Cupos por día</th>
+            <th scope="col">Cuenta de acceso</th>
             <th scope="col">Acciones</th>
           </tr>
         </thead>
@@ -106,16 +122,42 @@
               <span v-else class="texto-tenue">Sin horarios</span>
             </td>
             <td data-etiqueta="Cupos por día" class="numero">{{ medico.cupos }}</td>
+            <td data-etiqueta="Cuenta">
+              <span v-if="medico.cuenta">{{ medico.cuenta }}</span>
+              <span v-else class="texto-tenue">Sin cuenta</span>
+            </td>
             <td data-etiqueta="Acciones" class="tabla-datos__acciones">
-              <button type="button" class="boton boton--contorno boton--compacto" @click="editar(medico)" :aria-label="'Editar horarios de ' + medico.nombre">Editar horarios</button>
+              <div class="acciones-fila">
+                <button type="button" class="boton boton--contorno boton--compacto" @click="editar(medico)" :aria-label="'Editar horarios de ' + medico.nombre">Editar horarios</button>
+                <button v-if="!medico.cuenta" type="button" class="boton boton--contorno boton--compacto" @click="abrirCuenta(medico)" :aria-label="'Crear cuenta de acceso para ' + medico.nombre">Crear cuenta</button>
+              </div>
             </td>
           </tr>
           <tr v-if="!catalogo.medicos.length">
-            <td colspan="5" class="tabla-datos__vacia">Aún no hay médicos registrados.</td>
+            <td colspan="6" class="tabla-datos__vacia">Aún no hay médicos registrados.</td>
           </tr>
         </tbody>
       </table>
     </div>
+
+    <!-- Cuenta de acceso para un médico que aún no tiene una -->
+    <form v-if="cuentaPara" ref="formCuenta" class="formulario editor-horarios" novalidate @submit.prevent="guardarCuenta">
+      <h2>Cuenta de acceso de {{ cuentaPara.nombre }}</h2>
+      <p class="campo__ayuda">Con esta cuenta el médico ingresa a su agenda y ve solo sus propias citas. Comparte la contraseña inicial con él por un medio seguro.</p>
+      <campo-formulario id="cta-correo" etiqueta="Correo de acceso" obligatorio :error="erroresCuenta.cuentaCorreo">
+          <input type="email" id="cta-correo" v-model.trim="nuevaCuenta.correo" autocomplete="off" :aria-invalid="!!erroresCuenta.cuentaCorreo">
+      </campo-formulario>
+      <campo-formulario id="cta-telefono" etiqueta="Teléfono" obligatorio :error="erroresCuenta.cuentaTelefono">
+          <input type="tel" id="cta-telefono" v-model.trim="nuevaCuenta.telefono" autocomplete="off" :aria-invalid="!!erroresCuenta.cuentaTelefono">
+      </campo-formulario>
+      <campo-formulario id="cta-contrasena" etiqueta="Contraseña inicial" obligatorio :error="erroresCuenta.cuentaContrasena">
+          <input type="password" id="cta-contrasena" v-model="nuevaCuenta.contrasena" autocomplete="new-password" :aria-invalid="!!erroresCuenta.cuentaContrasena">
+      </campo-formulario>
+      <div class="acciones">
+        <button type="submit" class="boton boton--primario" :disabled="enviando">Crear cuenta</button>
+        <button type="button" class="boton boton--contorno" @click="cerrarCuenta">Cancelar</button>
+      </div>
+    </form>
 
     <!-- Editor de disponibilidad del médico seleccionado -->
     <form v-if="editando" ref="editor" class="formulario editor-horarios" novalidate @submit.prevent="guardarHorarios">

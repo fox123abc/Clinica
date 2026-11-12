@@ -38,7 +38,7 @@
       }
     },
     methods: {
-      // Rellena el formulario con el usuario de demostración (servidor/bd.js)
+      // Rellena el formulario con el usuario de demostración (servidor/bd/semillas.js)
       usarUsuarioPrueba: function (correo) {
         this.formulario.correo = correo;
         this.formulario.contrasena = "Altavida2026";

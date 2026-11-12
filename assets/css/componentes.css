@@ -393,6 +393,11 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* Un correo o un texto largo sin espacios se parte antes que ensanchar la tabla */
+.tabla-datos td {
+  overflow-wrap: anywhere;
+}
+
 .tabla-datos th:first-child,
 .tabla-datos td:first-child {
   padding-left: var(--espacio-md);
@@ -441,6 +446,55 @@
 
 .texto-tenue {
   color: var(--tinta-suave);
+}
+
+/* Cifras escritas a máquina, alineadas a la derecha (columnas numéricas) */
+.numero {
+  text-align: right !important;
+  font-family: var(--fuente-maquina);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* Dato secundario "escrito a máquina" (NIT, códigos) */
+.dato-maquina {
+  font-family: var(--fuente-maquina);
+  font-weight: 700;
+  font-size: 0.8125rem;
+  color: var(--tinta-suave);
+  white-space: nowrap;
+}
+
+/* Estado de una orden de empresa: rótulo a máquina cuyo borde cambia con el avance.
+   No usa tintas de sello: esas son solo para los estados de una cita (DESIGN.md). */
+.estado-orden {
+  display: inline-block;
+  font-family: var(--fuente-maquina);
+  font-weight: 700;
+  font-size: 0.8125rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 0.2rem 0.55rem;
+  border: 1.5px dashed var(--tinta);
+  border-radius: var(--radio-muestra);
+  white-space: nowrap;
+}
+
+.estado-orden--emitida {
+  border-style: solid;
+}
+
+.estado-orden--pagada {
+  border-style: solid;
+  background-color: var(--tinta);
+  color: var(--blanco);
+}
+
+.estado-orden--anulada {
+  border-color: var(--linea-tenue);
+  color: var(--tinta-suave);
+  text-decoration: line-through;
 }
 
 /* Texto solo para lectores de pantalla */

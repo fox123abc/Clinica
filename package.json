@@ -6,7 +6,8 @@
   "main": "servidor/servidor.js",
   "scripts": {
     "start": "node servidor/servidor.js",
-    "reiniciar-bd": "node servidor/reiniciar-bd.js"
+    "reiniciar-bd": "node servidor/reiniciar-bd.js",
+    "test": "node --test \"test/*.test.js\""
   },
   "engines": {
     "node": ">=22.13"

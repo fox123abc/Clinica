@@ -32,7 +32,8 @@ contraseña `Altavida2026`):
 | `paciente@altavida.com` | Paciente | `html/paciente/mis-citas.html` |
 | `recepcion@altavida.com` | Recepcionista | `html/recepcion/citas.html` |
 | `medico@altavida.com` | Médico (vinculado a `[Médico 1]`) | `html/medico/agenda.html` |
-| `admin@altavida.com` | Administrador | `html/admin/catalogo.html` |
+| `medico2@altavida.com` … `medico5@altavida.com` | Médico (vinculados a `[Médico 2]` … `[Médico 5]`) | `html/medico/agenda.html` |
+| `admin@altavida.com` | Administrador | `html/admin/panel.html` |
 
 El rol lo define la cuenta, no el formulario: tras iniciar sesión cada usuario
 llega a su propia página y no puede abrir las de otro rol.
@@ -86,53 +87,79 @@ Flujos de prueba sugeridos:
 
 ```
 clinica-altavida/
-├── package.json            Dependencias y scripts (npm start)
+├── package.json            Dependencias y scripts (npm start, npm test)
 ├── docker-compose.yml      Levanta todo con Docker (puerto 8080)
 ├── servidor/
-│   ├── servidor.js         API REST + archivos del sitio (Express)
-│   ├── bd.js               Conexión SQLite, tablas, catálogo y usuario de demostración
-│   ├── personal.js         Rutas de la API para recepción, médico y administración
+│   ├── servidor.js         Punto de entrada: arma la app, registra rutas, archivos y errores
+│   ├── bd/                 Base de datos relacional (ver docs/BASE-DE-DATOS.md)
+│   │   ├── index.js            Punto de entrada: migra, siembra y exporta la conexión
+│   │   ├── conexion.js         Abre SQLite, activa claves foráneas, enTransaccion()
+│   │   ├── esquema.sql         Tablas, claves foráneas, restricciones e índices
+│   │   ├── migraciones.js      Actualiza bases antiguas (PRAGMA user_version)
+│   │   ├── semillas.js         Catálogo y cuentas de demostración
+│   │   └── valores.js          Precio y cupos por defecto
+│   │       Documentación: docs/BASE-DE-DATOS.md (diagramas, historias de usuario)
+│   ├── agenda.js           Fechas locales y horas libres (núcleo compartido por citas y órdenes)
+│   ├── asignacion.js       Política de asignación por cupos al pagar una orden
+│   ├── sesion.js           Sesiones con cookie y middlewares requiereSesion / requiereRol
+│   ├── http.js             texto(), error(), ErrorDeNegocio
+│   ├── validaciones.js     Correo, teléfono, NIT, hora, rangos
 │   ├── seguridad.js        Hash de contraseñas (scrypt)
 │   ├── reiniciar-bd.js     Borra la base de datos (npm run reiniciar-bd)
+│   ├── rutas/              Una función por contexto del dominio (ver docs/DDD-EVENT-STORMING.md)
+│   │   ├── autenticacion.js    Registro, login, logout, sesión
+│   │   ├── catalogo.js         Catálogo público, horas libres y agenda pública
+│   │   ├── citas.js            Citas del paciente
+│   │   ├── personal.js         Recepción y agenda del médico
+│   │   ├── administracion.js   Catálogo (gestión), cupos y panel
+│   │   └── ordenes.js          Empresas y órdenes de empresas
 │   └── datos/              altavida.db (se crea sola, no se sube a git)
+├── test/
+│   └── api.test.js         Pruebas de las reglas del negocio (npm test)
 ├── index.html              Página pública de inicio (entrada del sitio)
 ├── html/                   Todas las demás páginas HTML
 │   ├── especialidades.html     Página pública de especialidades
 │   ├── login.html              Inicio de sesión
 │   ├── registro.html           Registro de paciente
-│   ├── paciente/               Área interna del paciente (tras iniciar sesión)
-│   │   ├── solicitud-cita.html     Formulario de solicitud de cita
-│   │   ├── confirmacion.html       Resumen posterior a la solicitud
-│   │   └── mis-citas.html          Consulta de citas del paciente
-│   ├── recepcion/              Área de recepción (rol recepcionista)
-│   │   └── citas.html              Confirmar y cancelar las citas de los pacientes
-│   ├── medico/                 Área médica (rol médico)
-│   │   └── agenda.html             Agenda del médico y registro de citas atendidas
-│   └── admin/                  Área de administración (rol administrador)
-│       └── catalogo.html           Especialidades, médicos y horarios de atención
+│   ├── paciente/               solicitud-cita, confirmacion, mis-citas
+│   ├── recepcion/              citas, ordenes, orden-pago (recepción; órdenes también administración)
+│   ├── medico/                 agenda
+│   └── admin/                  panel, catalogo, empresas
 └── assets/
     ├── css/
-    │   ├── variables.css     Tokens: color, tipografía, espaciado
+    │   ├── variables.css     Tokens del sistema "Carné de citas" (ver DESIGN.md)
     │   ├── base.css          Reinicio y tipografía base
-    │   ├── layout.css        Contenedor, encabezado, navegación, pie de página
-    │   ├── componentes.css   Botones, formularios, tablas, etiquetas de estado
-    │   ├── publico.css       Estilos exclusivos del sitio público
-    │   └── privado.css       Estilos exclusivos del área de paciente
-    ├── js/
-    │   ├── navegacion.js     Menú móvil y marca de la página actual
-    │   └── vue/              Lógica con Vue.js (una app por página)
-    │       ├── comun.js           Cliente de la API, validaciones y
-    │       │                      componentes reutilizables
-    │       ├── login.js           Formulario de inicio de sesión
-    │       ├── registro.js        Formulario de registro
-    │       ├── solicitud-cita.js  Formulario de solicitud / reprogramación de cita
-    │       ├── confirmacion.js    Resumen de la cita registrada
-    │       ├── mis-citas.js       Listado, filtro por estado y cancelación
-    │       ├── recepcion.js       Gestión de citas de recepción
-    │       ├── medico.js          Agenda del médico
-    │       └── admin.js           Administración del catálogo
-    └── img/                  Reservada (ver PENDIENTE.md)
+    │   ├── layout.css        Contenedor, membrete, navegación, pie de página
+    │   ├── componentes.css   Botones, formularios, casillas, tablas, sellos, avisos
+    │   ├── publico.css       Especialidades, ingreso y registro
+    │   ├── privado.css       Áreas con sesión: franja, paneles, solicitud, catálogo
+    │   ├── ordenes.css       Órdenes de empresas y orden de pago imprimible
+    │   ├── panel.css         Panel de administración
+    │   └── inicio.css        Portada (usa variables.css)
+    ├── img/
+    │   └── tinta-sello.svg   Textura de tinta de los sellos
+    └── js/
+        ├── navegacion.js     Menú móvil y marca de la página actual
+        └── vue/              Lógica con Vue.js (una app por página)
+            ├── comun.js           Cliente de la API, validaciones, utilidades y componentes
+            ├── inicio.js          Carné de la portada (agenda pública)
+            ├── login.js, registro.js
+            ├── solicitud-cita.js, confirmacion.js, mis-citas.js
+            ├── recepcion.js, medico.js
+            ├── panel.js, admin.js, empresas.js
+            └── ordenes.js, orden-pago.js
 ```
+
+### Pruebas automáticas
+
+```bash
+npm test
+```
+
+Ejecuta `test/api.test.js` con el corredor integrado de Node (`node --test`)
+sobre una base de datos temporal (no toca la real). Cubre acceso por rol,
+doble reserva, cupos diarios, agenda pública sin datos de pacientes y el ciclo
+completo de las órdenes de empresas, incluido el "todo o nada" al pagar.
 
 ## Alcance cubierto
 
@@ -143,6 +170,9 @@ clinica-altavida/
 - **Personal de la clínica (primera versión):** recepción (confirmar y cancelar
   citas), agenda médica (marcar citas atendidas) y administración (especialidades,
   médicos y horarios), con acceso separado por rol.
+- **Etapa 4:** órdenes de empresas (cotización, orden de pago, edición y
+  asignación automática por cupos), empresas clientes, cupos diarios por médico,
+  agenda pública en la portada y panel de administración.
 
 ## Uso de Vue.js
 

@@ -3,7 +3,7 @@
 ## Implementado (primera versión)
 
 - Página: `catalogo.html`, con su lógica en `assets/js/vue/admin.js`.
-- API: rutas `/api/admin/...` en `servidor/personal.js`, solo para el rol
+- API: rutas `/api/admin/...` en `servidor/rutas/administracion.js`, solo para el rol
   `administrador`.
 - El administrador crea especialidades y médicos, y reemplaza los horarios de
   atención de cada médico. No se elimina nada.

@@ -348,7 +348,7 @@ Pasos para crear, por ejemplo, una página de "Editar perfil":
 ```
 
 **3. Si necesita datos nuevos**, agregar la función en `Api` ([comun.js](../assets/js/vue/comun.js#L53))
-y su ruta en [servidor/servidor.js](../servidor/servidor.js).
+y su ruta en [servidor/rutas/](../servidor/rutas/) (un archivo por contexto).
 
 ### Errores comunes
 

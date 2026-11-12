@@ -81,6 +81,9 @@
     resumenAdmin: function () { return api("GET", "/admin/resumen"); },
     crearEspecialidad: function (nombre) { return api("POST", "/admin/especialidades", { nombre: nombre }); },
     crearMedico: function (datos) { return api("POST", "/admin/medicos", datos); },
+    crearCuentaMedico: function (medicoId, cuenta) {
+      return api("POST", "/admin/medicos/" + encodeURIComponent(medicoId) + "/cuenta", cuenta);
+    },
     guardarDisponibilidad: function (medicoId, franjas) {
       return api("PUT", "/admin/medicos/" + encodeURIComponent(medicoId) + "/disponibilidad", { franjas: franjas });
     },

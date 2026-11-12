@@ -1,7 +1,7 @@
 /*
  * seguridad.js
  * Hash y verificación de contraseñas con scrypt y sal aleatoria
- * (nunca se guardan en texto plano). Lo usan servidor.js y bd.js.
+ * (nunca se guardan en texto plano). Lo usan las rutas de autenticación y administración, y bd/semillas.js.
  */
 
 const crypto = require("node:crypto");

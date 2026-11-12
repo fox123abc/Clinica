@@ -366,7 +366,7 @@ flowchart LR
 | Registrar pago | Solo **emitida** · hay cupos para **todas** las citas en los próximos 120 días | Pago registrado → Citas de la orden asignadas | "No hay cupos suficientes de … (faltan N)"; no se asigna nada |
 | Anular orden | Solo **borrador** o **emitida** | Orden anulada | "Solo se pueden anular órdenes que aún no se han pagado" |
 
-**Política de asignación por cupos** (`asignarCitas()` en `servidor/ordenes.js`):
+**Política de asignación por cupos** (`asignarRenglon()` en `servidor/asignacion.js`):
 
 1. Se recorren los días desde **mañana**, hasta 120 días.
 2. En cada día se reparte **por turnos** entre los médicos de la especialidad:
@@ -637,22 +637,22 @@ classDiagram
 | Agregado          | Invariantes (reglas que siempre se cumplen)                                        | Dónde se garantizan                                                                        |
 | ----------------- | ---------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
 | **Cita**    | Un médico no puede tener **dos citas activas** en la misma fecha y horario. | Índice único `ux_citas_horario_activo` en la base de datos + validación en el servidor |
-|                   | El horario debe estar dentro de la disponibilidad del médico y no en el pasado.   | `validarDatosCita()` en `servidor/servidor.js`                                          |
-|                   | Solo las citas **pendientes o confirmadas** se reprograman o cancelan.       | `ESTADOS_MODIFICABLES` en el servidor                                                     |
+|                   | El horario debe estar dentro de la disponibilidad del médico y no en el pasado.   | `validarDatosCita()` en `servidor/rutas/citas.js`                                          |
+|                   | Solo las citas **pendientes o confirmadas** se reprograman o cancelan.       | `ESTADOS_MODIFICABLES` en `servidor/rutas/citas.js`                                                     |
 |                   | El estado es siempre uno de los cuatro definidos.                                  | `CHECK (estado IN (...))` en la tabla `citas`                                           |
 |                   | Un paciente solo ve y modifica **sus** citas.                                | Consultas filtradas por `paciente_id`                                                     |
-|                   | Solo se confirman las citas **pendientes** y solo se atienden las **confirmadas**. | Validaciones en `servidor/personal.js`                                                      |
-|                   | Un médico solo atiende las citas de **su** agenda.                                 | Consulta filtrada por `usuarios.medico_id` en `servidor/personal.js`                        |
-|                   | Cada rol solo accede a las rutas de su área.                                       | Middleware `requiereRol` en `servidor/servidor.js` (responde 403)                           |
+|                   | Solo se confirman las citas **pendientes** y solo se atienden las **confirmadas**. | Validaciones en `servidor/rutas/personal.js`                                                      |
+|                   | Un médico solo atiende las citas de **su** agenda.                                 | Consulta filtrada por `usuarios.medico_id` en `servidor/rutas/personal.js`                        |
+|                   | Cada rol solo accede a las rutas de su área.                                       | Middleware `requiereRol` en `servidor/sesion.js` (responde 403)                           |
 | **Usuario** | El correo es único.                                                               | `UNIQUE` en `usuarios.correo`                                                           |
 |                   | La contraseña nunca se guarda en texto plano.                                     | Hash scrypt con sal aleatoria                                                               |
 |                   | El registro público solo crea pacientes: el rol no se acepta desde el cliente.   | `INSERT` de `/api/registro` sin rol (valor por defecto `paciente`)                          |
 | **Médico** | Pertenece a una sola especialidad.                                                 | Llave foránea `especialidad_id`                                                          |
 |                   | Cada franja (día + hora) aparece una sola vez.                                    | Llave primaria de `disponibilidad`                                                        |
-|                   | Nunca tiene en un día más citas activas que sus **cupos diarios** (1 a 40).      | `horariosLibres()` en `servidor/servidor.js` + validación en `PUT /api/admin/medicos/:id/cupos` |
+|                   | Nunca tiene en un día más citas activas que sus **cupos diarios** (1 a 40).      | `horariosLibres()` en `servidor/agenda.js` + validación en `PUT /api/admin/medicos/:id/cupos` |
 | **Cita** (de una orden) | Una cita es de un paciente **o** de una orden, nunca de ninguno.       | `CHECK (paciente_id IS NOT NULL OR orden_id IS NOT NULL)` en `citas`                     |
-| **Empresa** | El NIT es único.                                                                  | `UNIQUE` en `empresas.nit` + validación en `servidor/ordenes.js`                          |
-| **Orden** | Solo en **borrador** se cambian especialidades, cantidades y empresa.             | Validaciones en `servidor/ordenes.js` (responde 409)                                      |
+| **Empresa** | El NIT es único.                                                                  | `UNIQUE` en `empresas.nit` + validación en `servidor/rutas/ordenes.js`                          |
+| **Orden** | Solo en **borrador** se cambian especialidades, cantidades y empresa.             | `exigirEstado()` en `servidor/rutas/ordenes.js` (responde 409)                                      |
 |                   | Una especialidad aparece una sola vez por orden; cantidad de 1 a 200.             | Llave primaria `(orden_id, especialidad_id)` + `CHECK` en `orden_items`                   |
 |                   | Al emitir, el precio de cada renglón y el total quedan **fijos**.               | `PATCH /api/ordenes/:id/emitir`                                                          |
 |                   | Una orden **pagada** no se reabre ni se anula.                                    | `PATCH .../reabrir` y `.../anular` solo aceptan borrador o emitida                       |
@@ -715,7 +715,7 @@ flowchart TB
 | Catálogo → Agendamiento         | **Customer / Supplier**   | Agendamiento (cliente) necesita médicos y franjas; Catálogo (proveedor) se las entrega según esas necesidades.     |
 | Agendamiento → Atención Médica | **Published Language** (objetivo) 🕓 | Atención Médica se enterará de las citas confirmadas o canceladas mediante eventos con un formato acordado.        |
 | Catálogo → Órdenes de Empresas | **Customer / Supplier**   | Órdenes necesita el precio de cada especialidad, sus médicos y sus cupos diarios para cotizar y asignar.         |
-| Órdenes ↔ Agendamiento          | **Shared Kernel**         | Ambos comparten la tabla `citas` (con su índice único) y la función `horariosLibres()`. Así una cita de empresa y una de paciente nunca chocan ni superan los cupos. Cambiar ese núcleo exige acuerdo entre los dos contextos. |
+| Órdenes ↔ Agendamiento          | **Shared Kernel**         | Ambos comparten la tabla `citas` (con su índice único) y la función `horariosLibres()` de `servidor/agenda.js`. Así una cita de empresa y una de paciente nunca chocan ni superan los cupos. Cambiar ese núcleo exige acuerdo entre los dos contextos. |
 
 > **Estado actual:** hoy no se publican eventos. Atención Médica consulta directamente
 > la tabla `citas` (`GET /api/medico/agenda`). La relación *Published Language* sigue
@@ -753,12 +753,12 @@ mismo significado, en las conversaciones, en la interfaz y en el código.
 | **NIT**                    | Número de identificación tributaria de la empresa; único.               | `empresas.nit`                                          |
 | **Orden**                  | Pedido de citas de una empresa, por especialidad y cantidad.            | `ordenes` · `/api/ordenes`                              |
 | **Renglón**                | Una especialidad dentro de la orden, con su cantidad y su precio.       | `orden_items`                                           |
-| **Cotización**             | Total de la orden calculado con los precios de ejemplo vigentes (en borrador). | `obtenerOrden()` en `servidor/ordenes.js`        |
+| **Cotización**             | Total de la orden calculado con los precios de ejemplo vigentes (en borrador). | `obtenerOrden()` en `servidor/rutas/ordenes.js`        |
 | **Rectificar y emitir**    | Revisar la orden y emitir la orden de pago; fija precios y total.       | `PATCH /api/ordenes/:id/emitir`                         |
 | **Orden de pago**          | Documento que se envía a la empresa con el detalle y el total a pagar.  | `html/recepcion/orden-pago.html`                        |
 | **Editar orden (reabrir)** | Devolver una orden emitida a borrador para corregirla.                  | `PATCH /api/ordenes/:id/reabrir`                        |
 | **Registrar pago**         | Indicar que la empresa pagó; dispara la asignación de citas.            | `PATCH /api/ordenes/:id/pagar`                          |
-| **Asignación por cupos**   | Reparto automático de las citas de una orden entre médicos y días.      | `asignarCitas()` en `servidor/ordenes.js`               |
+| **Asignación por cupos**   | Reparto automático de las citas de una orden entre médicos y días.      | `asignarCitasDeOrden()` en `servidor/asignacion.js`               |
 | **Por cobrar**             | Suma de las órdenes emitidas que la empresa aún no paga.                | `GET /api/admin/resumen`                                |
 | **Ocupación**              | Citas activas frente a cupos de un médico en los próximos 7 días.       | `GET /api/admin/resumen` · `html/admin/panel.html`      |
 
@@ -793,11 +793,11 @@ las siguientes etapas. No se inventaron reglas para ellas.
 > **Decisiones provisionales ya implementadas** (por confirmar con la clínica):
 > **H2** sin límite de citas activas por paciente; **H3** sin plazo mínimo para
 > cancelar o reprogramar; **H4** confirmación manual por la recepcionista, sin plazo.
-> Si la respuesta cambia, hay que ajustar `validarDatosCita()` y `servidor/personal.js`.
+> Si la respuesta cambia, hay que ajustar `validarDatosCita()` (`servidor/rutas/citas.js`) y `servidor/rutas/personal.js`.
 > En órdenes: **H12** pago registrado a mano; **H14** precios de ejemplo (60.000,
 > 85.000, 95.000 y 120.000; 80.000 para especialidades nuevas); **H16** una orden
 > pagada no se edita; **H17** asignación desde mañana y hasta 120 días; **H18** 4
-> cupos por día por defecto. Se ajustan en `servidor/ordenes.js` y `servidor/bd.js`.
+> cupos por día por defecto. Se ajustan en `servidor/asignacion.js`, `servidor/rutas/ordenes.js` y `servidor/bd/valores.js`.
 
 ---
 
@@ -805,7 +805,7 @@ las siguientes etapas. No se inventaron reglas para ellas.
 
 Cómo se refleja cada concepto del dominio en la implementación actual:
 
-| Concepto DDD                    | Contexto           | Base de datos                                       | API (`servidor/servidor.js`)                                      | Interfaz (Vue)                                                     |
+| Concepto DDD                    | Contexto           | Base de datos                                       | API (`servidor/rutas/`)                                      | Interfaz (Vue)                                                     |
 | ------------------------------- | ------------------ | --------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------ |
 | Usuario / Sesión               | Identidad y Acceso | `usuarios`, `sesiones`                          | `/api/registro`, `/api/login`, `/api/logout`, `/api/sesion` | `html/registro.html`, `html/login.html`                        |
 | Especialidad / Médico / Franja | Catálogo Clínico | `especialidades`, `medicos`, `disponibilidad` | `/api/catalogo`                                                   | selects de `solicitud-cita.html`                                 |
@@ -817,7 +817,7 @@ Cómo se refleja cada concepto del dominio en la implementación actual:
 | Gestión del catálogo            | Catálogo Clínico | `especialidades`, `medicos`, `disponibilidad`       | `/api/admin/catalogo`, `/api/admin/especialidades`, `/api/admin/medicos` | `html/admin/catalogo.html`                                   |
 | Cupos diarios                   | Catálogo Clínico | `medicos.cupos_diarios`                              | `PUT /api/admin/medicos/:id/cupos` · usado por `horariosLibres()`  | columna "Cupos por día" en `html/admin/catalogo.html`             |
 | Agenda pública (lectura)        | Agendamiento     | consulta sobre `disponibilidad` y `citas`            | `GET /api/agenda-publica`                                          | carné de `index.html` (`assets/js/vue/inicio.js`)                  |
-| Empresa                         | Órdenes de Empresas | `empresas`                                        | `/api/empresas` (GET, POST, PUT) · `servidor/ordenes.js`           | `html/admin/empresas.html`                                         |
+| Empresa                         | Órdenes de Empresas | `empresas`                                        | `/api/empresas` (GET, POST, PUT) · `servidor/rutas/ordenes.js`           | `html/admin/empresas.html`                                         |
 | Orden y renglones (agregado raíz) | Órdenes de Empresas | `ordenes`, `orden_items`                       | `/api/ordenes` (GET, POST, PUT items y empresa, PATCH emitir, reabrir, pagar, anular) | `html/recepcion/ordenes.html`                   |
 | Orden de pago (lectura)         | Órdenes de Empresas | `ordenes`, `orden_items`, `empresas`              | `GET /api/ordenes/:id`                                             | `html/recepcion/orden-pago.html`                                   |
 | Asignación por cupos (política) | Órdenes ↔ Agendamiento | `citas.orden_id` + `ux_citas_horario_activo`   | `asignarCitas()` dentro de `PATCH /api/ordenes/:id/pagar`          | lista "Citas asignadas" de la orden                                |
