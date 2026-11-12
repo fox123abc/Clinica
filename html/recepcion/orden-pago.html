@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Orden de pago | Clínica Altavida</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Courier+Prime:wght@400;700&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../../assets/css/variables.css">
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/componentes.css">
+  <link rel="stylesheet" href="../../assets/css/privado.css">
+</head>
+<body class="pagina-documento">
+
+  <!-- Página gestionada por Vue.js (assets/js/vue/orden-pago.js) -->
+  <main id="app-orden-pago" v-cloak>
+    <div class="documento__barra no-imprimir">
+      <a href="ordenes.html" class="boton boton--contorno boton--compacto">Volver a las órdenes</a>
+      <button type="button" class="boton boton--primario boton--compacto" @click="imprimir">Imprimir o guardar PDF</button>
+    </div>
+
+    <article v-if="orden" class="documento">
+      <header class="documento__membrete">
+        <div class="documento__marca">
+          <span class="documento__logo" aria-hidden="true"></span>
+          <div>
+            <strong>Clínica Altavida</strong>
+            <span>Colombia · Proyecto académico con fines demostrativos</span>
+          </div>
+        </div>
+        <div class="documento__titulo">
+          <h1>Orden de pago</h1>
+          <p>{{ numero }}</p>
+        </div>
+      </header>
+
+      <section class="documento__datos" aria-label="Datos de la orden">
+        <dl>
+          <div><dt>Empresa</dt><dd>{{ orden.empresa.nombre }}</dd></div>
+          <div><dt>NIT</dt><dd>{{ orden.empresa.nit }}</dd></div>
+          <div><dt>Contacto</dt><dd>{{ orden.empresa.contacto }}</dd></div>
+          <div><dt>Correo</dt><dd>{{ orden.empresa.correo }}</dd></div>
+          <div><dt>Teléfono</dt><dd>{{ orden.empresa.telefono }}</dd></div>
+          <div><dt>Emitida</dt><dd>{{ fecha(orden.emitidaEn) }}</dd></div>
+        </dl>
+      </section>
+
+      <table class="cotizacion documento__tabla">
+        <caption class="visualmente-oculto">Detalle de la orden de pago</caption>
+        <thead>
+          <tr>
+            <th scope="col">Especialidad</th>
+            <th scope="col" class="numero">Citas</th>
+            <th scope="col" class="numero">Valor unitario</th>
+            <th scope="col" class="numero">Subtotal</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="i in orden.items" :key="i.especialidadId">
+            <td>{{ i.especialidad }}</td>
+            <td class="numero">{{ i.cantidad }}</td>
+            <td class="numero">{{ pesos(i.precioUnitario) }}</td>
+            <td class="numero">{{ pesos(i.subtotal) }}</td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <th scope="row" colspan="3">Total a pagar</th>
+            <td class="numero cotizacion__total">{{ pesos(orden.total) }}</td>
+          </tr>
+        </tfoot>
+      </table>
+
+      <div class="documento__pie">
+        <p>
+          Una vez recibido el pago, la clínica asigna la fecha y la hora de cada cita según la
+          disponibilidad de sus especialistas y se las informa al contacto de la empresa.
+        </p>
+        <p class="documento__nota">Valores de ejemplo de la demostración académica, en pesos colombianos.</p>
+        <span v-if="orden.estado === 'pagada'" class="etiqueta-estado etiqueta-estado--confirmada etiqueta-estado--grande documento__sello">Pagada</span>
+        <span v-else-if="orden.estado === 'anulada'" class="etiqueta-estado etiqueta-estado--cancelada etiqueta-estado--grande documento__sello">Anulada</span>
+      </div>
+    </article>
+
+    <p v-else-if="error" class="aviso aviso--error documento__error" role="alert">{{ error }}</p>
+  </main>
+
+  <script src="https://unpkg.com/vue@3.4.38/dist/vue.global.prod.js"></script>
+  <script src="../../assets/js/vue/comun.js"></script>
+  <script src="../../assets/js/vue/orden-pago.js"></script>
+</body>
+</html>

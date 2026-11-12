@@ -1,8 +1,8 @@
 /* ==========================================================================
    COMPONENTES.CSS
-   Piezas reutilizables de interfaz: botones, formularios, tablas y
-   etiquetas de estado de una cita. Se usan tanto en el sitio público
-   como en el área de paciente.
+   Piezas reutilizables en el mundo "Carné de citas" (ver DESIGN.md):
+   botones de tinta, campos del carné, casillas de hora, registros (tablas),
+   sellos de estado y avisos.
    ========================================================================== */
 
 /* -------------------- Botones -------------------- */
@@ -11,59 +11,60 @@
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  font-family: var(--fuente-base);
-  font-size: var(--tamano-texto);
-  font-weight: 600;
+  font-family: var(--fuente-impresa);
+  font-size: 1rem;
+  font-weight: 800;
+  font-stretch: 105%;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   line-height: 1.2;
-  padding: 0.8rem 1.5rem;
+  padding: 0.9rem 1.5rem;
   border-radius: var(--radio-borde);
-  border: 1px solid transparent;
+  border: 2px solid transparent;
   cursor: pointer;
   text-decoration: none;
-  transition: background-color var(--transicion-rapida), color var(--transicion-rapida),
-    box-shadow var(--transicion-rapida), transform var(--transicion-rapida);
+  transition: background-color 150ms ease, color 150ms ease, border-color 150ms ease, transform 150ms var(--salida);
 }
 
-.boton:hover {
-  transform: translateY(-1px);
+.boton:active:not(:disabled) {
+  transform: translateY(1px);
 }
 
-.boton:active {
-  transform: translateY(0);
-}
-
+/* Principal: bloque de tinta; al pasar, la tinta del sello en curso */
 .boton--primario {
-  background-color: var(--color-sienna);
-  color: var(--color-superficie);
-  box-shadow: 0 2px 6px rgba(181, 101, 45, 0.3);
+  background-color: var(--tinta);
+  border-color: var(--tinta);
+  color: var(--blanco);
+  box-shadow: var(--sombra-boton);
 }
 
 .boton--primario:hover {
-  background-color: var(--color-sienna-oscuro);
-  color: var(--color-superficie);
-  box-shadow: 0 6px 16px rgba(181, 101, 45, 0.35);
+  background-color: var(--sello-pendiente);
+  border-color: var(--sello-pendiente);
+  color: var(--blanco);
 }
 
+/* Sobre fondos de tinta */
 .boton--secundario {
   background-color: transparent;
-  border-color: var(--color-superficie);
-  color: var(--color-superficie);
+  border-color: var(--blanco);
+  color: var(--blanco);
 }
 
 .boton--secundario:hover {
-  background-color: var(--color-superficie);
-  color: var(--color-pino);
+  background-color: var(--blanco);
+  color: var(--tinta);
 }
 
 .boton--contorno {
-  background-color: var(--color-superficie);
-  border-color: var(--color-pino);
-  color: var(--color-pino);
+  background-color: transparent;
+  border-color: var(--tinta);
+  color: var(--tinta);
 }
 
 .boton--contorno:hover {
-  background-color: var(--color-pino);
-  color: var(--color-superficie);
+  background-color: var(--tinta);
+  color: var(--blanco);
 }
 
 .boton--ancho-completo {
@@ -71,11 +72,34 @@
   text-align: center;
 }
 
+/* Botón pequeño para acciones dentro de tablas */
+.boton--compacto {
+  font-size: 0.8125rem;
+  padding: 0.4rem 0.8rem;
+  border-width: 1.5px;
+  box-shadow: none;
+}
+
+/* Acción destructiva discreta: solo texto hasta que se pasa el cursor */
+.boton--peligro {
+  background-color: transparent;
+  border-color: transparent;
+  color: var(--sello-cancelada);
+}
+
+.boton--peligro:hover {
+  background-color: var(--sello-cancelada-tenue);
+  border-color: var(--sello-cancelada);
+  color: var(--sello-cancelada);
+}
+
 .boton:disabled {
-  opacity: 0.6;
+  color: var(--tinta-suave);
+  background-color: transparent;
+  border-color: var(--linea-tenue);
+  box-shadow: none;
   cursor: not-allowed;
   transform: none;
-  box-shadow: none;
 }
 
 /* Botón con apariencia de enlace (acciones dentro de tablas y textos) */
@@ -84,28 +108,40 @@
   border: none;
   padding: 0;
   font: inherit;
-  color: var(--color-pino);
+  font-weight: 600;
+  color: var(--tinta);
   text-decoration: underline;
-  text-underline-offset: 2px;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 0.2em;
   cursor: pointer;
 }
 
 .boton-enlace:hover {
-  color: var(--color-sienna);
+  color: var(--sello-pendiente);
 }
 
 .boton-enlace--peligro {
-  color: var(--color-estado-cancelada);
+  color: var(--sello-cancelada);
 }
 
-/* -------------------- Formularios -------------------- */
+/* -------------------- Formulario como carné -------------------- */
 .formulario {
-  background-color: var(--color-superficie);
-  border: 1px solid var(--color-borde);
-  border-radius: var(--radio-grande);
+  background-color: var(--cara);
+  border: 2px solid var(--tinta);
+  border-radius: var(--radio-carne);
   padding: var(--espacio-lg);
   max-width: 32rem;
-  box-shadow: var(--sombra-media);
+  box-shadow: var(--sombra-carne);
+}
+
+.formulario > h2 {
+  font-size: 1.1rem;
+  font-weight: 800;
+  font-stretch: 115%;
+  letter-spacing: 0.12em;
+  padding-bottom: 0.75rem;
+  margin-bottom: var(--espacio-md);
+  border-bottom: 2px solid var(--tinta);
 }
 
 .formulario .aviso {
@@ -121,26 +157,40 @@
   margin-bottom: var(--espacio-md);
 }
 
-.campo label {
+/* Rótulo impreso del campo */
+.campo label,
+.campo > legend {
   display: block;
-  font-size: var(--tamano-pequeno);
-  font-weight: 600;
-  margin-bottom: 0.4rem;
-  color: var(--color-carbon);
+  font-family: var(--fuente-impresa);
+  font-size: var(--tamano-rotulo);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin-bottom: 0.45rem;
+  color: var(--tinta-suave);
 }
 
 .campo input,
 .campo select,
 .campo textarea {
   width: 100%;
-  font-family: var(--fuente-base);
-  font-size: var(--tamano-texto);
+  font-family: var(--fuente-lectura);
+  font-size: 1rem;
   padding: 0.7rem 0.85rem;
-  border: 1px solid var(--color-borde);
-  border-radius: var(--radio-borde);
-  background-color: var(--color-superficie);
-  color: var(--color-carbon);
+  border: 1.5px solid var(--tinta);
+  border-radius: var(--radio-casilla);
+  background-color: var(--blanco);
+  color: var(--tinta);
   transition: border-color var(--transicion-rapida), box-shadow var(--transicion-rapida);
+}
+
+/* Lo que el carné "rellena" (selecciones y fechas) va a máquina */
+.campo select,
+.campo input[type="date"] {
+  font-family: var(--fuente-maquina);
+  font-weight: 700;
+  font-size: 1.05rem;
+  font-variant-numeric: tabular-nums;
 }
 
 .campo textarea {
@@ -148,12 +198,17 @@
   min-height: 6rem;
 }
 
+.campo input::placeholder,
+.campo textarea::placeholder {
+  color: #5F6B7A;
+}
+
 /* Flecha propia en los select para que se vean igual en todos los navegadores */
 .campo select,
 .barra-filtros select {
   appearance: none;
   padding-right: 2.5rem;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%231B3B36' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%2314181F' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 0.9rem center;
 }
@@ -161,35 +216,36 @@
 .campo input:hover,
 .campo select:hover,
 .campo textarea:hover {
-  border-color: var(--color-salvia);
+  background-color: var(--papel);
 }
 
 .campo input:focus,
 .campo select:focus,
 .campo textarea:focus {
   outline: none;
-  border-color: var(--color-pino);
+  border-color: var(--sello-pendiente);
   box-shadow: var(--anillo-foco);
 }
 
 .campo input:disabled,
 .campo select:disabled,
 .campo textarea:disabled {
-  background-color: var(--color-hueso);
-  color: var(--color-carbon-suave);
-  border-color: var(--color-borde);
+  background-color: transparent;
+  color: var(--tinta-suave);
+  border-color: var(--linea-tenue);
+  border-style: dashed;
   cursor: not-allowed;
 }
 
 .campo__ayuda {
   font-size: var(--tamano-pequeno);
-  color: var(--color-carbon-suave);
-  margin-top: 0.35rem;
+  color: var(--tinta-suave);
+  margin-top: 0.4rem;
 }
 
 .campo--obligatorio > label::after {
   content: " *";
-  color: var(--color-sienna);
+  color: var(--sello-cancelada);
 }
 
 /* -------------------- Validación de formularios (Vue.js) -------------------- */
@@ -201,23 +257,24 @@
 .campo--error input,
 .campo--error select,
 .campo--error textarea {
-  border-color: var(--color-estado-cancelada);
-  background-color: #FFF8F6;
+  border-color: var(--sello-cancelada);
+  background-color: var(--sello-cancelada-tenue);
 }
 
 .campo--error input:focus,
 .campo--error select:focus,
 .campo--error textarea:focus {
-  box-shadow: 0 0 0 3px rgba(163, 76, 63, 0.2);
+  box-shadow: 0 0 0 3px rgba(180, 46, 40, 0.25);
 }
 
 .campo__error {
   display: flex;
   align-items: flex-start;
-  gap: 0.35rem;
+  gap: 0.4rem;
   font-size: var(--tamano-pequeno);
-  color: var(--color-estado-cancelada);
-  margin-top: 0.35rem;
+  font-weight: 600;
+  color: var(--sello-cancelada);
+  margin-top: 0.4rem;
 }
 
 .campo__error::before {
@@ -225,25 +282,36 @@
   flex: none;
   display: inline-grid;
   place-items: center;
-  width: 1rem;
-  height: 1rem;
-  margin-top: 0.15rem;
-  border-radius: 50%;
-  background-color: var(--color-estado-cancelada);
-  color: var(--color-superficie);
-  font-size: 0.7rem;
+  width: 1.05rem;
+  height: 1.05rem;
+  margin-top: 0.1rem;
+  border-radius: var(--radio-muestra);
+  background-color: var(--sello-cancelada);
+  color: var(--blanco);
+  font-family: var(--fuente-maquina);
+  font-size: 0.75rem;
   font-weight: 700;
 }
 
-/* -------------------- Selector de horarios (botones tipo chip) -------------------- */
+/* -------------------- Casillas de hora -------------------- */
 .horarios {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(5.25rem, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(5.5rem, 1fr));
   gap: 0.5rem;
 }
 
+.horario-chip {
+  position: relative;
+}
+
+/* El radio queda oculto dentro de su casilla (sin heredar el ancho de los campos) */
+.campo .horario-chip input,
 .horario-chip input {
   position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
   opacity: 0;
   pointer-events: none;
 }
@@ -251,80 +319,99 @@
 .horario-chip span {
   display: block;
   text-align: center;
-  padding: 0.55rem 0.5rem;
-  border: 1px solid var(--color-borde);
-  border-radius: var(--radio-borde);
-  background-color: var(--color-superficie);
-  font-weight: 500;
+  padding: 0.65rem 0.25rem;
+  border: 1.5px solid var(--tinta);
+  border-radius: var(--radio-casilla);
+  background-color: var(--blanco);
+  font-family: var(--fuente-maquina);
+  font-size: 1.1rem;
+  font-weight: 700;
   font-variant-numeric: tabular-nums;
   cursor: pointer;
-  transition: border-color var(--transicion-rapida), background-color var(--transicion-rapida);
+  transition: background-color var(--transicion-rapida), color var(--transicion-rapida);
 }
 
 .horario-chip span:hover {
-  border-color: var(--color-salvia);
-  background-color: var(--color-salvia-suave);
+  background-color: var(--cartulina);
 }
 
-.horario-chip input:checked + span {
-  background-color: var(--color-pino);
-  border-color: var(--color-pino);
-  color: var(--color-superficie);
+.horario-chip input:checked + span,
+.horario-chip input:checked + span:hover {
+  background-color: var(--sello-pendiente);
+  border-color: var(--sello-pendiente);
+  color: var(--blanco);
 }
 
 .horario-chip input:focus-visible + span {
-  box-shadow: var(--anillo-foco);
+  outline: 3px solid var(--sello-pendiente);
+  outline-offset: 3px;
 }
 
 .horarios__vacio {
   padding: 0.75rem 0.9rem;
-  border: 1px dashed var(--color-borde);
-  border-radius: var(--radio-borde);
-  color: var(--color-carbon-suave);
+  border: 1.5px dashed var(--linea-tenue);
+  border-radius: var(--radio-casilla);
+  color: var(--tinta-suave);
   font-size: var(--tamano-pequeno);
   margin: 0;
 }
 
-/* -------------------- Tablas -------------------- */
+/* -------------------- Registros (tablas) -------------------- */
 .tabla-contenedor {
-  background-color: var(--color-superficie);
-  border: 1px solid var(--color-borde);
+  background-color: var(--cara);
+  border: 2px solid var(--tinta);
   border-radius: var(--radio-grande);
-  box-shadow: var(--sombra-suave);
-  overflow: hidden;
+  /* Si la tabla no cabe, se desplaza en horizontal en lugar de cortar columnas */
+  overflow-x: auto;
 }
 
 .tabla-datos {
   width: 100%;
   border-collapse: collapse;
-  background-color: var(--color-superficie);
   font-size: var(--tamano-pequeno);
 }
 
 .tabla-datos caption {
   text-align: left;
-  font-family: var(--fuente-titulos);
-  font-size: var(--tamano-h3);
-  color: var(--color-pino);
-  padding: var(--espacio-sm) var(--espacio-md);
-  border-bottom: 1px solid var(--color-borde);
+  font-family: var(--fuente-impresa);
+  font-size: 1rem;
+  font-weight: 800;
+  font-stretch: 115%;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--tinta);
+  padding: 1rem var(--espacio-md);
+  border-bottom: 2px solid var(--tinta);
 }
 
 .tabla-datos th,
 .tabla-datos td {
   text-align: left;
-  padding: 0.85rem 1rem;
-  border-bottom: 1px solid var(--color-borde);
+  padding: 0.85rem 0.75rem;
+  border-bottom: 1px solid var(--linea-tenue);
   vertical-align: middle;
+  font-variant-numeric: tabular-nums;
+}
+
+.tabla-datos th:first-child,
+.tabla-datos td:first-child {
+  padding-left: var(--espacio-md);
+}
+
+.tabla-datos th:last-child,
+.tabla-datos td:last-child {
+  padding-right: var(--espacio-md);
 }
 
 .tabla-datos th {
-  background-color: var(--color-hueso);
-  color: var(--color-carbon-suave);
-  font-weight: 600;
-  font-size: 0.75rem;
+  font-family: var(--fuente-impresa);
+  color: var(--tinta-suave);
+  font-weight: 700;
+  font-size: var(--tamano-rotulo);
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.14em;
+  white-space: nowrap;
+  border-bottom: 1.5px solid var(--tinta);
 }
 
 .tabla-datos tbody tr:last-child td {
@@ -332,12 +419,12 @@
 }
 
 .tabla-datos tbody tr:hover td {
-  background-color: #FAF6EF;
+  background-color: var(--papel);
 }
 
 .tabla-datos__vacia {
   text-align: center !important;
-  color: var(--color-carbon-suave);
+  color: var(--tinta-suave);
   padding-block: var(--espacio-lg) !important;
 }
 
@@ -345,7 +432,28 @@
   white-space: nowrap;
 }
 
-/* En pantallas angostas cada fila se muestra como una tarjeta */
+/* Grupo de botones de una fila: alineados y con separación uniforme */
+.acciones-fila {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.texto-tenue {
+  color: var(--tinta-suave);
+}
+
+/* Texto solo para lectores de pantalla */
+.visualmente-oculto {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* En pantallas angostas cada fila se muestra como una ficha */
 @media (max-width: 45rem) {
   .tabla-datos thead {
     position: absolute;
@@ -358,26 +466,32 @@
   .tabla-datos tbody tr {
     display: block;
     padding: var(--espacio-sm) var(--espacio-md);
-    border-bottom: 1px solid var(--color-borde);
+    border-bottom: 2px dashed var(--linea);
   }
 
   .tabla-datos tbody tr:last-child {
     border-bottom: none;
   }
 
-  .tabla-datos td {
+  .tabla-datos td,
+  .tabla-datos td:first-child {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     gap: var(--espacio-sm);
-    padding: 0.35rem 0;
+    padding: 0.4rem 0;
     border-bottom: none;
     text-align: right;
   }
 
   .tabla-datos td[data-etiqueta]::before {
     content: attr(data-etiqueta);
-    font-weight: 600;
-    color: var(--color-carbon-suave);
+    font-family: var(--fuente-impresa);
+    font-size: var(--tamano-rotulo);
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--tinta-suave);
     text-align: left;
   }
 
@@ -386,65 +500,63 @@
   }
 }
 
-/* -------------------- Etiquetas de estado de una cita -------------------- */
-/* Fondo suave + texto oscuro del mismo tono: legible y con un punto de color */
+/* -------------------- Sellos de estado de una cita -------------------- */
+/* El estado se imprime como un sello de goma con la tinta de su estado */
 .etiqueta-estado {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  padding: 0.2rem 0.7rem;
-  border-radius: 999px;
+  display: inline-block;
+  font-family: var(--fuente-impresa);
+  font-weight: 900;
+  font-stretch: 85%;
+  font-size: 0.95rem;
+  line-height: 1;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   white-space: nowrap;
+  padding: 0.3rem 0.6rem 0.25rem;
+  border: 3px double currentColor;
+  border-radius: var(--radio-casilla);
+  transform: rotate(-4deg);
+  -webkit-mask-image: url("../img/tinta-sello.svg");
+  -webkit-mask-size: 20rem 7.5rem;
+  -webkit-mask-repeat: repeat;
+  mask-image: url("../img/tinta-sello.svg");
+  mask-size: 20rem 7.5rem;
+  mask-repeat: repeat;
 }
 
-.etiqueta-estado::before {
-  content: "";
-  width: 0.5rem;
-  height: 0.5rem;
-  border-radius: 50%;
-  background-color: currentColor;
+.etiqueta-estado--pendiente { color: var(--sello-pendiente); -webkit-mask-position: 0 0; mask-position: 0 0; }
+.etiqueta-estado--confirmada { color: var(--sello-confirmada); -webkit-mask-position: -7rem -2rem; mask-position: -7rem -2rem; }
+.etiqueta-estado--atendida { color: var(--sello-atendida); -webkit-mask-position: -13rem -4rem; mask-position: -13rem -4rem; }
+.etiqueta-estado--cancelada { color: var(--sello-cancelada); -webkit-mask-position: -3rem -5rem; mask-position: -3rem -5rem; }
+
+/* Sello grande (confirmación de una cita) */
+.etiqueta-estado--grande {
+  font-size: clamp(1.8rem, 3vw + 1rem, 2.6rem);
+  padding: 0.4rem 0.9rem 0.35rem;
+  border-width: 5px;
+  transform: rotate(-7deg);
 }
 
-.etiqueta-estado--pendiente {
-  background-color: var(--color-estado-pendiente-suave);
-  color: var(--color-estado-pendiente-texto);
-}
-
-.etiqueta-estado--confirmada {
-  background-color: var(--color-estado-confirmada-suave);
-  color: var(--color-estado-confirmada-texto);
-}
-
-.etiqueta-estado--cancelada {
-  background-color: var(--color-estado-cancelada-suave);
-  color: var(--color-estado-cancelada-texto);
-}
-
-.etiqueta-estado--atendida {
-  background-color: var(--color-estado-atendida-suave);
-  color: var(--color-estado-atendida-texto);
-}
-
-/* -------------------- Mensajes de aviso -------------------- */
+/* -------------------- Avisos -------------------- */
 .aviso {
-  border-left: 4px solid var(--color-salvia);
-  background-color: var(--color-salvia-suave);
+  border: 1.5px solid var(--tinta);
+  background-color: var(--cara);
   padding: 0.75rem var(--espacio-md);
   font-size: var(--tamano-pequeno);
-  border-radius: 0 var(--radio-borde) var(--radio-borde) 0;
+  border-radius: var(--radio-borde);
   max-width: none;
 }
 
 .aviso--error {
-  border-left-color: var(--color-estado-cancelada);
-  background-color: var(--color-estado-cancelada-suave);
-  color: var(--color-estado-cancelada-texto);
+  border-color: var(--sello-cancelada);
+  background-color: var(--sello-cancelada-tenue);
+  color: var(--sello-cancelada);
+  font-weight: 600;
 }
 
 .aviso--exito {
-  border-left-color: var(--color-estado-confirmada);
-  background-color: var(--color-estado-confirmada-suave);
-  color: var(--color-estado-confirmada-texto);
+  border-color: var(--sello-confirmada);
+  background-color: var(--sello-confirmada-tenue);
+  color: var(--sello-confirmada);
+  font-weight: 600;
 }

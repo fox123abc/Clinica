@@ -61,6 +61,9 @@
         (excluirCitaId ? "&excluir=" + encodeURIComponent(excluirCitaId) : "");
       return api("GET", "/horarios-disponibles" + consulta);
     },
+    agendaPublica: function (medicoId, fecha) {
+      return api("GET", "/agenda-publica?medicoId=" + encodeURIComponent(medicoId) + "&fecha=" + encodeURIComponent(fecha));
+    },
     listarCitas: function () { return api("GET", "/citas"); },
     obtenerCita: function (id) { return api("GET", "/citas/" + encodeURIComponent(id)); },
     crearCita: function (datos) { return api("POST", "/citas", datos); },
@@ -75,17 +78,47 @@
     atenderCita: function (id) { return api("PATCH", "/medico/citas/" + encodeURIComponent(id) + "/atender"); },
 
     catalogoAdmin: function () { return api("GET", "/admin/catalogo"); },
+    resumenAdmin: function () { return api("GET", "/admin/resumen"); },
     crearEspecialidad: function (nombre) { return api("POST", "/admin/especialidades", { nombre: nombre }); },
     crearMedico: function (datos) { return api("POST", "/admin/medicos", datos); },
     guardarDisponibilidad: function (medicoId, franjas) {
       return api("PUT", "/admin/medicos/" + encodeURIComponent(medicoId) + "/disponibilidad", { franjas: franjas });
-    }
+    },
+    guardarCupos: function (medicoId, cupos) {
+      return api("PUT", "/admin/medicos/" + encodeURIComponent(medicoId) + "/cupos", { cupos: cupos });
+    },
+
+    // Órdenes de empresas (recepción y administración)
+    listarEmpresas: function () { return api("GET", "/empresas"); },
+    crearEmpresa: function (datos) { return api("POST", "/empresas", datos); },
+    actualizarEmpresa: function (id, datos) { return api("PUT", "/empresas/" + encodeURIComponent(id), datos); },
+    listarOrdenes: function () { return api("GET", "/ordenes"); },
+    obtenerOrden: function (id) { return api("GET", "/ordenes/" + encodeURIComponent(id)); },
+    crearOrden: function (empresaId) { return api("POST", "/ordenes", { empresaId: empresaId }); },
+    guardarItemsOrden: function (id, items) { return api("PUT", "/ordenes/" + encodeURIComponent(id) + "/items", { items: items }); },
+    cambiarEmpresaOrden: function (id, empresaId) { return api("PUT", "/ordenes/" + encodeURIComponent(id) + "/empresa", { empresaId: empresaId }); },
+    reabrirOrden: function (id) { return api("PATCH", "/ordenes/" + encodeURIComponent(id) + "/reabrir"); },
+    emitirOrden: function (id) { return api("PATCH", "/ordenes/" + encodeURIComponent(id) + "/emitir"); },
+    pagarOrden: function (id) { return api("PATCH", "/ordenes/" + encodeURIComponent(id) + "/pagar"); },
+    anularOrden: function (id) { return api("PATCH", "/ordenes/" + encodeURIComponent(id) + "/anular"); }
   };
+
+  // 85000 -> "$ 85.000" (pesos colombianos, sin decimales)
+  function formatearPesos(valor) {
+    return "$ " + Number(valor || 0).toLocaleString("es-CO", { maximumFractionDigits: 0 });
+  }
 
   var ESTADOS = ["pendiente", "confirmada", "cancelada", "atendida"];
 
   function buscarPorId(lista, id) {
     return lista.find(function (elemento) { return elemento.id === id; }) || null;
+  }
+
+  // Solo las especialidades donde se puede agendar: con al menos un médico que tenga días de atención
+  function especialidadesAgendables(catalogo) {
+    return catalogo.especialidades.filter(function (e) {
+      return catalogo.medicos.some(function (m) { return m.especialidadId === e.id && m.dias.length; });
+    });
   }
 
   /* ------------------------------------------------------------------
@@ -196,17 +229,45 @@
     paciente: "/html/paciente/mis-citas.html",
     recepcionista: "/html/recepcion/citas.html",
     medico: "/html/medico/agenda.html",
-    administrador: "/html/admin/catalogo.html"
+    administrador: "/html/admin/panel.html"
   };
 
   function rutaInicio(rol) {
+    // Si el paciente eligió un horario en la página de inicio, se le lleva a terminar esa solicitud
+    if (rol === "paciente" && leerPreseleccion()) return "/html/paciente/solicitud-cita.html";
     return INICIO[rol] || "/index.html";
   }
 
-  // Si se indica rolEsperado y la sesión es de otro rol, se envía al usuario a su propia página de inicio
+  /*
+   * Horario elegido en la página de inicio antes de iniciar sesión.
+   * Se guarda en sessionStorage (solo esta pestaña) y se usa una vez para
+   * rellenar el formulario de solicitud.
+   */
+  var CLAVE_PRESELECCION = "altavida:preseleccion";
+
+  function guardarPreseleccion(datos) {
+    try { sessionStorage.setItem(CLAVE_PRESELECCION, JSON.stringify(datos)); } catch (e) { /* sin almacenamiento */ }
+  }
+
+  function leerPreseleccion() {
+    try {
+      var datos = JSON.parse(sessionStorage.getItem(CLAVE_PRESELECCION) || "null");
+      return datos && datos.medicoId && datos.fecha && datos.horario ? datos : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function borrarPreseleccion() {
+    try { sessionStorage.removeItem(CLAVE_PRESELECCION); } catch (e) { /* sin almacenamiento */ }
+  }
+
+  // Si se indica rolEsperado (un rol o una lista) y la sesión es de otro rol,
+  // se envía al usuario a su propia página de inicio
   function requerirSesion(rutaLogin, rolEsperado) {
+    var permitidos = rolEsperado ? [].concat(rolEsperado) : null;
     return Api.obtenerSesion().then(function (sesion) {
-      if (rolEsperado && sesion.rol !== rolEsperado) {
+      if (permitidos && permitidos.indexOf(sesion.rol) === -1) {
         window.location.replace(rutaInicio(sesion.rol));
         throw { estado: 401, redirigido: true, mensaje: "", campos: {} };
       }
@@ -256,14 +317,19 @@
     Api: Api,
     ESTADOS: ESTADOS,
     buscarPorId: buscarPorId,
+    especialidadesAgendables: especialidadesAgendables,
     Reglas: Reglas,
     validar: validar,
     fechaHoyISO: fechaHoyISO,
     fechaLocal: fechaLocal,
     formatearFecha: formatearFecha,
+    formatearPesos: formatearPesos,
     registrarComponentes: registrarComponentes,
     requerirSesion: requerirSesion,
     rutaInicio: rutaInicio,
+    guardarPreseleccion: guardarPreseleccion,
+    leerPreseleccion: leerPreseleccion,
+    borrarPreseleccion: borrarPreseleccion,
     montarFranjaSesion: montarFranjaSesion
   };
 })();

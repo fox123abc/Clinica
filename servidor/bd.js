@@ -171,7 +171,108 @@ function prepararPersonal() {
   });
 }
 
+/* ------------------------------------------------------------------
+ * Órdenes de empresas
+ * Una empresa pide citas por especialidad; recepción o administración
+ * arma la orden, emite la orden de pago y, al registrar el pago, el
+ * sistema asigna las citas según la capacidad diaria de cada médico.
+ * ------------------------------------------------------------------ */
+
+// Valores de ejemplo (COP) para la demostración académica; no son tarifas reales
+const PRECIOS_EJEMPLO = {
+  "especialidad-1": 60000,
+  "especialidad-2": 85000,
+  "especialidad-3": 95000,
+  "especialidad-4": 120000
+};
+const PRECIO_EJEMPLO_POR_DEFECTO = 80000;
+const CUPOS_DIARIOS_POR_DEFECTO = 4;
+
+function columnas(tabla) {
+  return bd.prepare(`PRAGMA table_info(${tabla})`).all().map((c) => c.name);
+}
+
+function prepararOrdenes() {
+  bd.exec(`
+    CREATE TABLE IF NOT EXISTS empresas (
+      id        INTEGER PRIMARY KEY AUTOINCREMENT,
+      nombre    TEXT NOT NULL,
+      nit       TEXT NOT NULL UNIQUE,
+      contacto  TEXT NOT NULL,
+      correo    TEXT NOT NULL,
+      telefono  TEXT NOT NULL,
+      creada_en TEXT NOT NULL DEFAULT (datetime('now', 'localtime'))
+    );
+
+    CREATE TABLE IF NOT EXISTS ordenes (
+      id          INTEGER PRIMARY KEY AUTOINCREMENT,
+      empresa_id  INTEGER NOT NULL REFERENCES empresas(id),
+      estado      TEXT    NOT NULL DEFAULT 'borrador'
+                  CHECK (estado IN ('borrador', 'emitida', 'pagada', 'anulada')),
+      total       INTEGER NOT NULL DEFAULT 0,
+      creada_por  INTEGER REFERENCES usuarios(id),
+      creada_en   TEXT    NOT NULL DEFAULT (datetime('now', 'localtime')),
+      emitida_en  TEXT,
+      pagada_en   TEXT
+    );
+
+    -- Cada renglón: una especialidad y cuántas citas pide la empresa
+    CREATE TABLE IF NOT EXISTS orden_items (
+      orden_id        INTEGER NOT NULL REFERENCES ordenes(id) ON DELETE CASCADE,
+      especialidad_id TEXT    NOT NULL REFERENCES especialidades(id),
+      cantidad        INTEGER NOT NULL CHECK (cantidad BETWEEN 1 AND 200),
+      precio_unitario INTEGER NOT NULL DEFAULT 0,
+      PRIMARY KEY (orden_id, especialidad_id)
+    );
+  `);
+
+  // Precio de ejemplo por especialidad
+  if (!columnas("especialidades").includes("precio")) {
+    bd.exec("ALTER TABLE especialidades ADD COLUMN precio INTEGER");
+  }
+  const sinPrecio = bd.prepare("SELECT id FROM especialidades WHERE precio IS NULL").all();
+  const fijarPrecio = bd.prepare("UPDATE especialidades SET precio = ? WHERE id = ?");
+  sinPrecio.forEach((e) => fijarPrecio.run(PRECIOS_EJEMPLO[e.id] || PRECIO_EJEMPLO_POR_DEFECTO, e.id));
+
+  // Capacidad diaria de cada médico (pacientes por día)
+  if (!columnas("medicos").includes("cupos_diarios")) {
+    bd.exec(`ALTER TABLE medicos ADD COLUMN cupos_diarios INTEGER NOT NULL DEFAULT ${CUPOS_DIARIOS_POR_DEFECTO}`);
+  }
+
+  // Las citas de una orden no tienen paciente registrado: citas.paciente_id pasa a ser
+  // opcional y se agrega citas.orden_id. SQLite no permite cambiar una columna,
+  // así que la tabla se reconstruye una sola vez conservando todos los datos.
+  if (!columnas("citas").includes("orden_id")) {
+    enTransaccion(() => {
+      bd.exec(`
+        CREATE TABLE citas_nueva (
+          id              INTEGER PRIMARY KEY AUTOINCREMENT,
+          paciente_id     INTEGER REFERENCES usuarios(id),
+          orden_id        INTEGER REFERENCES ordenes(id),
+          medico_id       TEXT    NOT NULL REFERENCES medicos(id),
+          fecha           TEXT    NOT NULL,
+          horario         TEXT    NOT NULL,
+          motivo          TEXT,
+          estado          TEXT    NOT NULL DEFAULT 'pendiente'
+                          CHECK (estado IN ('pendiente', 'confirmada', 'cancelada', 'atendida')),
+          creada_en       TEXT    NOT NULL DEFAULT (datetime('now', 'localtime')),
+          actualizada_en  TEXT    NOT NULL DEFAULT (datetime('now', 'localtime')),
+          CHECK (paciente_id IS NOT NULL OR orden_id IS NOT NULL)
+        );
+        INSERT INTO citas_nueva (id, paciente_id, medico_id, fecha, horario, motivo, estado, creada_en, actualizada_en)
+          SELECT id, paciente_id, medico_id, fecha, horario, motivo, estado, creada_en, actualizada_en FROM citas;
+        DROP TABLE citas;
+        ALTER TABLE citas_nueva RENAME TO citas;
+        CREATE UNIQUE INDEX ux_citas_horario_activo ON citas (medico_id, fecha, horario) WHERE estado <> 'cancelada';
+        CREATE INDEX ix_citas_paciente ON citas (paciente_id);
+        CREATE INDEX ix_citas_orden ON citas (orden_id);
+      `);
+    });
+  }
+}
+
 cargarCatalogoInicial();
 prepararPersonal();
+prepararOrdenes();
 
-module.exports = { bd, enTransaccion, RUTA_BD };
+module.exports = { bd, enTransaccion, RUTA_BD, PRECIO_EJEMPLO_POR_DEFECTO, CUPOS_DIARIOS_POR_DEFECTO };

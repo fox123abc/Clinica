@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Empresas clientes | Clínica Altavida</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Courier+Prime:wght@400;700&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../../assets/css/variables.css">
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/layout.css">
+  <link rel="stylesheet" href="../../assets/css/componentes.css">
+  <link rel="stylesheet" href="../../assets/css/privado.css">
+</head>
+<body>
+
+  <div class="franja-sesion" id="franja-sesion" v-cloak>
+    <div class="contenedor">
+      <span class="franja-sesion__usuario">
+        <span class="franja-sesion__avatar" aria-hidden="true">{{ inicial }}</span>
+        <span class="franja-sesion__nombre">Sesión iniciada como: <strong>{{ nombre }}</strong> · Administración</span>
+      </span>
+      <a href="../login.html" class="franja-sesion__accion" @click.prevent="salir">Cerrar sesión</a>
+    </div>
+  </div>
+
+  <header class="encabezado">
+    <div class="contenedor">
+      <a href="../../index.html" class="marca">Clínica Altavida</a>
+      <nav class="nav-principal" aria-label="Navegación del área de administración">
+        <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="menu-principal">Menú</button>
+        <ul class="nav-principal__enlaces" id="menu-principal">
+          <li><a href="panel.html">Panel</a></li>
+          <li><a href="catalogo.html">Catálogo clínico</a></li>
+          <li><a href="empresas.html">Empresas clientes</a></li>
+          <li><a href="../recepcion/ordenes.html">Órdenes de empresas</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Página gestionada por Vue.js (assets/js/vue/empresas.js) -->
+  <main class="contenedor seccion" id="app-empresas" v-cloak>
+    <div class="cabecera-panel">
+      <div>
+        <h1>Empresas clientes</h1>
+        <p>Registra las empresas que piden citas para sus empleados. Sus datos aparecen en las órdenes de pago.</p>
+      </div>
+      <button type="button" class="boton boton--primario" @click="nueva">+ Nueva empresa</button>
+    </div>
+
+    <p v-if="mensaje" class="aviso aviso--exito" role="status">{{ mensaje }}</p>
+    <p v-if="errorGeneral" class="aviso aviso--error" role="alert">{{ errorGeneral }}</p>
+
+    <div class="panel-ordenes">
+      <div class="tabla-contenedor">
+        <table class="tabla-datos">
+          <caption>Empresas registradas</caption>
+          <thead>
+            <tr>
+              <th scope="col">Empresa</th>
+              <th scope="col">Contacto</th>
+              <th scope="col" class="numero">Órdenes</th>
+              <th scope="col">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="e in empresas" :key="e.id" :class="{ 'fila-activa': editandoId === e.id }">
+              <td data-etiqueta="Empresa">
+                <strong>{{ e.nombre }}</strong><br>
+                <span class="dato-maquina">NIT {{ e.nit }}</span>
+              </td>
+              <td data-etiqueta="Contacto">
+                {{ e.contacto }}<br>
+                <span class="texto-tenue">{{ e.telefono }} · {{ e.correo }}</span>
+              </td>
+              <td data-etiqueta="Órdenes" class="numero">{{ e.ordenes }}</td>
+              <td data-etiqueta="Acciones" class="tabla-datos__acciones">
+                <button type="button" class="boton boton--contorno boton--compacto" @click="editar(e)"
+                        :aria-label="'Editar los datos de ' + e.nombre">Editar</button>
+              </td>
+            </tr>
+            <tr v-if="!empresas.length">
+              <td colspan="4" class="tabla-datos__vacia">Aún no hay empresas registradas. Agrega la primera con el formulario.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div ref="panel" class="panel-ordenes__detalle">
+        <form class="formulario orden" novalidate @submit.prevent="guardar">
+          <div class="orden__cabecera">
+            <h2>{{ editandoId ? 'Editar empresa' : 'Nueva empresa' }}</h2>
+          </div>
+
+          <campo-formulario id="e-nombre" etiqueta="Nombre de la empresa" obligatorio :error="errores.nombre">
+            <input type="text" id="e-nombre" ref="primerCampo" v-model.trim="formulario.nombre" maxlength="100" autocomplete="organization">
+          </campo-formulario>
+          <campo-formulario id="e-nit" etiqueta="NIT" obligatorio :error="errores.nit" ayuda="Con dígito de verificación, por ejemplo 900123456-7.">
+            <input type="text" id="e-nit" v-model.trim="formulario.nit" maxlength="20" inputmode="numeric">
+          </campo-formulario>
+          <campo-formulario id="e-contacto" etiqueta="Persona de contacto" obligatorio :error="errores.contacto">
+            <input type="text" id="e-contacto" v-model.trim="formulario.contacto" maxlength="80">
+          </campo-formulario>
+          <campo-formulario id="e-correo" etiqueta="Correo electrónico" obligatorio :error="errores.correo"
+                            ayuda="A este correo se envía la orden de pago.">
+            <input type="email" id="e-correo" v-model.trim="formulario.correo" autocomplete="email">
+          </campo-formulario>
+          <campo-formulario id="e-telefono" etiqueta="Teléfono" obligatorio :error="errores.telefono">
+            <input type="tel" id="e-telefono" v-model.trim="formulario.telefono" autocomplete="tel">
+          </campo-formulario>
+
+          <div class="acciones">
+            <button type="submit" class="boton boton--primario" :disabled="enviando">
+              {{ enviando ? 'Guardando…' : editandoId ? 'Guardar cambios' : 'Registrar empresa' }}
+            </button>
+            <button v-if="editandoId" type="button" class="boton boton--contorno" @click="nueva">Cancelar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <footer class="pie-pagina">
+    <div class="contenedor">
+      <span>&copy; 2026 Clínica Altavida. Proyecto académico con fines demostrativos.</span>
+    </div>
+  </footer>
+
+  <script src="../../assets/js/navegacion.js"></script>
+  <script src="https://unpkg.com/vue@3.4.38/dist/vue.global.prod.js"></script>
+  <script src="../../assets/js/vue/comun.js"></script>
+  <script src="../../assets/js/vue/empresas.js"></script>
+</body>
+</html>

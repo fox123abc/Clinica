@@ -4,32 +4,33 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Clínica Altavida | Gestión de citas médicas</title>
-  <meta name="description" content="Consulta las especialidades de Clínica Altavida y solicita tu cita médica en línea.">
+  <meta name="description" content="Elige un horario libre de verdad y solicita tu cita en Clínica Altavida. Recepción la confirma y nadie más puede ocuparla.">
+  <meta name="theme-color" content="#BFD6EA">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Newsreader:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Courier+Prime:wght@400;700&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="assets/css/variables.css">
-  <link rel="stylesheet" href="assets/css/base.css">
-  <link rel="stylesheet" href="assets/css/layout.css">
-  <link rel="stylesheet" href="assets/css/componentes.css">
-  <link rel="stylesheet" href="assets/css/publico.css">
+  <link rel="stylesheet" href="assets/css/inicio.css">
 </head>
-<body>
+<body class="carne-pagina">
 
-  <header class="encabezado">
-    <div class="contenedor">
-      <a href="index.html" class="marca">Clínica Altavida</a>
+  <a class="saltar" href="#carne">Ir a elegir un horario</a>
+
+  <!-- Encabezado impreso del carné -->
+  <header class="membrete">
+    <div class="membrete__interior">
+      <a href="index.html" class="membrete__marca" aria-label="Clínica Altavida, inicio">
+        <span class="logo-cruz" aria-hidden="true"></span>
+        <span>Clínica Altavida</span>
+      </a>
 
       <nav class="nav-principal" aria-label="Navegación principal">
-        <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="menu-principal">
-          Menú
-        </button>
+        <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="menu-principal">Menú</button>
         <ul class="nav-principal__enlaces" id="menu-principal">
-          <li><a href="index.html">Inicio</a></li>
           <li><a href="html/especialidades.html">Especialidades</a></li>
           <li><a href="html/login.html">Ingresar</a></li>
-          <li><a href="html/registro.html">Registrarme</a></li>
+          <li><a href="html/registro.html" class="nav-principal__destacado">Registrarme</a></li>
         </ul>
       </nav>
     </div>
@@ -37,84 +38,194 @@
 
   <main>
 
-    <!-- ============ Hero ============ -->
-    <section class="contenedor hero">
-      <div>
-        <span class="hero__etiqueta">Agenda médica en línea</span>
-        <h1 class="hero__titulo">Tu cita médica, organizada de principio a fin</h1>
-        <p>
-          Clínica Altavida centraliza la agenda de sus especialidades para que
-          puedas revisar la disponibilidad real de los médicos y solicitar tu
-          cita sin llamadas ni mensajes cruzados.
+    <!-- ============ Primera pantalla: el carné de citas, funcionando ============ -->
+    <section class="portada" aria-labelledby="titulo-portada">
+      <div class="portada__texto">
+        <h1 id="titulo-portada" class="portada__titulo">Tu cita, sellada y sin filas.</h1>
+        <p class="portada__sub">
+          Elige un horario que de verdad está libre. Recepción lo confirma con un
+          sello y nadie más puede ocuparlo.
         </p>
-        <div class="hero__acciones">
-          <a href="html/registro.html" class="boton boton--primario">Solicitar una cita</a>
-          <a href="html/especialidades.html" class="boton boton--contorno">Ver especialidades</a>
-        </div>
+        <a class="enlace-subrayado" href="#reverso">Cómo avanza tu cita</a>
       </div>
 
-      <!-- Ilustración abstracta de línea: no representa personas ni datos reales -->
-      <svg class="hero__ilustracion" viewBox="0 0 400 320" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Ilustración abstracta que combina una hoja y una cruz médica">
-        <circle cx="200" cy="160" r="140" fill="none" stroke="#6B8F71" stroke-width="1.5"/>
-        <path d="M200 60 C 260 100, 260 220, 200 260 C 140 220, 140 100, 200 60 Z" fill="none" stroke="#1B3B36" stroke-width="2"/>
-        <line x1="200" y1="130" x2="200" y2="190" stroke="#B5652D" stroke-width="6" stroke-linecap="round"/>
-        <line x1="170" y1="160" x2="230" y2="160" stroke="#B5652D" stroke-width="6" stroke-linecap="round"/>
-      </svg>
-    </section>
+      <!-- Gestionado por Vue.js (assets/js/vue/inicio.js) -->
+      <div class="carne" id="carne" tabindex="-1">
+        <div id="app-carne" class="carne__app">
+          <div class="carne__cabecera">
+            <span class="carne__titulo">Carné de citas</span>
+            <span class="carne__nota">Datos reales de la agenda</span>
+          </div>
 
-    <!-- ============ Sobre la clínica ============ -->
-    <section class="contenedor seccion">
-      <h2>Sobre Clínica Altavida</h2>
-      <p>
-        <!-- Marcador de contenido: reemplazar con la descripción institucional real de la clínica -->
-        [Descripción institucional pendiente: historia, misión y cobertura de Clínica Altavida.]
-      </p>
-    </section>
+          <!-- Visible mientras carga Vue y la agenda; el contenido de <template> no se muestra antes de montar -->
+          <p class="carne__cargando" v-if="!listo">Cargando la agenda de la clínica…</p>
 
-    <!-- ============ Flujo de una cita (secuencia real definida en el proyecto) ============ -->
-    <section class="contenedor seccion">
-      <h2>Así funciona la solicitud de tu cita</h2>
-      <ol class="pasos">
-        <li class="paso">
-          <span class="paso__numero">1</span>
-          <h3>Elige especialidad y médico</h3>
-          <p>Consulta la disponibilidad real de cada especialidad antes de continuar.</p>
-        </li>
-        <li class="paso">
-          <span class="paso__numero">2</span>
-          <h3>Selecciona fecha y horario</h3>
-          <p>El sistema solo muestra horarios que aún no han sido tomados.</p>
-        </li>
-        <li class="paso">
-          <span class="paso__numero">3</span>
-          <h3>Confirma tus datos</h3>
-          <p>Tu cita queda registrada con estado pendiente hasta ser confirmada.</p>
-        </li>
-      </ol>
-    </section>
+          <template v-if="listo">
+            <p v-if="errorCarga" class="carne__aviso" role="alert">{{ errorCarga }}</p>
 
-    <!-- ============ Acceso a la aplicación clínica interna ============ -->
-    <section class="contenedor seccion seccion--sin-borde">
-      <div class="banda-destacada">
-        <div>
-          <h2>¿Eres parte del personal de la clínica?</h2>
-          <p>Ingresa a la aplicación clínica interna para gestionar la agenda médica.</p>
+            <div v-else class="carne__campos">
+              <div class="campo-carne">
+                <label class="campo-carne__etiqueta" for="c-especialidad"><span>01</span> Especialidad</label>
+                <select id="c-especialidad" class="campo-carne__control" v-model="especialidadId">
+                  <option v-for="e in especialidades" :key="e.id" :value="e.id">{{ e.nombre }}</option>
+                </select>
+              </div>
+
+              <div class="campo-carne">
+                <label class="campo-carne__etiqueta" for="c-medico"><span>02</span> Médico</label>
+                <select id="c-medico" class="campo-carne__control" v-model="medicoId" :disabled="!medicosDeEspecialidad.length">
+                  <option v-for="m in medicosDeEspecialidad" :key="m.id" :value="m.id">{{ m.nombre }}</option>
+                  <option v-if="!medicosDeEspecialidad.length" value="">Sin médicos</option>
+                </select>
+              </div>
+
+              <fieldset class="campo-carne campo-carne--ancho">
+                <legend class="campo-carne__etiqueta"><span>03</span> Día</legend>
+                <div class="dias" v-if="dias.length">
+                  <button v-for="d in dias" :key="d.iso" type="button" class="dia"
+                          :aria-pressed="fecha === d.iso" @click="elegirDia(d.iso)">
+                    <span class="dia__semana">{{ d.semana }}</span>
+                    <span class="dia__numero">{{ d.numero }}</span>
+                    <span class="dia__mes">{{ d.mes }}</span>
+                  </button>
+                </div>
+                <p v-else class="campo-carne__vacio">Este médico aún no tiene días de atención.</p>
+              </fieldset>
+
+              <fieldset class="campo-carne campo-carne--ancho">
+                <legend class="campo-carne__etiqueta"><span>04</span> Hora</legend>
+                <p class="campo-carne__vacio" v-if="cargandoHoras">Consultando la agenda…</p>
+                <p class="campo-carne__vacio" v-else-if="fecha && !horas.length">No hay horas este día.</p>
+                <div class="horas" v-else-if="horas.length">
+                  <button v-for="h in horas" :key="h.hora" type="button" class="hora"
+                          :class="{ 'hora--tomada': !h.libre }"
+                          :disabled="!h.libre"
+                          :aria-pressed="horario === h.hora"
+                          :aria-label="h.libre ? h.hora + ', libre' : h.hora + ', ocupada'"
+                          @click="elegir(h.hora)">{{ h.hora }}</button>
+                </div>
+                <p class="horas__leyenda" v-if="horas.length">
+                  <span class="muestra"></span> libre
+                  <span class="muestra muestra--tomada"></span> ocupada o ya pasó
+                </p>
+              </fieldset>
+
+              <div class="campo-carne campo-carne--estado">
+                <span class="campo-carne__etiqueta"><span>05</span> Estado</span>
+                <p class="estado-carne" aria-live="polite">
+                  <span v-if="!horario">Por sellar: elige una hora libre</span>
+                  <span v-else>{{ resumen }}</span>
+                </p>
+                <span v-if="horario" :key="sello" class="sello sello--pendiente" aria-hidden="true">Pendiente</span>
+              </div>
+
+              <div class="carne__accion">
+                <button type="button" class="boton-tinta" :disabled="!horario" @click="reservar">
+                  Reservar este horario
+                </button>
+                <p class="carne__ayuda">Para reservar necesitas una cuenta de paciente. Tu elección se guarda mientras ingresas.</p>
+              </div>
+            </div>
+          </template>
         </div>
-        <a href="html/login.html" class="boton boton--secundario">Ingresar a la aplicación clínica</a>
+      </div>
+    </section>
+
+    <!-- ============ Reverso del carné: estados y normas ============ -->
+    <section class="reverso" id="reverso" aria-labelledby="titulo-reverso">
+      <div class="reverso__interior">
+        <h2 id="titulo-reverso" class="reverso__titulo">Cada cambio, un sello.</h2>
+        <p class="reverso__sub">Tu cita pasa por cuatro estados. Cada uno lo sella una persona distinta, y todos lo ven igual.</p>
+
+        <table class="registro">
+          <caption class="visualmente-oculto">Estados de una cita y quién los sella</caption>
+          <thead>
+            <tr>
+              <th scope="col">Sello</th>
+              <th scope="col">Quién lo pone</th>
+              <th scope="col">Qué significa</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="sello sello--pendiente sello--fijo">Pendiente</span></td>
+              <td>Tú, al reservar</td>
+              <td>El horario queda apartado a tu nombre y nadie más puede tomarlo.</td>
+            </tr>
+            <tr>
+              <td><span class="sello sello--confirmada sello--fijo">Confirmada</span></td>
+              <td>Recepción</td>
+              <td>La clínica revisó tu solicitud y te espera ese día a esa hora.</td>
+            </tr>
+            <tr>
+              <td><span class="sello sello--atendida sello--fijo">Atendida</span></td>
+              <td>Tu médico</td>
+              <td>La consulta se realizó y queda registrada en tu historial de citas.</td>
+            </tr>
+            <tr>
+              <td><span class="sello sello--cancelada sello--fijo">Cancelada</span></td>
+              <td>Tú o recepción</td>
+              <td>La cita se anula y el horario vuelve a quedar libre para otra persona.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="normas">
+          <h3 class="normas__titulo">Normas del carné</h3>
+          <ol class="normas__lista">
+            <li>Solo ves horas que siguen libres. Las ocupadas y las que ya pasaron aparecen tachadas.</li>
+            <li>Un horario, una persona. Si dos pacientes eligen la misma hora, el sistema acepta solo la primera solicitud.</li>
+            <li>Puedes reprogramar o cancelar tu cita mientras esté pendiente o confirmada, sin llamar a la clínica.</li>
+            <li>Cancelar libera el horario al instante para otro paciente.</li>
+            <li>No se aceptan citas en fechas pasadas ni en días en que el médico no atiende.</li>
+            <li>Cada cuenta entra solo a lo suyo: pacientes, recepción, médicos y administración tienen su propia página.</li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ Talonarios: una entrada por rol ============ -->
+    <section class="talonarios" aria-labelledby="titulo-talonarios">
+      <div class="talonarios__interior">
+        <h2 id="titulo-talonarios" class="talonarios__titulo">Cuatro talonarios, una sola agenda.</h2>
+        <ul class="talonarios__lista">
+          <li class="talon">
+            <h3 class="talon__rol">Paciente</h3>
+            <p>Reserva, reprograma o cancela tus citas y sigue su estado.</p>
+            <a class="talon__enlace" href="html/registro.html">Crear mi cuenta</a>
+          </li>
+          <li class="talon">
+            <h3 class="talon__rol">Recepción</h3>
+            <p>Confirma o cancela las citas solicitadas por los pacientes.</p>
+            <a class="talon__enlace" href="html/login.html">Ingresar</a>
+          </li>
+          <li class="talon">
+            <h3 class="talon__rol">Médico</h3>
+            <p>Consulta tu agenda y marca como atendidas las consultas realizadas.</p>
+            <a class="talon__enlace" href="html/login.html">Ingresar</a>
+          </li>
+          <li class="talon">
+            <h3 class="talon__rol">Administración</h3>
+            <p>Crea especialidades y médicos, y define sus horarios de atención.</p>
+            <a class="talon__enlace" href="html/login.html">Ingresar</a>
+          </li>
+        </ul>
+        <p class="talonarios__nota">La página de ingreso incluye cuentas de demostración para cada rol.</p>
       </div>
     </section>
 
   </main>
 
-  <footer class="pie-pagina">
-    <div class="contenedor">
-      <span>&copy; 2026 Clínica Altavida. Proyecto académico con fines demostrativos.</span>
-      <nav aria-label="Enlaces del pie de página">
-        <a href="html/especialidades.html">Especialidades</a>
-      </nav>
+  <footer class="pie">
+    <div class="pie__interior">
+      <span>&copy; 2026 Clínica Altavida · Colombia. Proyecto académico con fines demostrativos.</span>
+      <a href="html/especialidades.html">Especialidades</a>
     </div>
   </footer>
 
   <script src="assets/js/navegacion.js"></script>
+  <script src="https://unpkg.com/vue@3.4.38/dist/vue.global.prod.js"></script>
+  <script src="assets/js/vue/comun.js"></script>
+  <script src="assets/js/vue/inicio.js"></script>
 </body>
 </html>

@@ -17,6 +17,7 @@
           hoy: A.fechaHoyISO(),
           filtro: "proximas",
           nombreMedico: sesion.nombre,
+          procesando: null,
           mensaje: "",
           errorGeneral: ""
         };
@@ -35,14 +36,18 @@
       methods: {
         formatearFecha: A.formatearFecha,
         atender: function (cita) {
+          if (this.procesando) return;
           var vm = this;
           this.mensaje = "";
           this.errorGeneral = "";
+          this.procesando = cita.id;
           A.Api.atenderCita(cita.id).then(function (actualizada) {
             cita.estado = actualizada.estado;
             vm.mensaje = "La cita de " + cita.paciente + " quedó registrada como atendida.";
           }).catch(function (e) {
             vm.errorGeneral = e.mensaje;
+          }).finally(function () {
+            vm.procesando = null;
           });
         }
       }

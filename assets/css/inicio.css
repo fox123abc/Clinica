@@ -1,0 +1,993 @@
+/* ==========================================================================
+   INICIO.CSS
+   Página de inicio con el mundo "Carné de citas": cartulina celeste,
+   tinta de imprenta, casillas numeradas y sellos de goma para los estados.
+   Hoja independiente: la portada no carga los estilos del resto del sitio.
+   ========================================================================== */
+
+:root {
+  /* Cartulina y tinta */
+  --cartulina: #BFD6EA;
+  --cartulina-honda: #A9C7E1;
+  --cara: #E8F1F9;
+  --papel: #F7FAFD;
+  --tinta: #14181F;
+  --tinta-suave: #3A4452;
+  --linea: rgba(20, 24, 31, 0.85);
+  --linea-tenue: rgba(20, 24, 31, 0.28);
+
+  /* Tintas de sello (una por estado de la cita) */
+  --sello-pendiente: #5B3FA0;
+  --sello-confirmada: #1F6B45;
+  --sello-atendida: #1E4E8C;
+  --sello-cancelada: #B42E28;
+
+  --fuente-impresa: "Archivo", "Arial Narrow", Arial, sans-serif;
+  --fuente-lectura: "Public Sans", "Segoe UI", Arial, sans-serif;
+  --fuente-maquina: "Courier Prime", "Courier New", monospace;
+
+  --margen: clamp(1rem, 4vw, 4rem);
+  --ancho: 84rem;
+  --salida: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* -------------------- Base -------------------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+body {
+  margin: 0;
+  background-color: var(--cartulina);
+  color: var(--tinta);
+  font-family: var(--fuente-lectura);
+  font-size: 1rem;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background-color: var(--sello-pendiente);
+  color: #FFFFFF;
+}
+
+/* Superficies del navegador con los colores del carné */
+html {
+  accent-color: var(--sello-pendiente);
+  caret-color: var(--sello-pendiente);
+  scrollbar-color: var(--tinta-suave) var(--cartulina);
+}
+
+a {
+  color: inherit;
+  text-underline-offset: 0.2em;
+  text-decoration-thickness: 1.5px;
+}
+
+a:focus-visible,
+button:focus-visible,
+select:focus-visible,
+.carne:focus-visible {
+  outline: 3px solid var(--sello-pendiente);
+  outline-offset: 3px;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--fuente-impresa);
+  margin: 0;
+  text-wrap: balance;
+}
+
+p {
+  margin: 0;
+}
+
+.visualmente-oculto {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.saltar {
+  position: absolute;
+  left: var(--margen);
+  top: -3rem;
+  z-index: 10;
+  padding: 0.6rem 1rem;
+  background: var(--tinta);
+  color: #FFFFFF;
+  font-weight: 600;
+}
+
+.saltar:focus {
+  top: 0.75rem;
+}
+
+/* -------------------- Membrete (encabezado impreso) -------------------- */
+.membrete {
+  border-bottom: 2px solid var(--tinta);
+}
+
+.membrete__interior {
+  max-width: var(--ancho);
+  margin: 0 auto;
+  padding: 1rem var(--margen);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.membrete__marca {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  text-decoration: none;
+  font-family: var(--fuente-impresa);
+  font-weight: 800;
+  font-stretch: 112%;
+  font-size: 1.15rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* Logo: cuadrado con la cruz de la clínica */
+.logo-cruz {
+  position: relative;
+  flex: none;
+  width: 1.9rem;
+  height: 1.9rem;
+  border-radius: 6px;
+  background-color: var(--sello-cancelada);
+}
+
+.logo-cruz::before,
+.logo-cruz::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #FFFFFF;
+  border-radius: 1px;
+}
+
+.logo-cruz::before {
+  width: 1.05rem;
+  height: 0.3rem;
+}
+
+.logo-cruz::after {
+  width: 0.3rem;
+  height: 1.05rem;
+}
+
+.nav-principal__enlaces {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: 0.25rem;
+}
+
+.nav-principal__enlaces a {
+  display: block;
+  padding: 0.5rem 0.9rem;
+  font-family: var(--fuente-impresa);
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border: 1.5px solid transparent;
+  border-radius: 6px;
+}
+
+.nav-principal__enlaces a:hover {
+  border-color: var(--tinta);
+}
+
+.nav-principal__destacado {
+  background-color: var(--tinta);
+  color: #FFFFFF;
+}
+
+.nav-principal__enlaces a.nav-principal__destacado:hover {
+  background-color: var(--sello-pendiente);
+  border-color: var(--sello-pendiente);
+}
+
+.nav-toggle {
+  display: none;
+  font: 700 0.95rem var(--fuente-impresa);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.5rem 0.9rem;
+  background: transparent;
+  color: var(--tinta);
+  border: 1.5px solid var(--tinta);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+@media (max-width: 40rem) {
+  .nav-toggle {
+    display: block;
+  }
+
+  .nav-principal {
+    position: relative;
+  }
+
+  .nav-principal__enlaces {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: calc(100% + 0.5rem);
+    z-index: 5;
+    flex-direction: column;
+    min-width: 13rem;
+    padding: 0.5rem;
+    background-color: var(--papel);
+    border: 2px solid var(--tinta);
+    border-radius: 8px;
+    box-shadow: 0 10px 24px rgba(20, 24, 31, 0.18);
+  }
+
+  .nav-principal__enlaces.esta-abierto {
+    display: flex;
+  }
+}
+
+/* -------------------- Portada -------------------- */
+.portada {
+  max-width: var(--ancho);
+  margin: 0 auto;
+  padding: clamp(2rem, 5vw, 4rem) var(--margen) clamp(3rem, 6vw, 5rem);
+  display: grid;
+  gap: clamp(2rem, 4vw, 3.5rem);
+  align-items: start;
+}
+
+@media (min-width: 64rem) {
+  .portada {
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+  }
+
+  .portada__texto {
+    position: sticky;
+    top: 2rem;
+    padding-top: 1rem;
+  }
+}
+
+.portada__titulo {
+  font-weight: 900;
+  font-stretch: 70%;
+  font-size: clamp(3.2rem, 6.4vw + 0.5rem, 6.25rem);
+  line-height: 0.88;
+  letter-spacing: -0.015em;
+  text-transform: uppercase;
+  margin-bottom: 1.5rem;
+}
+
+.portada__sub {
+  font-size: clamp(1.1rem, 0.6vw + 0.95rem, 1.35rem);
+  line-height: 1.45;
+  max-width: 30ch;
+  margin-bottom: 1.5rem;
+  color: var(--tinta);
+}
+
+.enlace-subrayado {
+  font-family: var(--fuente-impresa);
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.enlace-subrayado:hover {
+  color: var(--sello-pendiente);
+}
+
+/* -------------------- El carné -------------------- */
+.carne {
+  background-color: var(--cara);
+  border: 2px solid var(--tinta);
+  border-radius: 14px;
+  box-shadow: 0 2px 4px rgba(20, 24, 31, 0.1), 0 24px 48px -16px rgba(20, 24, 31, 0.35);
+  scroll-margin-top: 1rem;
+}
+
+.carne__cabecera {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 1rem clamp(1rem, 3vw, 2rem);
+  border-bottom: 2px solid var(--tinta);
+}
+
+.carne__titulo {
+  font-family: var(--fuente-impresa);
+  font-weight: 800;
+  font-stretch: 115%;
+  font-size: 1.1rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.carne__nota {
+  font-size: 0.8125rem;
+  color: var(--tinta-suave);
+}
+
+.carne__cargando,
+.carne__aviso {
+  padding: 2rem clamp(1rem, 3vw, 2rem);
+  color: var(--tinta-suave);
+}
+
+.carne__aviso {
+  color: var(--sello-cancelada);
+  font-weight: 600;
+}
+
+/* Campos numerados en posición fija: 01 a 05 */
+.carne__campos {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.campo-carne {
+  margin: 0;
+  min-width: 0;
+  padding: 0.9rem clamp(1rem, 3vw, 2rem) 1.1rem;
+  border: 0;
+  border-bottom: 1.5px solid var(--linea);
+}
+
+.campo-carne:nth-child(1) {
+  border-right: 1.5px solid var(--linea);
+}
+
+.campo-carne--ancho,
+.campo-carne--estado,
+.carne__accion {
+  grid-column: 1 / -1;
+}
+
+.campo-carne__etiqueta {
+  display: block;
+  padding: 0;
+  margin-bottom: 0.5rem;
+  font-family: var(--fuente-impresa);
+  font-weight: 700;
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--tinta-suave);
+}
+
+/* La leyenda de un fieldset se dibuja sobre el borde; así se comporta como las demás etiquetas */
+legend.campo-carne__etiqueta {
+  float: left;
+  width: 100%;
+}
+
+legend.campo-carne__etiqueta + * {
+  clear: both;
+}
+
+.campo-carne__etiqueta span {
+  color: var(--tinta);
+  margin-right: 0.35rem;
+}
+
+/* Selects con aspecto de renglón para escribir */
+.campo-carne__control {
+  width: 100%;
+  appearance: none;
+  font-family: var(--fuente-maquina);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--tinta);
+  background: transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%2314181F' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 0.2rem center;
+  border: 0;
+  border-bottom: 1.5px dashed var(--linea-tenue);
+  border-radius: 0;
+  padding: 0.25rem 1.6rem 0.35rem 0;
+  cursor: pointer;
+}
+
+.campo-carne__control:hover {
+  border-bottom-color: var(--tinta);
+}
+
+.campo-carne__control:disabled {
+  color: var(--tinta-suave);
+  cursor: not-allowed;
+}
+
+.campo-carne__vacio {
+  font-size: 0.95rem;
+  color: var(--tinta-suave);
+}
+
+/* 03 · Días como casillas de calendario impreso */
+.dias {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.dia {
+  display: grid;
+  justify-items: center;
+  gap: 0.05rem;
+  padding: 0.5rem 0.25rem 0.55rem;
+  font-family: var(--fuente-impresa);
+  color: var(--tinta);
+  background-color: var(--papel);
+  border: 1.5px solid var(--tinta);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 120ms ease, color 120ms ease;
+}
+
+.dia:hover {
+  background-color: #FFFFFF;
+}
+
+.dia__semana,
+.dia__mes {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.dia__numero {
+  font-family: var(--fuente-maquina);
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.dia[aria-pressed="true"],
+.dia[aria-pressed="true"]:hover {
+  background-color: var(--tinta);
+  color: #FFFFFF;
+}
+
+/* 04 · Horas: casillas libres y tachadas */
+.horas {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(5.5rem, 1fr));
+  gap: 0.5rem;
+}
+
+.hora {
+  font-family: var(--fuente-maquina);
+  font-size: 1.1rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  padding: 0.65rem 0.25rem;
+  color: var(--tinta);
+  background-color: #FFFFFF;
+  border: 1.5px solid var(--tinta);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 120ms ease, color 120ms ease;
+}
+
+.hora:hover:not(:disabled) {
+  background-color: var(--cartulina);
+}
+
+.hora[aria-pressed="true"],
+.hora[aria-pressed="true"]:hover:not(:disabled) {
+  background-color: var(--sello-pendiente);
+  border-color: var(--sello-pendiente);
+  color: #FFFFFF;
+}
+
+/* Tachado a mano: rayas diagonales sobre la casilla ocupada */
+.hora--tomada {
+  color: var(--tinta-suave);
+  background: repeating-linear-gradient(135deg, transparent 0 7px, var(--linea-tenue) 7px 8.5px), var(--cara);
+  border-color: var(--linea-tenue);
+  text-decoration: line-through;
+  text-decoration-thickness: 1.5px;
+  cursor: not-allowed;
+}
+
+.horas__leyenda {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.4rem 0.5rem;
+  margin-top: 0.75rem;
+  font-size: 0.8125rem;
+  color: var(--tinta-suave);
+}
+
+.muestra {
+  display: inline-block;
+  width: 1rem;
+  height: 0.8rem;
+  background: #FFFFFF;
+  border: 1.5px solid var(--tinta);
+  border-radius: 3px;
+}
+
+.muestra--tomada {
+  margin-left: 0.75rem;
+  background: repeating-linear-gradient(135deg, transparent 0 3px, var(--linea-tenue) 3px 4px), var(--cara);
+  border-color: var(--linea-tenue);
+}
+
+/* 05 · Estado y sello */
+.campo-carne--estado {
+  position: relative;
+  min-height: 6.5rem;
+  /* Línea perforada: separa el cuerpo del carné del talón con la acción */
+  border-bottom: 2px dashed var(--linea);
+}
+
+.estado-carne {
+  font-family: var(--fuente-maquina);
+  font-size: 1.1rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  max-width: 60%;
+}
+
+.estado-carne span:first-letter {
+  text-transform: uppercase;
+}
+
+.carne__accion {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1.5rem;
+  padding: 1.25rem clamp(1rem, 3vw, 2rem) 1.5rem;
+}
+
+.carne__ayuda {
+  flex: 1 1 16rem;
+  font-size: 0.875rem;
+  color: var(--tinta-suave);
+  max-width: 44ch;
+}
+
+.boton-tinta {
+  font-family: var(--fuente-impresa);
+  font-weight: 800;
+  font-stretch: 105%;
+  font-size: 1.05rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 1rem 1.6rem;
+  color: #FFFFFF;
+  background-color: var(--tinta);
+  border: 2px solid var(--tinta);
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(20, 24, 31, 0.25);
+  transition: background-color 150ms ease, transform 150ms var(--salida);
+}
+
+.boton-tinta:hover:not(:disabled) {
+  background-color: var(--sello-pendiente);
+  border-color: var(--sello-pendiente);
+}
+
+.boton-tinta:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.boton-tinta:disabled {
+  color: var(--tinta-suave);
+  background-color: transparent;
+  border-color: var(--linea-tenue);
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+/* -------------------- Sellos de goma -------------------- */
+.sello {
+  display: inline-block;
+  font-family: var(--fuente-impresa);
+  font-weight: 900;
+  font-stretch: 85%;
+  font-size: 1.6rem;
+  line-height: 1;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.35rem 0.8rem 0.3rem;
+  border: 4px double currentColor;
+  border-radius: 6px;
+  transform: rotate(-7deg);
+  /* Tinta irregular: la máscara deja huecos y bordes rotos como un sello de goma real */
+  -webkit-mask-image: url("../img/tinta-sello.svg");
+  -webkit-mask-size: 20rem 7.5rem;
+  -webkit-mask-repeat: repeat;
+  mask-image: url("../img/tinta-sello.svg");
+  mask-size: 20rem 7.5rem;
+  mask-repeat: repeat;
+}
+
+/* Cada tinta toma otra zona de la textura: ningún sello sale idéntico */
+.sello--pendiente { color: var(--sello-pendiente); -webkit-mask-position: 0 0; mask-position: 0 0; }
+.sello--confirmada { color: var(--sello-confirmada); -webkit-mask-position: -7rem -2rem; mask-position: -7rem -2rem; }
+.sello--atendida { color: var(--sello-atendida); -webkit-mask-position: -13rem -4rem; mask-position: -13rem -4rem; }
+.sello--cancelada { color: var(--sello-cancelada); -webkit-mask-position: -3rem -5rem; mask-position: -3rem -5rem; }
+
+/* El sello del carné cae una sola vez sobre el campo de estado */
+.campo-carne--estado .sello {
+  position: absolute;
+  right: clamp(1rem, 3vw, 2rem);
+  top: 50%;
+  margin-top: -1.3rem;
+  font-size: clamp(1.6rem, 2.4vw + 0.6rem, 2.4rem);
+  animation: golpe-sello 140ms cubic-bezier(0.5, 0, 0.75, 0) both;
+}
+
+/* Una sola impresión: el sello baja y golpea; no hay fundido */
+@keyframes golpe-sello {
+  0% {
+    transform: rotate(-7deg) scale(1.25);
+  }
+  80% {
+    transform: rotate(-7deg) scale(0.98);
+  }
+  100% {
+    transform: rotate(-7deg) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .campo-carne--estado .sello {
+    animation: none;
+  }
+}
+
+.sello--fijo {
+  font-size: 1.2rem;
+  transform: rotate(-4deg);
+}
+
+/* -------------------- Reverso: estados y normas -------------------- */
+.reverso {
+  background-color: var(--cara);
+  border-top: 2px solid var(--tinta);
+  border-bottom: 2px solid var(--tinta);
+}
+
+.reverso__interior {
+  max-width: var(--ancho);
+  margin: 0 auto;
+  padding: clamp(3rem, 7vw, 6rem) var(--margen);
+  display: grid;
+  gap: 2rem 4rem;
+}
+
+@media (min-width: 64rem) {
+  .reverso__interior {
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+    align-items: start;
+  }
+
+  .reverso__titulo,
+  .reverso__sub {
+    grid-column: 1 / -1;
+  }
+}
+
+.reverso__titulo,
+.talonarios__titulo {
+  font-weight: 900;
+  font-stretch: 72%;
+  font-size: clamp(2.4rem, 4vw + 1rem, 4.25rem);
+  line-height: 0.92;
+  text-transform: uppercase;
+}
+
+.reverso__sub {
+  font-size: 1.15rem;
+  max-width: 52ch;
+  margin-top: -0.75rem;
+  color: var(--tinta-suave);
+}
+
+/* Libro de registro: filas rayadas como un formulario impreso */
+.registro {
+  width: 100%;
+  border-collapse: collapse;
+  border-top: 2px solid var(--tinta);
+}
+
+.registro th {
+  text-align: left;
+  font-family: var(--fuente-impresa);
+  font-weight: 700;
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--tinta-suave);
+  padding: 0.75rem 1rem 0.75rem 0;
+  border-bottom: 1.5px solid var(--tinta);
+  white-space: nowrap;
+}
+
+.registro td {
+  padding: 1.1rem 1rem 1.1rem 0;
+  border-bottom: 1px solid var(--linea-tenue);
+  vertical-align: middle;
+}
+
+.registro td:first-child {
+  width: 11.5rem;
+}
+
+.registro td:nth-child(2) {
+  font-family: var(--fuente-impresa);
+  font-weight: 700;
+  font-size: 1.05rem;
+  white-space: nowrap;
+}
+
+.registro td:last-child {
+  color: var(--tinta-suave);
+}
+
+/* Normas: letra pequeña y densa en dos columnas, como el reverso de un carné */
+.normas {
+  border: 2px solid var(--tinta);
+  border-radius: 10px;
+  padding: 1.5rem;
+  background-color: var(--cara);
+}
+
+.normas__titulo {
+  font-weight: 800;
+  font-stretch: 115%;
+  font-size: 0.95rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding-bottom: 0.75rem;
+  margin-bottom: 1rem;
+  border-bottom: 1.5px solid var(--tinta);
+}
+
+.normas__lista {
+  margin: 0;
+  padding-left: 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  column-count: 2;
+  /* Deja sitio a los números de la segunda columna a la derecha de la línea divisoria */
+  column-gap: 3rem;
+  column-rule: 1px solid var(--linea-tenue);
+}
+
+/* El número va dentro de cada norma para que nunca toque la línea entre columnas */
+.normas__lista li {
+  position: relative;
+  list-style: none;
+  padding-left: 1.6rem;
+  break-inside: avoid;
+  margin-bottom: 0.75rem;
+}
+
+.normas__lista li::before {
+  content: counter(list-item) ".";
+  position: absolute;
+  left: 0;
+  font-family: var(--fuente-maquina);
+  font-weight: 700;
+}
+
+/* -------------------- Talonarios por rol -------------------- */
+.talonarios {
+  background-color: var(--cartulina-honda);
+}
+
+.talonarios__interior {
+  max-width: var(--ancho);
+  margin: 0 auto;
+  padding: clamp(3rem, 7vw, 6rem) var(--margen);
+}
+
+.talonarios__titulo {
+  margin-bottom: 2rem;
+}
+
+.talonarios__lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  background-color: var(--cara);
+  border: 2px solid var(--tinta);
+  border-radius: 12px;
+}
+
+/* Línea perforada entre talones */
+.talon {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 1.5rem;
+  border-left: 2px dashed var(--linea);
+}
+
+.talon:first-child {
+  border-left: 0;
+}
+
+.talon__rol {
+  font-weight: 800;
+  font-stretch: 112%;
+  font-size: 1.15rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.talon p {
+  color: var(--tinta-suave);
+  flex: 1;
+}
+
+.talon__enlace {
+  align-self: flex-start;
+  font-family: var(--fuente-impresa);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.talon__enlace:hover {
+  color: var(--sello-pendiente);
+}
+
+.talonarios__nota {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  color: var(--tinta-suave);
+}
+
+@media (max-width: 60rem) {
+  .talonarios__lista {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .talon:nth-child(3) {
+    border-left: 0;
+  }
+
+  .talon:nth-child(n + 3) {
+    border-top: 2px dashed var(--linea);
+  }
+}
+
+/* -------------------- Pie -------------------- */
+.pie {
+  background-color: var(--tinta);
+  color: #DCE6F0;
+  font-size: 0.875rem;
+}
+
+.pie__interior {
+  max-width: var(--ancho);
+  margin: 0 auto;
+  padding: 1.75rem var(--margen);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.75rem 1.5rem;
+}
+
+.pie a:focus-visible {
+  outline-color: #FFFFFF;
+}
+
+/* -------------------- Pantallas angostas -------------------- */
+@media (max-width: 40rem) {
+  .carne__campos {
+    grid-template-columns: 1fr;
+  }
+
+  .campo-carne:nth-child(1) {
+    border-right: 0;
+  }
+
+  .dias {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .estado-carne {
+    max-width: none;
+  }
+
+  .normas__lista {
+    column-count: 1;
+  }
+
+  /* Sin espacio a la derecha: el sello cae debajo de la fecha en lugar de taparla */
+  .campo-carne--estado .sello {
+    position: static;
+    margin-top: 0.9rem;
+    margin-left: 0.25rem;
+  }
+
+  .boton-tinta {
+    width: 100%;
+  }
+
+  .registro thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+
+  .registro tr {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.4rem 1rem;
+    align-items: center;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--linea-tenue);
+  }
+
+  .registro td {
+    padding: 0;
+    border: 0;
+  }
+
+  .registro td:first-child {
+    width: auto;
+  }
+
+  .registro td:last-child {
+    grid-column: 1 / -1;
+  }
+
+  .talonarios__lista {
+    grid-template-columns: 1fr;
+  }
+
+  .talon,
+  .talon:nth-child(3) {
+    border-left: 0;
+  }
+
+  .talon + .talon {
+    border-top: 2px dashed var(--linea);
+  }
+}

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel | Clínica Altavida</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Courier+Prime:wght@400;700&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../../assets/css/variables.css">
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/layout.css">
+  <link rel="stylesheet" href="../../assets/css/componentes.css">
+  <link rel="stylesheet" href="../../assets/css/privado.css">
+</head>
+<body>
+
+  <div class="franja-sesion" id="franja-sesion" v-cloak>
+    <div class="contenedor">
+      <span class="franja-sesion__usuario">
+        <span class="franja-sesion__avatar" aria-hidden="true">{{ inicial }}</span>
+        <span class="franja-sesion__nombre">Sesión iniciada como: <strong>{{ nombre }}</strong> · Administración</span>
+      </span>
+      <a href="../login.html" class="franja-sesion__accion" @click.prevent="salir">Cerrar sesión</a>
+    </div>
+  </div>
+
+  <header class="encabezado">
+    <div class="contenedor">
+      <a href="../../index.html" class="marca">Clínica Altavida</a>
+      <nav class="nav-principal" aria-label="Navegación del área de administración">
+        <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="menu-principal">Menú</button>
+        <ul class="nav-principal__enlaces" id="menu-principal">
+          <li><a href="panel.html">Panel</a></li>
+          <li><a href="catalogo.html">Catálogo clínico</a></li>
+          <li><a href="empresas.html">Empresas clientes</a></li>
+          <li><a href="../recepcion/ordenes.html">Órdenes de empresas</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Página gestionada por Vue.js (assets/js/vue/panel.js) -->
+  <main class="contenedor seccion" id="app-panel" v-cloak>
+    <div class="cabecera-panel">
+      <div>
+        <h1>Panel</h1>
+        <p>Así va la clínica hoy, {{ fechaLarga(r.hoy) }}.</p>
+      </div>
+      <button type="button" class="boton boton--contorno" :disabled="cargando" @click="recargar">
+        {{ cargando ? 'Actualizando…' : 'Actualizar' }}
+      </button>
+    </div>
+
+    <p v-if="errorGeneral" class="aviso aviso--error" role="alert">{{ errorGeneral }}</p>
+
+    <!-- ============ Avisos: lo que impide agendar o espera a alguien ============ -->
+    <section v-if="hayAvisos" class="panel-bloque panel-avisos" aria-labelledby="t-avisos">
+      <h2 id="t-avisos" class="panel-bloque__titulo">Requiere atención</h2>
+      <ul class="panel-avisos__lista">
+        <li v-if="r.avisos.especialidadesSinMedicos.length">
+          <strong>{{ r.avisos.especialidadesSinMedicos.length }} {{ r.avisos.especialidadesSinMedicos.length === 1 ? 'especialidad' : 'especialidades' }} sin médicos con horario</strong>
+          ({{ r.avisos.especialidadesSinMedicos.join(', ') }}): no aparecen para agendar.
+          <a href="catalogo.html">Asignar médicos</a>
+        </li>
+        <li v-if="r.avisos.medicosSinHorario.length">
+          <strong>{{ r.avisos.medicosSinHorario.length }} {{ r.avisos.medicosSinHorario.length === 1 ? 'médico' : 'médicos' }} sin horario</strong>
+          ({{ r.avisos.medicosSinHorario.join(', ') }}): nadie puede agendar con {{ r.avisos.medicosSinHorario.length === 1 ? 'él' : 'ellos' }}.
+          <a href="catalogo.html">Definir horarios</a>
+        </li>
+        <li v-if="r.avisos.pendientesPorConfirmar">
+          <strong>{{ r.avisos.pendientesPorConfirmar }} {{ r.avisos.pendientesPorConfirmar === 1 ? 'cita pendiente' : 'citas pendientes' }}</strong>
+          esperan que recepción las confirme.
+        </li>
+      </ul>
+    </section>
+
+    <div class="panel-rejilla">
+      <!-- ============ Citas ============ -->
+      <section class="panel-bloque" aria-labelledby="t-citas">
+        <h2 id="t-citas" class="panel-bloque__titulo">Citas</h2>
+        <dl class="panel-cifras">
+          <div>
+            <dt>Hoy</dt>
+            <dd>{{ r.citasHoy }}</dd>
+          </div>
+          <div>
+            <dt>Próximos 7 días</dt>
+            <dd>{{ r.citasSemana }}</dd>
+          </div>
+        </dl>
+        <p class="panel-bloque__nota">Sin contar las canceladas.</p>
+
+        <h3 class="panel-subtitulo">Todas las citas por estado</h3>
+        <ul class="panel-estados">
+          <li v-for="estado in estados" :key="estado">
+            <etiqueta-estado :estado="estado"></etiqueta-estado>
+            <span class="panel-estados__numero">{{ r.porEstado[estado] }}</span>
+          </li>
+        </ul>
+      </section>
+
+      <!-- ============ Órdenes de empresas ============ -->
+      <section class="panel-bloque" aria-labelledby="t-ordenes">
+        <h2 id="t-ordenes" class="panel-bloque__titulo">Órdenes de empresas</h2>
+        <dl class="panel-cifras">
+          <div>
+            <dt>Pagado</dt>
+            <dd>{{ pesos(r.montoPagado) }}</dd>
+          </div>
+          <div>
+            <dt>Por cobrar</dt>
+            <dd>{{ pesos(r.montoPorCobrar) }}</dd>
+          </div>
+        </dl>
+        <p class="panel-bloque__nota">«Por cobrar» = órdenes de pago emitidas que la empresa aún no paga. Valores de ejemplo.</p>
+
+        <h3 class="panel-subtitulo">Órdenes por estado</h3>
+        <ul class="panel-estados">
+          <li v-for="estado in estadosOrden" :key="estado">
+            <span class="estado-orden" :class="'estado-orden--' + estado">{{ estado }}</span>
+            <span class="panel-estados__numero">{{ r.ordenes[estado] }}</span>
+          </li>
+        </ul>
+        <a class="panel-enlace" href="../recepcion/ordenes.html">Ver órdenes</a>
+      </section>
+    </div>
+
+    <!-- ============ Ocupación de la semana ============ -->
+    <section class="panel-bloque" aria-labelledby="t-ocupacion">
+      <h2 id="t-ocupacion" class="panel-bloque__titulo">Ocupación de los próximos 7 días</h2>
+      <p class="panel-bloque__nota panel-bloque__nota--arriba">
+        Citas agendadas frente a los cupos de cada médico del {{ fechaCorta(r.hoy) }} al {{ fechaCorta(r.finSemana) }}.
+        Los cupos de un día son lo menor entre sus cupos diarios y las horas de su horario.
+      </p>
+      <ul v-if="ocupacionOrdenada.length" class="ocupacion">
+        <li v-for="m in ocupacionOrdenada" :key="m.id" class="ocupacion__fila"
+            :title="m.medico + ': ' + m.usadas + ' de ' + m.capacidad + ' cupos (' + porcentaje(m) + ' %)'">
+          <span class="ocupacion__nombre">
+            <strong>{{ m.medico }}</strong>
+            <span class="texto-tenue">{{ m.especialidad }}</span>
+          </span>
+          <span class="ocupacion__pista" role="img"
+                :aria-label="m.usadas + ' de ' + m.capacidad + ' cupos ocupados'">
+            <span class="ocupacion__barra" :style="{ width: porcentaje(m) + '%' }"></span>
+          </span>
+          <span class="ocupacion__valor">
+            {{ m.usadas }} de {{ m.capacidad }}
+            <span v-if="m.usadas >= m.capacidad" class="ocupacion__lleno">lleno</span>
+          </span>
+        </li>
+      </ul>
+      <p v-else class="texto-tenue">Ningún médico tiene horario en los próximos 7 días.</p>
+    </section>
+  </main>
+
+  <footer class="pie-pagina">
+    <div class="contenedor">
+      <span>&copy; 2026 Clínica Altavida. Proyecto académico con fines demostrativos.</span>
+    </div>
+  </footer>
+
+  <script src="../../assets/js/navegacion.js"></script>
+  <script src="https://unpkg.com/vue@3.4.38/dist/vue.global.prod.js"></script>
+  <script src="../../assets/js/vue/comun.js"></script>
+  <script src="../../assets/js/vue/panel.js"></script>
+</body>
+</html>

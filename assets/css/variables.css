@@ -1,58 +1,49 @@
 /* ==========================================================================
    VARIABLES.CSS
-   Sistema de tokens de diseño de Clínica Altavida.
-   Aquí se centralizan colores, tipografías, espaciados y bordes para que
-   el resto de hojas de estilo solo referencien estas variables y el
-   mantenimiento del diseño se haga en un único lugar.
+   Tokens del mundo "Carné de citas" (ver DESIGN.md) para todas las páginas
+   salvo la portada, que tiene su propia hoja (inicio.css) con los mismos valores.
+   Los nombres antiguos (--color-pino, --color-hueso…) se conservan como alias
+   para que las reglas existentes tomen los valores nuevos.
    ========================================================================== */
 
 :root {
-  /* -------------------- Paleta de color -------------------- */
-  /* Verde pino: color de marca principal, usado en encabezados y navegación */
-  --color-pino: #1B3B36;
-  --color-pino-oscuro: #122723;
+  /* -------------------- Cartulina y tinta -------------------- */
+  --cartulina: #BFD6EA;
+  --cartulina-honda: #A9C7E1;
+  --cara: #E8F1F9;
+  --papel: #F7FAFD;
+  --blanco: #FFFFFF;
+  --tinta: #14181F;
+  --tinta-suave: #3A4452;
+  --linea: rgba(20, 24, 31, 0.85);
+  --linea-tenue: rgba(20, 24, 31, 0.28);
 
-  /* Verde salvia: color secundario, usado en acentos y estados positivos */
-  --color-salvia: #6B8F71;
-  --color-salvia-suave: #DCE6DC;
+  /* -------------------- Tintas de sello (una por estado) -------------------- */
+  --sello-pendiente: #5B3FA0;
+  --sello-confirmada: #1F6B45;
+  --sello-atendida: #1E4E8C;
+  --sello-cancelada: #B42E28;
 
-  /* Hueso cálido: fondo general de las páginas */
-  --color-hueso: #EDE7DC;
-
-  /* Sienna: color de acento para llamadas a la acción (botones primarios) */
-  --color-sienna: #B5652D;
-  --color-sienna-oscuro: #92501F;
-
-  /* Carbón: color principal de texto */
-  --color-carbon: #202422;
-  --color-carbon-suave: #4B534F;
-
-  /* Blanco cálido: superficies (tarjetas, formularios, tablas) */
-  --color-superficie: #FFFDF9;
-
-  /* Bordes y líneas divisorias */
-  --color-borde: #D8D0C0;
-
-  /* Estados de una cita (definidos en el flujo del documento del proyecto) */
-  --color-estado-pendiente: #C99A2E;
-  --color-estado-confirmada: #6B8F71;
-  --color-estado-cancelada: #A34C3F;
-  --color-estado-atendida: #4B6D7A;
+  /* Fondos tenues de cada tinta, solo para avisos y errores de campo */
+  --sello-pendiente-tenue: #ECE7F6;
+  --sello-confirmada-tenue: #DDEEE4;
+  --sello-atendida-tenue: #DCE6F3;
+  --sello-cancelada-tenue: #F7E3E1;
 
   /* -------------------- Tipografía -------------------- */
-  /* Serif editorial para titulares: transmite confianza e identidad */
-  --fuente-titulos: "Newsreader", Georgia, "Times New Roman", serif;
-  /* Sans legible para texto de interfaz, formularios y tablas */
-  --fuente-base: "IBM Plex Sans", "Segoe UI", Arial, sans-serif;
+  --fuente-impresa: "Archivo", "Arial Narrow", Arial, sans-serif;
+  --fuente-lectura: "Public Sans", "Segoe UI", Arial, sans-serif;
+  --fuente-maquina: "Courier Prime", "Courier New", monospace;
 
-  --tamano-h1: clamp(2rem, 4vw + 1rem, 3.25rem);
-  --tamano-h2: clamp(1.5rem, 2vw + 1rem, 2.25rem);
-  --tamano-h3: 1.25rem;
+  --tamano-h1: clamp(2.4rem, 3.2vw + 1.2rem, 3.75rem);
+  --tamano-h2: clamp(1.45rem, 1.2vw + 1rem, 1.9rem);
+  --tamano-h3: 1rem;
   --tamano-texto: 1rem;
   --tamano-pequeno: 0.875rem;
+  --tamano-rotulo: 0.75rem;
 
-  --interlineado-titulo: 1.15;
-  --interlineado-texto: 1.6;
+  --interlineado-titulo: 0.92;
+  --interlineado-texto: 1.55;
 
   /* -------------------- Espaciados -------------------- */
   --espacio-xs: 0.5rem;
@@ -61,26 +52,55 @@
   --espacio-lg: 2.5rem;
   --espacio-xl: 4rem;
   --espacio-xxl: 6rem;
+  --margen: clamp(1rem, 4vw, 4rem);
 
-  /* Fondos suaves de los estados (para etiquetas legibles con texto oscuro) */
-  --color-estado-pendiente-suave: #F6EBCF;
-  --color-estado-pendiente-texto: #7A5A10;
-  --color-estado-confirmada-suave: #DCE6DC;
-  --color-estado-confirmada-texto: #2F5236;
-  --color-estado-cancelada-suave: #F4E1DD;
-  --color-estado-cancelada-texto: #7E3328;
-  --color-estado-atendida-suave: #DCE7EB;
-  --color-estado-atendida-texto: #2F4C57;
-
-  /* -------------------- Bordes y sombras -------------------- */
+  /* -------------------- Formas y sombras -------------------- */
+  --radio-muestra: 3px;
+  --radio-casilla: 6px;
   --radio-borde: 8px;
-  --radio-grande: 16px;
-  --sombra-suave: 0 1px 2px rgba(27, 59, 54, 0.06), 0 2px 8px rgba(27, 59, 54, 0.05);
-  --sombra-media: 0 4px 12px rgba(27, 59, 54, 0.08), 0 12px 32px rgba(27, 59, 54, 0.08);
-  --anillo-foco: 0 0 0 3px rgba(107, 143, 113, 0.35);
-  --ancho-maximo-contenido: 72rem;
-  --ancho-maximo-texto: 40rem;
+  --radio-bloque: 10px;
+  --radio-grande: 12px;
+  --radio-carne: 14px;
 
-  /* -------------------- Transiciones -------------------- */
-  --transicion-rapida: 150ms ease;
+  /* Solo el carné (formularios de cita, ingreso) proyecta sombra amplia */
+  --sombra-carne: 0 2px 4px rgba(20, 24, 31, 0.1), 0 24px 48px -16px rgba(20, 24, 31, 0.35);
+  --sombra-boton: 0 2px 4px rgba(20, 24, 31, 0.25);
+  --sombra-menu: 0 10px 24px rgba(20, 24, 31, 0.18);
+  --sombra-suave: none;
+  --sombra-media: none;
+  --anillo-foco: 0 0 0 3px rgba(91, 63, 160, 0.35);
+
+  --ancho-maximo-contenido: 84rem;
+  --ancho-maximo-texto: 60ch;
+
+  --transicion-rapida: 120ms ease;
+  --salida: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* -------------------- Alias de los nombres anteriores -------------------- */
+  --color-pino: var(--tinta);
+  --color-pino-oscuro: #0B0E13;
+  --color-salvia: var(--tinta-suave);
+  --color-salvia-suave: var(--cara);
+  --color-hueso: var(--cartulina);
+  --color-sienna: var(--tinta);
+  --color-sienna-oscuro: var(--sello-pendiente);
+  --color-carbon: var(--tinta);
+  --color-carbon-suave: var(--tinta-suave);
+  --color-superficie: var(--cara);
+  --color-borde: var(--linea-tenue);
+  --fuente-titulos: var(--fuente-impresa);
+  --fuente-base: var(--fuente-lectura);
+
+  --color-estado-pendiente: var(--sello-pendiente);
+  --color-estado-confirmada: var(--sello-confirmada);
+  --color-estado-cancelada: var(--sello-cancelada);
+  --color-estado-atendida: var(--sello-atendida);
+  --color-estado-pendiente-suave: var(--sello-pendiente-tenue);
+  --color-estado-pendiente-texto: var(--sello-pendiente);
+  --color-estado-confirmada-suave: var(--sello-confirmada-tenue);
+  --color-estado-confirmada-texto: var(--sello-confirmada);
+  --color-estado-cancelada-suave: var(--sello-cancelada-tenue);
+  --color-estado-cancelada-texto: var(--sello-cancelada);
+  --color-estado-atendida-suave: var(--sello-atendida-tenue);
+  --color-estado-atendida-texto: var(--sello-atendida);
 }

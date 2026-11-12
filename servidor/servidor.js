@@ -156,7 +156,7 @@ app.get("/api/sesion", requiereSesion, (req, res) => {
  * ================================================================== */
 
 app.get("/api/catalogo", (req, res) => {
-  const especialidades = bd.prepare("SELECT id, nombre FROM especialidades ORDER BY nombre").all();
+  const especialidades = bd.prepare("SELECT id, nombre, precio FROM especialidades ORDER BY nombre").all();
   const medicos = bd.prepare(`
     SELECT m.id, m.nombre, m.especialidad_id AS especialidadId,
            (SELECT GROUP_CONCAT(DISTINCT d.dia_semana) FROM disponibilidad d WHERE d.medico_id = m.id) AS dias
@@ -174,8 +174,12 @@ app.get("/api/catalogo", (req, res) => {
  * Horarios disponibles
  * ================================================================== */
 
-// Horas libres de un médico en una fecha (descarta las ocupadas y, si es hoy, las ya pasadas)
+// Horas libres de un médico en una fecha: descarta las ocupadas y, si es hoy, las ya pasadas.
+// Si el médico ya completó su capacidad diaria (cupos_diarios), no queda ninguna libre.
 function horariosLibres(medicoId, fecha, excluirCitaId) {
+  const medico = bd.prepare("SELECT cupos_diarios AS cupos FROM medicos WHERE id = ?").get(medicoId);
+  if (!medico) return [];
+
   const horas = bd.prepare(
     "SELECT hora FROM disponibilidad WHERE medico_id = ? AND dia_semana = ? ORDER BY hora"
   ).all(medicoId, diaSemana(fecha)).map((f) => f.hora);
@@ -184,6 +188,8 @@ function horariosLibres(medicoId, fecha, excluirCitaId) {
     SELECT horario FROM citas
     WHERE medico_id = ? AND fecha = ? AND estado <> 'cancelada' AND id <> ?
   `).all(medicoId, fecha, excluirCitaId || 0).map((f) => f.horario));
+
+  if (ocupadas.size >= medico.cupos) return [];
 
   const esHoy = fecha === fechaHoy();
   const ahora = horaActual();
@@ -196,6 +202,20 @@ app.get("/api/horarios-disponibles", requiereSesion, (req, res) => {
   if (!medicoId || !esFechaValida(fecha)) return error(res, 400, "Médico y fecha son obligatorios.");
   if (fecha < fechaHoy()) return res.json([]);
   res.json(horariosLibres(medicoId, fecha, Number(req.query.excluir) || 0));
+});
+
+// Vista pública de la agenda de un día (página de inicio): todas las horas del médico,
+// marcando cuáles siguen libres. No expone datos de pacientes, solo si la hora está tomada.
+app.get("/api/agenda-publica", (req, res) => {
+  const medicoId = texto(req.query.medicoId);
+  const fecha = texto(req.query.fecha);
+  if (!medicoId || !esFechaValida(fecha)) return error(res, 400, "Médico y fecha son obligatorios.");
+  if (fecha < fechaHoy()) return res.json([]);
+  const libres = new Set(horariosLibres(medicoId, fecha, 0));
+  const horas = bd.prepare(
+    "SELECT hora FROM disponibilidad WHERE medico_id = ? AND dia_semana = ? ORDER BY hora"
+  ).all(medicoId, diaSemana(fecha)).map((f) => f.hora);
+  res.json(horas.map((hora) => ({ hora, libre: libres.has(hora) })));
 });
 
 /* ==================================================================
@@ -305,6 +325,7 @@ app.patch("/api/citas/:id/cancelar", requiereSesion, (req, res) => {
 });
 
 require("./personal").registrarRutasPersonal(app, { bd, enTransaccion, requiereRol, error, texto, fechaHoy });
+require("./ordenes").registrarRutasOrdenes(app, { bd, enTransaccion, requiereRol, error, texto, fechaHoy, horariosLibres });
 
 app.use("/api", (req, res) => error(res, 404, "Ruta de la API no encontrada."));
 

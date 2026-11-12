@@ -15,14 +15,22 @@
   var MAX_MOTIVO = 300;
 
   function crearApp(sesion, catalogo, cita) {
+    // Horario elegido en la página de inicio (solo para solicitudes nuevas); se usa una sola vez
+    var pre = cita ? null : A.leerPreseleccion();
+    A.borrarPreseleccion();
+    if (pre && !A.buscarPorId(catalogo.medicos, pre.medicoId)) pre = null;
+    if (pre) cita = { especialidadId: pre.especialidadId, medicoId: pre.medicoId, fecha: pre.fecha, horario: pre.horario, motivo: "" };
+    var reprogramada = pre ? null : cita;
+
     return Vue.createApp({
       data: function () {
         return {
-          especialidades: catalogo.especialidades,
-          medicos: catalogo.medicos,
+          // Solo especialidades y médicos con días de atención: en los demás no se podría agendar
+          especialidades: A.especialidadesAgendables(catalogo),
+          medicos: catalogo.medicos.filter(function (m) { return m.dias.length; }),
           hoy: A.fechaHoyISO(),
           maxMotivo: MAX_MOTIVO,
-          citaReprogramada: cita,
+          citaReprogramada: reprogramada,
           formulario: {
             especialidadId: cita ? cita.especialidadId : "",
             medicoId: cita ? cita.medicoId : "",

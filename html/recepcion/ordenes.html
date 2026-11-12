@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Órdenes de empresas | Clínica Altavida</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Courier+Prime:wght@400;700&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../../assets/css/variables.css">
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/layout.css">
+  <link rel="stylesheet" href="../../assets/css/componentes.css">
+  <link rel="stylesheet" href="../../assets/css/privado.css">
+</head>
+<body>
+
+  <div class="franja-sesion" id="franja-sesion" v-cloak>
+    <div class="contenedor">
+      <span class="franja-sesion__usuario">
+        <span class="franja-sesion__avatar" aria-hidden="true">{{ inicial }}</span>
+        <span class="franja-sesion__nombre">Sesión iniciada como: <strong>{{ nombre }}</strong></span>
+      </span>
+      <a href="../login.html" class="franja-sesion__accion" @click.prevent="salir">Cerrar sesión</a>
+    </div>
+  </div>
+
+  <header class="encabezado">
+    <div class="contenedor">
+      <a href="../../index.html" class="marca">Clínica Altavida</a>
+      <nav class="nav-principal" aria-label="Navegación del personal">
+        <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="menu-principal">Menú</button>
+        <!-- ordenes.js deja visibles solo los enlaces del rol que inició sesión -->
+        <ul class="nav-principal__enlaces" id="menu-principal">
+          <li data-rol="recepcionista" hidden><a href="citas.html">Gestión de citas</a></li>
+          <li data-rol="administrador" hidden><a href="../admin/panel.html">Panel</a></li>
+          <li data-rol="administrador" hidden><a href="../admin/catalogo.html">Catálogo clínico</a></li>
+          <li data-rol="administrador" hidden><a href="../admin/empresas.html">Empresas clientes</a></li>
+          <li><a href="ordenes.html">Órdenes de empresas</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Página gestionada por Vue.js (assets/js/vue/ordenes.js) -->
+  <main class="contenedor seccion" id="app-ordenes" v-cloak>
+    <div class="cabecera-panel">
+      <div>
+        <h1>Órdenes de empresas</h1>
+        <p>Arma la orden con las especialidades que pide la empresa, emite la orden de pago y, cuando paguen, el sistema asigna las citas.</p>
+      </div>
+      <button type="button" class="boton boton--primario" @click="abrirNueva">+ Nueva orden</button>
+    </div>
+
+    <p v-if="mensaje" class="aviso aviso--exito" role="status">{{ mensaje }}</p>
+    <p v-if="errorGeneral" class="aviso aviso--error" role="alert">{{ errorGeneral }}</p>
+
+    <!-- Pasos del proceso: siempre visibles para orientar -->
+    <ol class="pasos-orden" aria-label="Pasos de una orden">
+      <li><span>01</span> Borrador: agrega especialidades y cantidades</li>
+      <li><span>02</span> Emitida: se envía la orden de pago a la empresa</li>
+      <li><span>03</span> Pagada: el sistema asigna fechas según los cupos</li>
+    </ol>
+
+    <div class="panel-ordenes">
+      <!-- ============ Listado ============ -->
+      <div class="tabla-contenedor">
+        <table class="tabla-datos">
+          <caption>Órdenes registradas</caption>
+          <thead>
+            <tr>
+              <th scope="col">N.º</th>
+              <th scope="col">Empresa</th>
+              <th scope="col">Citas</th>
+              <th scope="col">Total</th>
+              <th scope="col">Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="o in ordenes" :key="o.id" class="fila-seleccionable"
+                :class="{ 'fila-activa': orden && orden.id === o.id }">
+              <td data-etiqueta="N.º">
+                <button type="button" class="boton-enlace" @click="abrir(o.id)"
+                        :aria-label="'Abrir la orden ' + o.id + ' de ' + o.empresa">{{ numero(o.id) }}</button>
+              </td>
+              <td data-etiqueta="Empresa">{{ o.empresa }}</td>
+              <td data-etiqueta="Citas" class="numero">{{ o.citasPedidas }}</td>
+              <td data-etiqueta="Total" class="numero">{{ pesos(o.total) }}</td>
+              <td data-etiqueta="Estado"><span class="estado-orden" :class="'estado-orden--' + o.estado">{{ o.estado }}</span></td>
+            </tr>
+            <tr v-if="!ordenes.length">
+              <td colspan="5" class="tabla-datos__vacia">Aún no hay órdenes. Crea la primera con «+ Nueva orden».</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ============ Panel derecho ============ -->
+      <div ref="panel" class="panel-ordenes__detalle">
+
+        <!-- Nueva orden: elegir o registrar la empresa -->
+        <section v-if="modo === 'nueva'" class="formulario orden" aria-labelledby="titulo-nueva">
+          <h2 id="titulo-nueva">Nueva orden</h2>
+
+          <form v-if="!registrandoEmpresa" novalidate @submit.prevent="crearOrden">
+            <campo-formulario id="o-empresa" etiqueta="Empresa" obligatorio :error="errores.empresaId"
+                              :ayuda="empresas.length ? '' : 'Aún no hay empresas: registra la primera.'">
+              <select id="o-empresa" v-model="empresaId" :disabled="!empresas.length">
+                <option value="" disabled>Selecciona una empresa</option>
+                <option v-for="e in empresas" :key="e.id" :value="e.id">{{ e.nombre }} · NIT {{ e.nit }}</option>
+              </select>
+            </campo-formulario>
+            <div class="acciones">
+              <button type="submit" class="boton boton--primario" :disabled="enviando || !empresas.length">Crear orden</button>
+              <button type="button" class="boton boton--contorno" @click="registrandoEmpresa = true">Registrar empresa nueva</button>
+            </div>
+          </form>
+
+          <form v-else novalidate @submit.prevent="registrarEmpresa">
+            <p class="campo__ayuda orden__ayuda">Datos de la empresa que pide las citas. La orden de pago se envía a este contacto.</p>
+            <campo-formulario id="e-nombre" etiqueta="Nombre de la empresa" obligatorio :error="errores.nombre">
+              <input type="text" id="e-nombre" v-model.trim="empresa.nombre" maxlength="100" autocomplete="organization">
+            </campo-formulario>
+            <campo-formulario id="e-nit" etiqueta="NIT" obligatorio :error="errores.nit">
+              <input type="text" id="e-nit" v-model.trim="empresa.nit" maxlength="20" inputmode="numeric" placeholder="900123456-7">
+            </campo-formulario>
+            <campo-formulario id="e-contacto" etiqueta="Persona de contacto" obligatorio :error="errores.contacto">
+              <input type="text" id="e-contacto" v-model.trim="empresa.contacto" maxlength="80">
+            </campo-formulario>
+            <campo-formulario id="e-correo" etiqueta="Correo electrónico" obligatorio :error="errores.correo">
+              <input type="email" id="e-correo" v-model.trim="empresa.correo" autocomplete="email">
+            </campo-formulario>
+            <campo-formulario id="e-telefono" etiqueta="Teléfono" obligatorio :error="errores.telefono">
+              <input type="tel" id="e-telefono" v-model.trim="empresa.telefono" autocomplete="tel">
+            </campo-formulario>
+            <div class="acciones">
+              <button type="submit" class="boton boton--primario" :disabled="enviando">Guardar empresa</button>
+              <button type="button" class="boton boton--contorno" @click="registrandoEmpresa = false">Volver</button>
+            </div>
+          </form>
+        </section>
+
+        <!-- Orden abierta -->
+        <section v-else-if="orden" class="formulario orden" :aria-label="'Orden ' + numero(orden.id)">
+          <div class="orden__cabecera">
+            <h2>Orden {{ numero(orden.id) }}</h2>
+            <span class="estado-orden" :class="'estado-orden--' + orden.estado">{{ orden.estado }}</span>
+          </div>
+
+          <dl class="orden__empresa">
+            <div><dt>Empresa</dt><dd>{{ orden.empresa.nombre }}</dd></div>
+            <div><dt>NIT</dt><dd>{{ orden.empresa.nit }}</dd></div>
+            <div><dt>Contacto</dt><dd>{{ orden.empresa.contacto }} · {{ orden.empresa.telefono }}</dd></div>
+            <div><dt>Correo</dt><dd>{{ orden.empresa.correo }}</dd></div>
+          </dl>
+
+          <!-- Corregir la empresa (solo en borrador) -->
+          <template v-if="orden.estado === 'borrador'">
+            <button v-if="!cambiandoEmpresa" type="button" class="boton-enlace orden__cambiar-empresa"
+                    @click="empezarCambioEmpresa">¿Empresa equivocada? Cambiar empresa</button>
+            <form v-else class="orden__agregar" novalidate @submit.prevent="guardarEmpresa">
+              <div class="campo campo--ancho-completo">
+                <label for="o-cambiar-empresa">Empresa correcta</label>
+                <select id="o-cambiar-empresa" v-model="empresaNueva">
+                  <option v-for="e in empresas" :key="e.id" :value="e.id">{{ e.nombre }} · NIT {{ e.nit }}</option>
+                </select>
+              </div>
+              <div class="acciones">
+                <button type="submit" class="boton boton--contorno" :disabled="enviando">Guardar empresa</button>
+                <button type="button" class="boton boton--peligro" @click="cambiandoEmpresa = false">Cancelar</button>
+              </div>
+            </form>
+          </template>
+
+          <!-- Agregar especialidad (solo en borrador) -->
+          <form v-if="orden.estado === 'borrador'" class="orden__agregar" novalidate @submit.prevent="agregarItem">
+            <div class="campo">
+              <label for="i-especialidad">Especialidad que necesita</label>
+              <select id="i-especialidad" v-model="nuevoItem.especialidadId">
+                <option value="" disabled>Selecciona una especialidad</option>
+                <option v-for="e in especialidadesDisponibles" :key="e.id" :value="e.id">{{ e.nombre }} · {{ pesos(e.precio) }}</option>
+              </select>
+            </div>
+            <div class="campo campo--cantidad">
+              <label for="i-cantidad">Citas</label>
+              <input type="number" id="i-cantidad" v-model.number="nuevoItem.cantidad" min="1" max="200">
+            </div>
+            <button type="submit" class="boton boton--contorno" :disabled="enviando || !nuevoItem.especialidadId">Agregar a la orden</button>
+          </form>
+
+          <!-- Cotización -->
+          <table class="cotizacion">
+            <caption class="visualmente-oculto">Cotización de la orden</caption>
+            <thead>
+              <tr>
+                <th scope="col">Especialidad</th>
+                <th scope="col" class="numero">Citas</th>
+                <th scope="col" class="numero">Valor unitario</th>
+                <th scope="col" class="numero">Subtotal</th>
+                <th v-if="orden.estado === 'borrador'" scope="col"><span class="visualmente-oculto">Quitar</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="i in orden.items" :key="i.especialidadId">
+                <td>{{ i.especialidad }}</td>
+                <td class="numero">
+                  <input v-if="orden.estado === 'borrador'" class="cotizacion__cantidad" type="number" min="1" max="200"
+                         :value="i.cantidad" :aria-label="'Citas de ' + i.especialidad"
+                         @change="cambiarCantidad(i, $event.target.value)">
+                  <span v-else>{{ i.cantidad }}</span>
+                </td>
+                <td class="numero">{{ pesos(i.precioUnitario) }}</td>
+                <td class="numero">{{ pesos(i.subtotal) }}</td>
+                <td v-if="orden.estado === 'borrador'">
+                  <button type="button" class="boton boton--peligro boton--compacto" @click="quitarItem(i)"
+                          :aria-label="'Quitar ' + i.especialidad">Quitar</button>
+                </td>
+              </tr>
+              <tr v-if="!orden.items.length">
+                <td :colspan="orden.estado === 'borrador' ? 5 : 4" class="cotizacion__vacia">Agrega las especialidades que pide la empresa.</td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr>
+                <th scope="row" colspan="3">Total a pagar</th>
+                <td class="numero cotizacion__total">{{ pesos(orden.total) }}</td>
+                <td v-if="orden.estado === 'borrador'"></td>
+              </tr>
+            </tfoot>
+          </table>
+          <p class="orden__nota">Valores de ejemplo de la demostración académica, en pesos colombianos.</p>
+
+          <!-- Citas asignadas (orden pagada) -->
+          <div v-if="orden.citas.length" class="orden__citas">
+            <h3>Citas asignadas</h3>
+            <ul>
+              <li v-for="c in orden.citas" :key="c.id" :class="{ 'cita-anulada': c.estado === 'cancelada' }">
+                <span class="orden__fecha">{{ fechaCorta(c.fecha) }} · {{ c.horario }}</span>
+                <span>{{ c.especialidad }} · {{ c.medico }}</span>
+                <etiqueta-estado :estado="c.estado"></etiqueta-estado>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Acciones según el estado -->
+          <div class="orden__acciones">
+            <template v-if="orden.estado === 'borrador'">
+              <button type="button" class="boton boton--primario" :disabled="enviando || !orden.items.length" @click="emitir">
+                Rectificar y emitir orden de pago
+              </button>
+              <button type="button" class="boton boton--peligro" :disabled="enviando" @click="anular">Anular</button>
+            </template>
+            <template v-else-if="orden.estado === 'emitida'">
+              <a class="boton boton--contorno" :href="'orden-pago.html?id=' + orden.id" target="_blank" rel="noopener">Ver orden de pago</a>
+              <button type="button" class="boton boton--primario" :disabled="enviando" @click="pagar">
+                {{ enviando ? 'Asignando citas…' : 'Registrar pago y asignar citas' }}
+              </button>
+              <button type="button" class="boton boton--contorno" :disabled="enviando" @click="reabrir">Editar orden</button>
+              <button type="button" class="boton boton--peligro" :disabled="enviando" @click="anular">Anular</button>
+            </template>
+            <template v-else-if="orden.estado === 'pagada'">
+              <a class="boton boton--contorno" :href="'orden-pago.html?id=' + orden.id" target="_blank" rel="noopener">Ver orden de pago</a>
+              <p class="orden__nota orden__nota--ancha">
+                Una orden pagada ya no se edita: sus citas están en las agendas de los médicos.
+                Si sobra alguna, recepción la cancela en «Gestión de citas» y el horario queda libre.
+              </p>
+            </template>
+          </div>
+        </section>
+
+        <div v-else class="orden-vacia">
+          <p>Selecciona una orden del listado o crea una nueva.</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="pie-pagina">
+    <div class="contenedor">
+      <span>&copy; 2026 Clínica Altavida. Proyecto académico con fines demostrativos.</span>
+    </div>
+  </footer>
+
+  <script src="../../assets/js/navegacion.js"></script>
+  <script src="https://unpkg.com/vue@3.4.38/dist/vue.global.prod.js"></script>
+  <script src="../../assets/js/vue/comun.js"></script>
+  <script src="../../assets/js/vue/ordenes.js"></script>
+</body>
+</html>

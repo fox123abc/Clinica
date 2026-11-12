@@ -26,6 +26,7 @@
           enviando: false,
           editando: null,
           filas: [],
+          cupos: 4,
           errorEditor: ""
         };
       },
@@ -34,11 +35,8 @@
           var e = A.buscarPorId(this.catalogo.especialidades, id);
           return e ? e.nombre : "—";
         },
-        resumen: function (medico) {
-          if (!medico.disponibilidad.length) return "Sin horarios";
-          return medico.disponibilidad.map(function (f) {
-            return DIAS[f.dia].slice(0, 3) + " " + f.horas.join(", ");
-          }).join(" · ");
+        diaCorto: function (dia) {
+          return DIAS[dia].slice(0, 3);
         },
         recargar: function () {
           var vm = this;
@@ -100,9 +98,20 @@
           this.limpiarAvisos();
           this.errorEditor = "";
           this.editando = medico;
+          this.cupos = medico.cupos;
           this.filas = ORDEN_DIAS.map(function (dia) {
             var franja = medico.disponibilidad.find(function (f) { return f.dia === dia; });
             return { dia: dia, nombre: DIAS[dia], texto: franja ? franja.horas.join(", ") : "" };
+          });
+          // El editor aparece debajo de la tabla: se lleva a la vista y se enfoca el primer día
+          var vm = this;
+          this.$nextTick(function () {
+            var editor = vm.$refs.editor;
+            if (!editor) return;
+            var suave = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+            editor.scrollIntoView({ behavior: suave ? "smooth" : "auto", block: "start" });
+            var primero = editor.querySelector("input");
+            if (primero) primero.focus({ preventScroll: true });
           });
         },
         cancelarEdicion: function () {
@@ -123,11 +132,18 @@
             }
             if (horas.length) franjas.push({ dia: fila.dia, horas: horas });
           }
+          var cupos = Number(this.cupos);
+          if (!Number.isInteger(cupos) || cupos < 1 || cupos > 40) {
+            this.errorEditor = "Los cupos por día deben ser un número entre 1 y 40.";
+            return;
+          }
           var vm = this;
           var medico = this.editando;
           this.enviando = true;
           A.Api.guardarDisponibilidad(medico.id, franjas).then(function () {
-            vm.mensaje = "Los horarios de " + medico.nombre + " fueron actualizados.";
+            return A.Api.guardarCupos(medico.id, cupos);
+          }).then(function () {
+            vm.mensaje = "Los horarios y los cupos de " + medico.nombre + " fueron actualizados.";
             vm.editando = null;
             return vm.recargar();
           }).catch(function (e) {

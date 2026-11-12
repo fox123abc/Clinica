@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="120" viewBox="0 0 320 120" preserveAspectRatio="none">
+  <!--
+    Máscara de tinta para los sellos de goma (assets/css/inicio.css, .sello).
+    Origen: dibujada a mano para este proyecto con ruido fractal (feTurbulence);
+    casi todo es opaco y el ruido abre poros y zonas más claras, como la carga
+    desigual de un sello sobre la cartulina. No contiene imágenes externas.
+  -->
+  <filter id="tinta" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+    <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed="7" result="grano"/>
+    <feTurbulence type="fractalNoise" baseFrequency="0.02 0.05" numOctaves="1" seed="4" result="carga"/>
+    <feComposite in="grano" in2="carga" operator="arithmetic" k1="0" k2="0.75" k3="0.35" k4="-0.05" result="mezcla"/>
+    <feColorMatrix in="mezcla" type="matrix"
+      values="0 0 0 0 0
+              0 0 0 0 0
+              0 0 0 0 0
+              0 0 0 -4.5 3.6"/>
+  </filter>
+  <rect width="320" height="120" fill="#000" filter="url(#tinta)"/>
+</svg>

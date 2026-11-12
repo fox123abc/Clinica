@@ -6,7 +6,7 @@
   <title>Cita registrada | Clínica Altavida</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Newsreader:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Courier+Prime:wght@400;700&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="../../assets/css/variables.css">
   <link rel="stylesheet" href="../../assets/css/base.css">
@@ -45,10 +45,11 @@
   <main class="contenedor seccion" id="app-confirmacion" v-cloak>
     <div class="confirmacion">
       <template v-if="cita">
-        <div class="confirmacion__icono" aria-hidden="true">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
-        </div>
         <h1>Tu solicitud fue registrada</h1>
+        <!-- El estado de la cita cae como sello (decorativo: el estado también figura en el resumen) -->
+        <div class="confirmacion__sello" aria-hidden="true">
+          <etiqueta-estado :estado="cita.estado" class="etiqueta-estado--grande"></etiqueta-estado>
+        </div>
         <p class="aviso">
           Tu cita queda con estado pendiente hasta que la clínica la confirme.
         </p>

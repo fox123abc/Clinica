@@ -6,7 +6,7 @@
   <title>Agenda médica | Clínica Altavida</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Newsreader:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Courier+Prime:wght@400;700&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="../../assets/css/variables.css">
   <link rel="stylesheet" href="../../assets/css/base.css">
@@ -81,16 +81,18 @@
         </thead>
         <tbody>
           <tr v-for="cita in citasFiltradas" :key="cita.id">
-            <td data-etiqueta="Fecha">{{ formatearFecha(cita.fecha) }}</td>
+            <td data-etiqueta="Fecha" class="tabla-datos__fecha">{{ formatearFecha(cita.fecha) }}</td>
             <td data-etiqueta="Horario">{{ cita.horario }}</td>
-            <td data-etiqueta="Paciente">{{ cita.paciente }}</td>
+            <td data-etiqueta="Paciente" class="tabla-datos__nombre">{{ cita.paciente }}</td>
             <td data-etiqueta="Teléfono">{{ cita.telefono }}</td>
             <td data-etiqueta="Motivo">{{ cita.motivo || '—' }}</td>
             <td data-etiqueta="Estado"><etiqueta-estado :estado="cita.estado"></etiqueta-estado></td>
             <td data-etiqueta="Acciones" class="tabla-datos__acciones">
-              <button v-if="cita.estado === 'confirmada'" type="button" class="boton-enlace" @click="atender(cita)">Marcar atendida</button>
-              <span v-else-if="cita.estado === 'pendiente'">Espera confirmación</span>
-              <span v-else>—</span>
+              <button v-if="cita.estado === 'confirmada'" type="button" class="boton boton--contorno boton--compacto"
+                      :disabled="procesando === cita.id" @click="atender(cita)"
+                      :aria-label="'Marcar como atendida la cita de ' + cita.paciente">Marcar atendida</button>
+              <span v-else-if="cita.estado === 'pendiente'" class="texto-tenue">Espera confirmación</span>
+              <span v-else class="texto-tenue">—</span>
             </td>
           </tr>
           <tr v-if="!citasFiltradas.length">

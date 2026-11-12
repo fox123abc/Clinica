@@ -1,8 +1,8 @@
 /* ==========================================================================
    BASE.CSS
-   Reinicio de estilos del navegador y reglas tipográficas base.
-   No contiene estilos de componentes ni de layout: solo el punto de
-   partida compartido por todas las páginas.
+   Reinicio del navegador y tipografía base del mundo "Carné de citas":
+   cartulina celeste de fondo, titulares de imprenta en Archivo y lectura
+   en Public Sans.
    ========================================================================== */
 
 *,
@@ -13,15 +13,19 @@
 
 html {
   scroll-behavior: smooth;
+  accent-color: var(--sello-pendiente);
+  caret-color: var(--sello-pendiente);
+  scrollbar-color: var(--tinta-suave) var(--cartulina);
 }
 
 body {
   margin: 0;
-  font-family: var(--fuente-base);
+  font-family: var(--fuente-lectura);
   font-size: var(--tamano-texto);
   line-height: var(--interlineado-texto);
-  color: var(--color-carbon);
-  background-color: var(--color-hueso);
+  color: var(--tinta);
+  background-color: var(--cartulina);
+  -webkit-font-smoothing: antialiased;
 }
 
 img,
@@ -30,26 +34,38 @@ svg {
   display: block;
 }
 
+/* Titulares de imprenta: Archivo condensado y en mayúsculas */
 h1,
 h2,
 h3 {
-  font-family: var(--fuente-titulos);
+  font-family: var(--fuente-impresa);
   line-height: var(--interlineado-titulo);
-  font-weight: 500;
   margin: 0 0 var(--espacio-sm) 0;
-  color: var(--color-pino);
+  color: var(--tinta);
+  text-wrap: balance;
+  text-transform: uppercase;
 }
 
 h1 {
   font-size: var(--tamano-h1);
+  font-weight: 900;
+  font-stretch: 72%;
+  letter-spacing: -0.01em;
 }
 
 h2 {
   font-size: var(--tamano-h2);
+  font-weight: 900;
+  font-stretch: 78%;
 }
 
+/* Rótulo de bloque: Archivo expandido y espaciado */
 h3 {
   font-size: var(--tamano-h3);
+  font-weight: 800;
+  font-stretch: 112%;
+  letter-spacing: 0.08em;
+  line-height: 1.2;
 }
 
 p {
@@ -58,13 +74,13 @@ p {
 }
 
 a {
-  color: var(--color-pino);
-  text-decoration-thickness: 1px;
-  text-underline-offset: 2px;
+  color: var(--tinta);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 0.2em;
 }
 
 a:hover {
-  color: var(--color-sienna);
+  color: var(--sello-pendiente);
 }
 
 ul,
@@ -72,14 +88,24 @@ ol {
   padding-left: 1.25rem;
 }
 
-/* Estado de foco visible para navegación por teclado (accesibilidad) */
+code {
+  font-family: var(--fuente-maquina);
+  font-weight: 700;
+}
+
+/* Foco visible para teclado: anillo violeta separado del control */
 a:focus-visible,
 button:focus-visible,
 input:focus-visible,
 select:focus-visible,
 textarea:focus-visible {
-  outline: 3px solid var(--color-sienna);
-  outline-offset: 2px;
+  outline: 3px solid var(--sello-pendiente);
+  outline-offset: 3px;
+}
+
+::selection {
+  background-color: var(--sello-pendiente);
+  color: var(--blanco);
 }
 
 /* Respeta la preferencia del usuario de reducir animaciones */

@@ -6,7 +6,7 @@
   <title>Administración | Clínica Altavida</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Newsreader:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Courier+Prime:wght@400;700&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="../../assets/css/variables.css">
   <link rel="stylesheet" href="../../assets/css/base.css">
@@ -34,7 +34,10 @@
           Menú
         </button>
         <ul class="nav-principal__enlaces" id="menu-principal">
+          <li><a href="panel.html">Panel</a></li>
           <li><a href="catalogo.html">Catálogo clínico</a></li>
+          <li><a href="empresas.html">Empresas clientes</a></li>
+          <li><a href="../recepcion/ordenes.html">Órdenes de empresas</a></li>
         </ul>
       </nav>
     </div>
@@ -85,30 +88,47 @@
             <th scope="col">Médico</th>
             <th scope="col">Especialidad</th>
             <th scope="col">Horarios de atención</th>
+            <th scope="col" class="numero">Cupos por día</th>
             <th scope="col">Acciones</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="medico in catalogo.medicos" :key="medico.id">
-            <td data-etiqueta="Médico">{{ medico.nombre }}</td>
-            <td data-etiqueta="Especialidad">{{ nombreEspecialidad(medico.especialidadId) }}</td>
-            <td data-etiqueta="Horarios">{{ resumen(medico) }}</td>
+          <tr v-for="medico in catalogo.medicos" :key="medico.id" :class="{ 'fila-activa': editando && editando.id === medico.id }">
+            <td data-etiqueta="Médico" class="tabla-datos__nombre">{{ medico.nombre }}</td>
+            <td data-etiqueta="Especialidad" class="tabla-datos__nombre">{{ nombreEspecialidad(medico.especialidadId) }}</td>
+            <td data-etiqueta="Horarios">
+              <ul v-if="medico.disponibilidad.length" class="horario-resumen">
+                <li v-for="franja in medico.disponibilidad" :key="franja.dia">
+                  <span class="horario-resumen__dia">{{ diaCorto(franja.dia) }}</span>
+                  <span>{{ franja.horas.join(", ") }}</span>
+                </li>
+              </ul>
+              <span v-else class="texto-tenue">Sin horarios</span>
+            </td>
+            <td data-etiqueta="Cupos por día" class="numero">{{ medico.cupos }}</td>
             <td data-etiqueta="Acciones" class="tabla-datos__acciones">
-              <button type="button" class="boton-enlace" @click="editar(medico)">Editar horarios</button>
+              <button type="button" class="boton boton--contorno boton--compacto" @click="editar(medico)" :aria-label="'Editar horarios de ' + medico.nombre">Editar horarios</button>
             </td>
           </tr>
           <tr v-if="!catalogo.medicos.length">
-            <td colspan="4" class="tabla-datos__vacia">Aún no hay médicos registrados.</td>
+            <td colspan="5" class="tabla-datos__vacia">Aún no hay médicos registrados.</td>
           </tr>
         </tbody>
       </table>
     </div>
 
     <!-- Editor de disponibilidad del médico seleccionado -->
-    <form v-if="editando" class="formulario editor-horarios" novalidate @submit.prevent="guardarHorarios">
+    <form v-if="editando" ref="editor" class="formulario editor-horarios" novalidate @submit.prevent="guardarHorarios">
       <h2>Horarios de {{ editando.nombre }}</h2>
       <p class="campo__ayuda">Escribe las horas de cada día separadas por comas, en formato HH:MM (por ejemplo 08:00, 08:30). Deja vacío un día sin atención.</p>
       <p v-if="errorEditor" class="aviso aviso--error" role="alert">{{ errorEditor }}</p>
+      <div class="editor-horarios__fila editor-horarios__cupos">
+        <label for="cupos-medico">Cupos por día</label>
+        <div class="campo">
+          <input type="number" id="cupos-medico" v-model.number="cupos" min="1" max="40" aria-describedby="cupos-ayuda">
+          <p class="campo__ayuda" id="cupos-ayuda">Pacientes que atiende como máximo en un día. Las órdenes de empresas se reparten respetando este límite.</p>
+        </div>
+      </div>
       <div class="editor-horarios__fila" v-for="fila in filas" :key="fila.dia">
         <label :for="'dia-' + fila.dia">{{ fila.nombre }}</label>
         <div class="campo"><input type="text" :id="'dia-' + fila.dia" v-model="fila.texto" placeholder="Sin atención"></div>

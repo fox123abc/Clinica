@@ -1,16 +1,14 @@
 /* ==========================================================================
    LAYOUT.CSS
-   Estructura compartida por todas las páginas: contenedor, encabezado,
-   navegación principal y pie de página. No contiene estilos de
-   componentes internos (botones, formularios, tablas): esos viven en
-   componentes.css.
+   Estructura compartida: contenedor, membrete (encabezado impreso con la
+   navegación) y pie de página, en el mundo "Carné de citas".
    ========================================================================== */
 
 .contenedor {
   width: 100%;
   max-width: var(--ancho-maximo-contenido);
   margin-inline: auto;
-  padding-inline: var(--espacio-md);
+  padding-inline: var(--margen);
 }
 
 /* El pie de página queda abajo aunque la página tenga poco contenido */
@@ -24,33 +22,35 @@ main {
   flex: 1 0 auto;
 }
 
-/* -------------------- Encabezado y navegación -------------------- */
+/* -------------------- Membrete y navegación -------------------- */
 .encabezado {
   position: sticky;
   top: 0;
   z-index: 10;
-  background-color: var(--color-pino);
-  color: var(--color-superficie);
-  box-shadow: 0 2px 12px rgba(18, 39, 35, 0.18);
+  background-color: var(--cartulina);
+  border-bottom: 2px solid var(--tinta);
 }
 
 .encabezado .contenedor {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-block: 0.85rem;
+  padding-block: 0.9rem;
   gap: var(--espacio-md);
 }
 
-/* Logotipo: cruz clínica dibujada solo con CSS + nombre de la clínica */
+/* Logotipo: cuadrado rojo con la cruz + nombre en Archivo expandido */
 .marca {
   display: inline-flex;
   align-items: center;
-  gap: 0.6rem;
-  font-family: var(--fuente-titulos);
-  font-size: 1.375rem;
-  font-weight: 500;
-  color: var(--color-superficie);
+  gap: 0.7rem;
+  font-family: var(--fuente-impresa);
+  font-size: 1.1rem;
+  font-weight: 800;
+  font-stretch: 112%;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--tinta);
   text-decoration: none;
   white-space: nowrap;
 }
@@ -58,17 +58,17 @@ main {
 .marca::before {
   content: "";
   flex: none;
-  width: 1.75rem;
-  height: 1.75rem;
-  border-radius: 8px;
+  width: 1.8rem;
+  height: 1.8rem;
+  border-radius: var(--radio-casilla);
   background:
-    linear-gradient(var(--color-superficie), var(--color-superficie)) center / 0.9rem 0.25rem no-repeat,
-    linear-gradient(var(--color-superficie), var(--color-superficie)) center / 0.25rem 0.9rem no-repeat,
-    var(--color-sienna);
+    linear-gradient(var(--blanco), var(--blanco)) center / 1rem 0.28rem no-repeat,
+    linear-gradient(var(--blanco), var(--blanco)) center / 0.28rem 1rem no-repeat,
+    var(--sello-cancelada);
 }
 
 .marca:hover {
-  color: var(--color-superficie);
+  color: var(--tinta);
 }
 
 .nav-principal {
@@ -87,73 +87,79 @@ main {
 
 .nav-principal__enlaces a {
   display: block;
-  padding: 0.45rem 0.85rem;
-  border-radius: 999px;
-  color: var(--color-superficie);
-  font-size: var(--tamano-pequeno);
-  font-weight: 500;
+  padding: 0.5rem 0.9rem;
+  border: 1.5px solid transparent;
+  border-radius: var(--radio-casilla);
+  color: var(--tinta);
+  font-family: var(--fuente-impresa);
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   text-decoration: none;
-  transition: background-color var(--transicion-rapida);
+  transition: border-color var(--transicion-rapida), background-color var(--transicion-rapida);
 }
 
 .nav-principal__enlaces a:hover {
-  color: var(--color-superficie);
-  background-color: rgba(255, 253, 249, 0.12);
+  color: var(--tinta);
+  border-color: var(--tinta);
 }
 
-/* Página actual (aria-current lo asigna navegacion.js) */
+/* Página actual (aria-current lo asigna navegacion.js): bloque de tinta */
 .nav-principal__enlaces a[aria-current="page"] {
-  background-color: rgba(255, 253, 249, 0.18);
-  box-shadow: inset 0 0 0 1px rgba(255, 253, 249, 0.25);
+  background-color: var(--tinta);
+  border-color: var(--tinta);
+  color: var(--blanco);
 }
 
 /* Botón de menú, solo visible en pantallas angostas */
 .nav-toggle {
   display: none;
-  background: none;
-  border: 1px solid rgba(255, 253, 249, 0.6);
-  border-radius: var(--radio-borde);
-  color: var(--color-superficie);
-  font-family: var(--fuente-base);
-  font-weight: 500;
-  padding: 0.4rem 0.8rem;
+  background: transparent;
+  border: 1.5px solid var(--tinta);
+  border-radius: var(--radio-casilla);
+  color: var(--tinta);
+  font-family: var(--fuente-impresa);
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.5rem 0.9rem;
   cursor: pointer;
 }
 
 /* -------------------- Pie de página -------------------- */
 .pie-pagina {
-  background-color: var(--color-pino-oscuro);
-  color: var(--color-hueso);
+  background-color: var(--tinta);
+  color: #DCE6F0;
   margin-top: var(--espacio-xxl);
-  border-top: 4px solid var(--color-salvia);
 }
 
 .pie-pagina .contenedor {
-  padding-block: var(--espacio-lg);
+  padding-block: 1.75rem;
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
-  gap: var(--espacio-md);
+  gap: 0.75rem 1.5rem;
   font-size: var(--tamano-pequeno);
 }
 
 .pie-pagina a {
-  color: var(--color-hueso);
+  color: #DCE6F0;
 }
 
 .pie-pagina a:hover {
-  color: var(--color-salvia-suave);
+  color: var(--blanco);
+}
+
+.pie-pagina a:focus-visible {
+  outline-color: var(--blanco);
 }
 
 /* -------------------- Secciones generales -------------------- */
 .seccion {
   padding-block: var(--espacio-xl);
-  border-bottom: 1px solid var(--color-borde);
-}
-
-.seccion:last-of-type {
-  border-bottom: none;
 }
 
 /* -------------------- Utilidades de cuadrícula -------------------- */
@@ -172,12 +178,8 @@ main {
   }
 }
 
-/* -------------------- Comportamiento responsive del menú -------------------- */
+/* -------------------- Menú en pantallas angostas -------------------- */
 @media (max-width: 45rem) {
-  .contenedor {
-    padding-inline: var(--espacio-sm);
-  }
-
   .seccion {
     padding-block: var(--espacio-lg);
   }
@@ -186,32 +188,24 @@ main {
     display: inline-block;
   }
 
-  .encabezado .contenedor {
+  .nav-principal {
     position: relative;
   }
 
+  /* Panel desplegado sobre papel, como una hoja suelta */
   .nav-principal__enlaces {
     display: none;
     position: absolute;
-    top: 100%;
-    left: 0;
+    top: calc(100% + 0.5rem);
     right: 0;
+    z-index: 5;
     flex-direction: column;
-    gap: 0.25rem;
-    background-color: var(--color-pino);
-    padding: var(--espacio-sm);
-    border-top: 1px solid rgba(255, 253, 249, 0.12);
-    box-shadow: 0 12px 24px rgba(18, 39, 35, 0.25);
-  }
-
-  .nav-principal__enlaces a {
+    min-width: 13rem;
+    padding: 0.5rem;
+    background-color: var(--papel);
+    border: 2px solid var(--tinta);
     border-radius: var(--radio-borde);
-    padding: 0.7rem 0.9rem;
-    font-size: var(--tamano-texto);
-  }
-
-  .nav-principal {
-    position: static;
+    box-shadow: var(--sombra-menu);
   }
 
   /* Clase que se activa mediante JavaScript (navegacion.js) */
